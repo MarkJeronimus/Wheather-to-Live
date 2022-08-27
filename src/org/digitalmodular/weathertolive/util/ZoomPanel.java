@@ -288,6 +288,29 @@ public class ZoomPanel extends JPanel implements MouseListener,
 			int visibleImageWidth  = (getWidth() + blockSize) / blockSize;
 			int visibleImageHeight = (getHeight() + blockSize) / blockSize;
 
+			// Clip "invisible" portion if image is partially in frame
+			if (ul.x < 0) {
+				x -= ul.x * blockSize;
+				visibleImageWidth += ul.x;
+				ul.x = 0;
+			}
+
+			if (ul.y < 0) {
+				y -= ul.y * blockSize;
+				visibleImageHeight += ul.y;
+				ul.y = 0;
+			}
+
+			int excess = ul.x + visibleImageWidth - imageWidth;
+			if (excess > 0) {
+				visibleImageWidth -= excess;
+			}
+
+			excess = ul.y + visibleImageHeight - imageHeight;
+			if (excess > 0) {
+				visibleImageHeight -= excess;
+			}
+
 			g.drawImage(image,
 			            x,
 			            y,

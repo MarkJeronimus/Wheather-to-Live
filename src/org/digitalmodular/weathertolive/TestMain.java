@@ -83,7 +83,7 @@ public class TestMain extends ZoomPanel {
 		if (dataBuffer instanceof DataBufferShort) {
 			short[] shorts = ((DataBufferShort)dataBuffer).getData();
 
-			for (int i = 0; i < shorts.length; i++) {
+			for (int i = 0; i < ints.length; i++) {
 				if (shorts[i] == -32768) {
 					ints[i] = 0x001020;
 				} else {
@@ -94,7 +94,7 @@ public class TestMain extends ZoomPanel {
 		} else if (dataBuffer instanceof DataBufferFloat) {
 			float[] floats = ((DataBufferFloat)dataBuffer).getData();
 
-			for (int i = 0; i < floats.length; i++) {
+			for (int i = 0; i < ints.length; i++) {
 				if (floats[i] < 1.0e-10f) {
 					ints[i] = 0x001020;
 				} else {
