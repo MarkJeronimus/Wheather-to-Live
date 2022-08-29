@@ -26,7 +26,7 @@
  */
 package org.digitalmodular.weathertolive.dataset;
 
-import org.digitalmodular.weathertolive.util.NumberUtilities;
+import org.digitalmodular.weathertolive.util.RangeF;
 import static org.digitalmodular.weathertolive.util.ValidatorUtilities.requireAtLeast;
 import static org.digitalmodular.weathertolive.util.ValidatorUtilities.requireNonNull;
 import static org.digitalmodular.weathertolive.util.ValidatorUtilities.requireThat;
@@ -41,11 +41,15 @@ public class Dataset {
 	private final int     width;
 	private final int     height;
 	private final float[] rawData;
+	private final RangeF  minMax;
 
 	private float[] data;
 	private boolean dirty = true;
 
-	protected Dataset(float[] rawData, int width, int height) {
+	/**
+	 * @param absoluteZero Whether the values start at 0 or can go negative (should find minimum)
+	 */
+	protected Dataset(float[] rawData, int width, int height, boolean absoluteZero) {
 		this.rawData = requireNonNull(rawData, "rawData");
 		this.width = requireAtLeast(360, width, "width");
 		this.height = requireAtLeast(180, height, "height");
@@ -54,7 +58,32 @@ public class Dataset {
 		                                              rawData.length + ", " + width + " * " + height +
 		                                              " (" + width * height + ')');
 
+		minMax = findMinMax(rawData, absoluteZero);
+
 		data = new float[rawData.length];
+	}
+
+	private static RangeF findMinMax(float[] rawData, boolean absoluteZero) {
+		float min = Float.POSITIVE_INFINITY;
+		float max = Float.NEGATIVE_INFINITY;
+
+		for (float value : rawData) {
+			if (!Float.isNaN(value)) {
+				min = Math.min(min, value);
+				max = Math.max(max, value);
+			}
+		}
+
+		if (absoluteZero) {
+			if (min < 0.0f) {
+				throw new AssertionError("Dataset that should be 'absoluteZero' has negative minimum: [" +
+				                         min + ", " + max + ']');
+			}
+
+			min = 0.0f;
+		}
+
+		return RangeF.of(min, max);
 	}
 
 	protected void markDirty() {
@@ -69,11 +98,16 @@ public class Dataset {
 		return height;
 	}
 
+	public RangeF getMinMax() {
+		return minMax;
+	}
+
 	/**
 	 * Returns a view into the (mutable!) internal data.
 	 * <p>
 	 * This data in this view is regenerated every time a parameter is changed.
 	 */
+	@SuppressWarnings("AssignmentOrReturnOfFieldWithMutableType")
 	public float[] getData() {
 		if (dirty) {
 			regenerate();
@@ -85,7 +119,7 @@ public class Dataset {
 
 	protected void regenerate() {
 		for (int i = 0; i < rawData.length; i++) {
-			data[i] = NumberUtilities.clamp(rawData[i] / 50.0f, 0.0f, 1.0f);
+			data[i] = minMax.unLerp(rawData[i]);
 		}
 	}
 }

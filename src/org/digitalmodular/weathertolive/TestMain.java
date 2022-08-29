@@ -52,7 +52,7 @@ public class TestMain extends ZoomPanel {
 	public static void main(String... args) throws IOException {
 //		downloadDataSet("wc2.1_10m_tmax.zip");
 
-		Dataset dataSet = WorldClimDatasetFactory.createFor("wc2.1_10m_tmax.zip");
+		Dataset dataSet = WorldClimDatasetFactory.createFor("wc2.1_10m_prec.zip", true);
 
 		BufferedImage image = makeImage(dataSet);
 
