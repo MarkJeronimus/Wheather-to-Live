@@ -75,7 +75,7 @@ public final class WorldClimDatasetFactory {
 		float[] rawData = new float[floats.length];
 
 		for (int i = 0; i < rawData.length; i++) {
-			if (floats[i] < 1.0e-10f) {
+			if (floats[i] < -1.0e+5f) {
 				rawData[i] = Float.NaN;
 			} else {
 				rawData[i] = floats[i];
