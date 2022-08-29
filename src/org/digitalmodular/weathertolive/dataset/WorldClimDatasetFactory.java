@@ -34,8 +34,11 @@ import java.awt.image.DataBufferUShort;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 import javax.imageio.ImageIO;
+
+import org.jetbrains.annotations.Nullable;
 
 /**
  * @author Mark Jeronimus
@@ -50,13 +53,33 @@ public final class WorldClimDatasetFactory {
 	 * @param absoluteZero Whether the values start at 0 or can go negative (should find minimum)
 	 */
 	public static Dataset createFor(String filename, boolean absoluteZero) throws IOException {
+		String prefix = filename.substring(0, 14); // e.g. "wc2.1_10m_prec"
+
 		try (ZipFile zip = new ZipFile(new File(filename))) {
-			InputStream   inputStream = zip.getInputStream(zip.getEntry("wc2.1_10m_prec_01.tif"));
-			BufferedImage geoData     = ImageIO.read(inputStream);
+			float[][] rawData = new float[12][];
 
-			float[] rawData = convertGeoTiffToRawData(geoData);
+			int width  = 0;
+			int height = 0;
 
-			return new Dataset(rawData, geoData.getWidth(), geoData.getHeight(), absoluteZero);
+			for (int month = 0; month < 12; month++) {
+				String count = Integer.toString(month + 1);
+				String pad   = "0".repeat(2 - count.length());
+
+				String             tifFilename = prefix + '_' + pad + count + ".tif";
+				@Nullable ZipEntry zipEntry    = zip.getEntry(tifFilename);
+				if (zipEntry == null) {
+					throw new IOException(tifFilename + " not found in " + filename);
+				}
+
+				InputStream   inputStream = zip.getInputStream(zipEntry);
+				BufferedImage geoData     = ImageIO.read(inputStream);
+				width = geoData.getWidth();
+				height = geoData.getHeight();
+
+				rawData[month] = convertGeoTiffToRawData(geoData);
+			}
+
+			return new Dataset(rawData, width, height, absoluteZero);
 		}
 	}
 

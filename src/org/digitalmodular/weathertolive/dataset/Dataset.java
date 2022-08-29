@@ -27,6 +27,7 @@
 package org.digitalmodular.weathertolive.dataset;
 
 import org.digitalmodular.weathertolive.util.RangeF;
+import static org.digitalmodular.weathertolive.util.ValidatorUtilities.requireArrayLengthExactly;
 import static org.digitalmodular.weathertolive.util.ValidatorUtilities.requireAtLeast;
 import static org.digitalmodular.weathertolive.util.ValidatorUtilities.requireNonNull;
 import static org.digitalmodular.weathertolive.util.ValidatorUtilities.requireThat;
@@ -38,39 +39,44 @@ import static org.digitalmodular.weathertolive.util.ValidatorUtilities.requireTh
 public class Dataset {
 	public static final int SEA_BLUE = 0x001020;
 
-	private final int     width;
-	private final int     height;
-	private final float[] rawData;
-	private final RangeF  minMax;
+	private final int       width;
+	private final int       height;
+	private final float[][] rawData;
+	private final RangeF    minMax;
 
-	private float[] data;
-	private boolean dirty = true;
+	private final float[][] data;
+	private       boolean   dirty = true;
 
 	/**
 	 * @param absoluteZero Whether the values start at 0 or can go negative (should find minimum)
 	 */
-	protected Dataset(float[] rawData, int width, int height, boolean absoluteZero) {
+	protected Dataset(float[][] rawData, int width, int height, boolean absoluteZero) {
 		this.rawData = requireNonNull(rawData, "rawData");
+		requireArrayLengthExactly(12, rawData, "rawData");
 		this.width = requireAtLeast(360, width, "width");
 		this.height = requireAtLeast(180, height, "height");
 		requireThat(width == height * 2, "'width' should be double 'height': " + width + ", " + height);
-		requireThat(rawData.length == width * height, "'rawData.length' should equal 'width' * 'height': " +
-		                                              rawData.length + ", " + width + " * " + height +
-		                                              " (" + width * height + ')');
+		for (int month = 0; month < 12; month++) {
+			requireThat(rawData[month].length == width * height,
+			            "'rawData[" + month + "].length' should equal 'width' * 'height': " +
+			            rawData[month].length + ", " + width + " * " + height + " (" + width * height + ')');
+		}
 
 		minMax = findMinMax(rawData, absoluteZero);
 
-		data = new float[rawData.length];
+		data = new float[12][rawData[0].length];
 	}
 
-	private static RangeF findMinMax(float[] rawData, boolean absoluteZero) {
+	private static RangeF findMinMax(float[][] rawData, boolean absoluteZero) {
 		float min = Float.POSITIVE_INFINITY;
 		float max = Float.NEGATIVE_INFINITY;
 
-		for (float value : rawData) {
-			if (!Float.isNaN(value)) {
-				min = Math.min(min, value);
-				max = Math.max(max, value);
+		for (int month = 0; month < 12; month++) {
+			for (float value : rawData[month]) {
+				if (!Float.isNaN(value)) {
+					min = Math.min(min, value);
+					max = Math.max(max, value);
+				}
 			}
 		}
 
@@ -105,10 +111,12 @@ public class Dataset {
 	/**
 	 * Returns a view into the (mutable!) internal data.
 	 * <p>
+	 * The array has dimensions [month 0..12][pixel 0..width*height].
+	 * <p>
 	 * This data in this view is regenerated every time a parameter is changed.
 	 */
 	@SuppressWarnings("AssignmentOrReturnOfFieldWithMutableType")
-	public float[] getData() {
+	public float[][] getData() {
 		if (dirty) {
 			regenerate();
 			dirty = false;
@@ -118,8 +126,13 @@ public class Dataset {
 	}
 
 	protected void regenerate() {
-		for (int i = 0; i < rawData.length; i++) {
-			data[i] = minMax.unLerp(rawData[i]);
+		for (int month = 0; month < 12; month++) {
+			float[] rawMonthData = rawData[month];
+			float[] monthData    = data[month];
+
+			for (int i = 0; i < rawMonthData.length; i++) {
+				monthData[i] = minMax.unLerp(rawMonthData[i]);
+			}
 		}
 	}
 }

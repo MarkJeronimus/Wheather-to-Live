@@ -81,7 +81,7 @@ public class TestMain extends ZoomPanel {
 		BufferedImage image  = new BufferedImage(dataSet.getWidth(), dataSet.getHeight(), BufferedImage.TYPE_INT_RGB);
 		int[]         pixels = ((DataBufferInt)image.getRaster().getDataBuffer()).getData();
 
-		float[] data = dataSet.getData();
+		float[] data = dataSet.getData()[0];
 		for (int i = 0; i < data.length; i++) {
 			if (Float.isNaN(data[i])) {
 				pixels[i] = Dataset.SEA_BLUE;
