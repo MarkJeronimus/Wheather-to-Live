@@ -83,7 +83,11 @@ public class TestMain extends ZoomPanel {
 
 		float[] data = dataSet.getData();
 		for (int i = 0; i < data.length; i++) {
-			pixels[i] = NumberUtilities.clamp((int)(data[i] * 255), 0, 255) * 0x010101;
+			if (Float.isNaN(data[i])) {
+				pixels[i] = Dataset.SEA_BLUE;
+			} else {
+				pixels[i] = NumberUtilities.clamp((int)(data[i] * 255), 0, 255) * 0x010101;
+			}
 		}
 
 		return image;
