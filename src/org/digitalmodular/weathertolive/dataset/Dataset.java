@@ -28,6 +28,7 @@ package org.digitalmodular.weathertolive.dataset;
 
 import org.digitalmodular.weathertolive.util.NumberUtilities;
 import static org.digitalmodular.weathertolive.util.ValidatorUtilities.requireAtLeast;
+import static org.digitalmodular.weathertolive.util.ValidatorUtilities.requireNonNull;
 import static org.digitalmodular.weathertolive.util.ValidatorUtilities.requireThat;
 
 /**
@@ -39,18 +40,21 @@ public class Dataset {
 
 	private final int     width;
 	private final int     height;
-	protected     float[] rawData;
+	private final float[] rawData;
 
 	private float[] data;
 	private boolean dirty = true;
 
-	protected Dataset(int width, int height) {
+	protected Dataset(float[] rawData, int width, int height) {
+		this.rawData = requireNonNull(rawData, "rawData");
 		this.width = requireAtLeast(360, width, "width");
 		this.height = requireAtLeast(180, height, "height");
 		requireThat(width == height * 2, "'width' should be double 'height': " + width + ", " + height);
+		requireThat(rawData.length == width * height, "'rawData.length' should equal 'width' * 'height': " +
+		                                              rawData.length + ", " + width + " * " + height +
+		                                              " (" + width * height + ')');
 
-		rawData = new float[width * height];
-		data = new float[width * height];
+		data = new float[rawData.length];
 	}
 
 	protected void markDirty() {

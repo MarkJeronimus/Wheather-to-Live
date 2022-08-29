@@ -58,21 +58,21 @@ public final class WorldClimDatasetFactory {
 	private static Dataset convertGeoDataToImage(BufferedImage geoData) {
 		DataBuffer dataBuffer = geoData.getRaster().getDataBuffer();
 
-		Dataset dataset = new Dataset(geoData.getWidth(), geoData.getHeight());
-
 		if (dataBuffer instanceof DataBufferFloat) {
-			fromFloatDataSet((DataBufferFloat)dataBuffer, dataset.rawData);
+			return fromFloatDataSet(geoData, (DataBufferFloat)dataBuffer);
 		} else if (dataBuffer instanceof DataBufferShort) {
-			fromShortDataSet((DataBufferShort)dataBuffer, dataset.rawData);
+			return fromShortDataSet(geoData, (DataBufferShort)dataBuffer);
 		} else if (dataBuffer instanceof DataBufferUShort) {
-			fromUShortDataSet((DataBufferUShort)dataBuffer, dataset.rawData);
+			return fromUShortDataSet(geoData, (DataBufferUShort)dataBuffer);
+		} else {
+			throw new UnsupportedOperationException("unimplemented TIFF dataBuffer format: " +
+			                                        dataBuffer.getClass().getSimpleName());
 		}
-
-		return dataset;
 	}
 
-	private static void fromFloatDataSet(DataBufferFloat dataBuffer, float[] rawData) {
-		float[] floats = dataBuffer.getData();
+	private static Dataset fromFloatDataSet(BufferedImage geoData, DataBufferFloat dataBuffer) {
+		float[] floats  = dataBuffer.getData();
+		float[] rawData = new float[floats.length];
 
 		for (int i = 0; i < rawData.length; i++) {
 			if (floats[i] < 1.0e-10f) {
@@ -81,10 +81,13 @@ public final class WorldClimDatasetFactory {
 				rawData[i] = floats[i];
 			}
 		}
+
+		return new Dataset(rawData, geoData.getWidth(), geoData.getHeight());
 	}
 
-	private static void fromUShortDataSet(DataBufferUShort dataBuffer, float[] rawData) {
-		short[] shorts = dataBuffer.getData();
+	private static Dataset fromUShortDataSet(BufferedImage geoData, DataBufferUShort dataBuffer) {
+		short[] shorts  = dataBuffer.getData();
+		float[] rawData = new float[shorts.length];
 
 		for (int i = 0; i < rawData.length; i++) {
 			if (shorts[i] == -1) {
@@ -93,10 +96,13 @@ public final class WorldClimDatasetFactory {
 				rawData[i] = (shorts[i] & 0xFFFF) / 256.0f;
 			}
 		}
+
+		return new Dataset(rawData, geoData.getWidth(), geoData.getHeight());
 	}
 
-	private static void fromShortDataSet(DataBufferShort dataBuffer, float[] rawData) {
-		short[] shorts = dataBuffer.getData();
+	private static Dataset fromShortDataSet(BufferedImage geoData, DataBufferShort dataBuffer) {
+		short[] shorts  = dataBuffer.getData();
+		float[] rawData = new float[shorts.length];
 
 		for (int i = 0; i < rawData.length; i++) {
 			if (shorts[i] == -32768) {
@@ -105,5 +111,7 @@ public final class WorldClimDatasetFactory {
 				rawData[i] = (shorts[i]) / 2.0f;
 			}
 		}
+
+		return new Dataset(rawData, geoData.getWidth(), geoData.getHeight());
 	}
 }
