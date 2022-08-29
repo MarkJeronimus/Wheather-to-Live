@@ -27,9 +27,9 @@
 package org.digitalmodular.weathertolive;
 
 import java.awt.Color;
-import java.awt.Dimension;
 import java.awt.image.BufferedImage;
 import java.awt.image.DataBufferInt;
+import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 import java.nio.file.Path;
@@ -45,8 +45,8 @@ import org.digitalmodular.utilities.graphics.image.AnimationFrame;
 import org.digitalmodular.weathertolive.dataset.Dataset;
 import org.digitalmodular.weathertolive.dataset.WorldClimDatasetFactory;
 import org.digitalmodular.weathertolive.util.AnimationZoomPanel;
+import org.digitalmodular.weathertolive.util.ColorGradient;
 import org.digitalmodular.weathertolive.util.HTTPDownloader;
-import org.digitalmodular.weathertolive.util.NumberUtilities;
 
 /**
  * @author Mark Jeronimus
@@ -81,8 +81,10 @@ public class TestMain extends AnimationZoomPanel {
 		httpDownloader.downloadToFile(url, null, file);
 	}
 
-	private static List<AnimationFrame> makeSequence(Dataset dataSet) {
+	private static List<AnimationFrame> makeSequence(Dataset dataSet) throws IOException {
 		float[][] monthlyData = dataSet.getData();
+
+		ColorGradient gradient = new ColorGradient(new File("Inferno-mod.png"));
 
 		List<AnimationFrame> sequence = new ArrayList<>(12);
 
@@ -98,7 +100,7 @@ public class TestMain extends AnimationZoomPanel {
 				if (Float.isNaN(data[i])) {
 					pixels[i] = Dataset.SEA_BLUE;
 				} else {
-					pixels[i] = NumberUtilities.clamp((int)(data[i] * 255), 0, 255) * 0x010101;
+					pixels[i] = gradient.getColor(data[i]);
 				}
 			}
 
