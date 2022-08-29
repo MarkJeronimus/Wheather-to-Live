@@ -54,26 +54,28 @@ public final class WorldClimDatasetFactory {
 			InputStream   inputStream = zip.getInputStream(zip.getEntry("wc2.1_10m_prec_01.tif"));
 			BufferedImage geoData     = ImageIO.read(inputStream);
 
-			return convertGeoDataToImage(geoData, absoluteZero);
+			float[] rawData = convertGeoTiffToRawData(geoData);
+
+			return new Dataset(rawData, geoData.getWidth(), geoData.getHeight(), absoluteZero);
 		}
 	}
 
-	private static Dataset convertGeoDataToImage(BufferedImage geoData, boolean absoluteZero) {
+	private static float[] convertGeoTiffToRawData(BufferedImage geoData) {
 		DataBuffer dataBuffer = geoData.getRaster().getDataBuffer();
 
 		if (dataBuffer instanceof DataBufferFloat) {
-			return fromFloatDataSet(geoData, absoluteZero, (DataBufferFloat)dataBuffer);
+			return fromFloatDataSet((DataBufferFloat)dataBuffer);
 		} else if (dataBuffer instanceof DataBufferShort) {
-			return fromShortDataSet(geoData, absoluteZero, (DataBufferShort)dataBuffer);
+			return fromShortDataSet((DataBufferShort)dataBuffer);
 		} else if (dataBuffer instanceof DataBufferUShort) {
-			return fromUShortDataSet(geoData, absoluteZero, (DataBufferUShort)dataBuffer);
+			return fromUShortDataSet((DataBufferUShort)dataBuffer);
 		} else {
 			throw new UnsupportedOperationException("unimplemented TIFF dataBuffer format: " +
 			                                        dataBuffer.getClass().getSimpleName());
 		}
 	}
 
-	private static Dataset fromFloatDataSet(BufferedImage geoData, boolean absoluteZero, DataBufferFloat dataBuffer) {
+	private static float[] fromFloatDataSet(DataBufferFloat dataBuffer) {
 		float[] floats  = dataBuffer.getData();
 		float[] rawData = new float[floats.length];
 
@@ -85,10 +87,10 @@ public final class WorldClimDatasetFactory {
 			}
 		}
 
-		return new Dataset(rawData, geoData.getWidth(), geoData.getHeight(), absoluteZero);
+		return rawData;
 	}
 
-	private static Dataset fromUShortDataSet(BufferedImage geoData, boolean absoluteZero, DataBufferUShort dataBuffer) {
+	private static float[] fromUShortDataSet(DataBufferUShort dataBuffer) {
 		short[] shorts  = dataBuffer.getData();
 		float[] rawData = new float[shorts.length];
 
@@ -100,10 +102,10 @@ public final class WorldClimDatasetFactory {
 			}
 		}
 
-		return new Dataset(rawData, geoData.getWidth(), geoData.getHeight(), absoluteZero);
+		return rawData;
 	}
 
-	private static Dataset fromShortDataSet(BufferedImage geoData, boolean absoluteZero, DataBufferShort dataBuffer) {
+	private static float[] fromShortDataSet(DataBufferShort dataBuffer) {
 		short[] shorts  = dataBuffer.getData();
 		float[] rawData = new float[shorts.length];
 
@@ -115,6 +117,6 @@ public final class WorldClimDatasetFactory {
 			}
 		}
 
-		return new Dataset(rawData, geoData.getWidth(), geoData.getHeight(), absoluteZero);
+		return rawData;
 	}
 }
