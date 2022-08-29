@@ -67,9 +67,6 @@ public class ZoomPanel extends JPanel implements MouseListener,
 	private boolean centered                 = true;
 	private int     offsetX                  = 0;
 	private int     offsetY                  = 0;
-	private int     remainingAnimationFrames = 0;
-	private int     newCenterX               = 0;
-	private int     newCenterY               = 0;
 
 	private int mouseX = 0;
 	private int mouseY = 0;
@@ -104,7 +101,6 @@ public class ZoomPanel extends JPanel implements MouseListener,
 			setPreferredSize(new Dimension(image.getWidth(), image.getHeight()));
 		}
 
-		resetZoom();
 		repaint();
 	}
 
@@ -136,7 +132,6 @@ public class ZoomPanel extends JPanel implements MouseListener,
 	}
 
 	public void resetZoom() {
-		stopAnimation();
 		offsetX = 0;
 		offsetY = 0;
 		zoom = 0;
@@ -186,43 +181,6 @@ public class ZoomPanel extends JPanel implements MouseListener,
 		offsetY = displayHeight / 2 - multiplyByZoom(y);
 
 		repaint();
-	}
-
-	public void startAnimation(int x, int y, int numSteps) {
-		if (image == null) {
-			return;
-		}
-
-		centered = false;
-
-		int imageWidth  = image.getWidth();
-		int imageHeight = image.getHeight();
-
-		int displayWidth  = multiplyByZoom(imageWidth);
-		int displayHeight = multiplyByZoom(imageHeight);
-
-		newCenterX = displayWidth / 2 - multiplyByZoom(x);
-		newCenterY = displayHeight / 2 - multiplyByZoom(y);
-
-		remainingAnimationFrames = numSteps;
-	}
-
-	public void animate() {
-		if (remainingAnimationFrames <= 0) {
-			return;
-		}
-
-		int dx = newCenterX - offsetX;
-		int dy = newCenterY - offsetY;
-		offsetX += (int)(dx / (double)remainingAnimationFrames);
-		offsetY += (int)(dy / (double)remainingAnimationFrames);
-		remainingAnimationFrames--;
-
-		repaint();
-	}
-
-	public void stopAnimation() {
-		remainingAnimationFrames = 0;
 	}
 
 	public int multiplyByZoom(int value) {
@@ -333,6 +291,7 @@ public class ZoomPanel extends JPanel implements MouseListener,
 	}
 
 	@Override
+	@SuppressWarnings("deprecation")
 	public void mousePressed(MouseEvent e) {
 		requestFocus();
 
@@ -363,6 +322,7 @@ public class ZoomPanel extends JPanel implements MouseListener,
 	}
 
 	@Override
+	@SuppressWarnings("deprecation")
 	public void mouseReleased(MouseEvent e) {
 		if (image == null) {
 			return;
@@ -386,6 +346,7 @@ public class ZoomPanel extends JPanel implements MouseListener,
 	}
 
 	@Override
+	@SuppressWarnings("deprecation")
 	public void mouseClicked(MouseEvent e) {
 		if (image == null) {
 			return;
@@ -410,6 +371,7 @@ public class ZoomPanel extends JPanel implements MouseListener,
 	}
 
 	@Override
+	@SuppressWarnings("deprecation")
 	public void mouseMoved(MouseEvent e) {
 		if (image == null) {
 			return;
@@ -432,6 +394,7 @@ public class ZoomPanel extends JPanel implements MouseListener,
 	}
 
 	@Override
+	@SuppressWarnings("deprecation")
 	public void mouseDragged(MouseEvent e) {
 		if (image == null) {
 			return;
@@ -519,11 +482,9 @@ public class ZoomPanel extends JPanel implements MouseListener,
 		// o += mouse // move: origin back to mouse position
 		// Because of integer arithmetic: Grow before shrinking.
 		if (-oldZoom > zoom) {
-			stopAnimation();
 			offsetX = multiplyByZoom(multiplyByZoom(offsetX - mouseX, -oldZoom)) + mouseX;
 			offsetY = multiplyByZoom(multiplyByZoom(offsetY - mouseY, -oldZoom)) + mouseY;
 		} else {
-			stopAnimation();
 			offsetX = multiplyByZoom(multiplyByZoom(offsetX - mouseX), -oldZoom) + mouseX;
 			offsetY = multiplyByZoom(multiplyByZoom(offsetY - mouseY), -oldZoom) + mouseY;
 		}

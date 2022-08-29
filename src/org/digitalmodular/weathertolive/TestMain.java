@@ -34,33 +34,37 @@ import java.io.IOException;
 import java.net.URL;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.List;
 import javax.swing.JFrame;
 import javax.swing.SwingUtilities;
 import javax.swing.WindowConstants;
 
+import org.digitalmodular.utilities.graphics.image.AnimationFrame;
+
 import org.digitalmodular.weathertolive.dataset.Dataset;
 import org.digitalmodular.weathertolive.dataset.WorldClimDatasetFactory;
+import org.digitalmodular.weathertolive.util.AnimationZoomPanel;
 import org.digitalmodular.weathertolive.util.HTTPDownloader;
 import org.digitalmodular.weathertolive.util.NumberUtilities;
-import org.digitalmodular.weathertolive.util.ZoomPanel;
 
 /**
  * @author Mark Jeronimus
  */
 // Created 2022-08-26
-public class TestMain extends ZoomPanel {
+public class TestMain extends AnimationZoomPanel {
 	public static void main(String... args) throws IOException {
 //		downloadDataSet("wc2.1_10m_tmax.zip");
 
-		Dataset dataSet = WorldClimDatasetFactory.createFor("wc2.1_10m_prec.zip", true);
+		Dataset dataSet = WorldClimDatasetFactory.createFor("wc2.1_10m_wind.zip", true);
 
-		BufferedImage image = makeImage(dataSet);
+		List<AnimationFrame> sequence = makeSequence(dataSet);
 
 		SwingUtilities.invokeLater(() -> {
 			JFrame f = new JFrame();
 			f.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
 
-			f.setContentPane(new TestMain(image));
+			f.setContentPane(new TestMain(sequence));
 
 			f.pack();
 			f.setLocationRelativeTo(null);
@@ -77,26 +81,38 @@ public class TestMain extends ZoomPanel {
 		httpDownloader.downloadToFile(url, null, file);
 	}
 
-	private static BufferedImage makeImage(Dataset dataSet) {
-		BufferedImage image  = new BufferedImage(dataSet.getWidth(), dataSet.getHeight(), BufferedImage.TYPE_INT_RGB);
-		int[]         pixels = ((DataBufferInt)image.getRaster().getDataBuffer()).getData();
+	private static List<AnimationFrame> makeSequence(Dataset dataSet) {
+		float[][] monthlyData = dataSet.getData();
 
-		float[] data = dataSet.getData()[0];
-		for (int i = 0; i < data.length; i++) {
-			if (Float.isNaN(data[i])) {
-				pixels[i] = Dataset.SEA_BLUE;
-			} else {
-				pixels[i] = NumberUtilities.clamp((int)(data[i] * 255), 0, 255) * 0x010101;
+		List<AnimationFrame> sequence = new ArrayList<>(12);
+
+		for (int month = 0; month < 12; month++) {
+			BufferedImage image = new BufferedImage(dataSet.getWidth(),
+			                                        dataSet.getHeight(),
+			                                        BufferedImage.TYPE_INT_RGB);
+			int[] pixels = ((DataBufferInt)image.getRaster().getDataBuffer()).getData();
+
+			float[] data = monthlyData[month];
+
+			for (int i = 0; i < data.length; i++) {
+				if (Float.isNaN(data[i])) {
+					pixels[i] = Dataset.SEA_BLUE;
+				} else {
+					pixels[i] = NumberUtilities.clamp((int)(data[i] * 255), 0, 255) * 0x010101;
+				}
 			}
+
+			sequence.add(new AnimationFrame(image, 1_500_000_000 / 12));
 		}
 
-		return image;
+		return sequence;
 	}
 
-	public TestMain(BufferedImage image) {
-		setPreferredSize(new Dimension(image.getWidth(), image.getHeight()));
+	public TestMain(List<AnimationFrame> sequence) {
 		setBackground(Color.BLACK);
-		setImage(image);
-		setZoom(0);
+		setAnimation(sequence);
+		setZoom(-1);
+
+		startAnimation();
 	}
 }
