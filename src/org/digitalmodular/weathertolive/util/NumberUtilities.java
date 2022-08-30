@@ -207,27 +207,29 @@ public final class NumberUtilities {
 
 	public static int bitCount1(int i) {
 		// Java implementation
-		i = i - (i >>> 1 & 0x55555555);
+		i -= (i >>> 1 & 0x55555555);
 		i = (i & 0x33333333) + (i >>> 2 & 0x33333333);
 		i = i + (i >>> 4) & 0x0f0f0f0f;
-		i = i + (i >>> 8);
-		i = i + (i >>> 16);
+		i += (i >>> 8);
+		i += (i >>> 16);
 		return i & 0x3f;
 	}
 
 	public static int bitCount(int i) {
 		// Faster than Java implementation
-		i = i - (i >>> 1 & 0x55555555);
+		i -= (i >>> 1 & 0x55555555);
 		i = (i & 0x33333333) + (i >>> 2 & 0x33333333);
 		i = i + (i >>> 4) & 0x0f0f0f0f;
 		return i * 0x01010101 >>> 24;
 	}
 
 	public static int compareUnsigned(int lhs, int rhs) {
-		if (rhs >= 0 && lhs < 0)
+		if (rhs >= 0 && lhs < 0) {
 			return 1;
-		if (rhs < 0 && lhs >= 0)
+		}
+		if (rhs < 0 && lhs >= 0) {
 			return -1;
+		}
 
 		return Integer.signum(lhs - rhs);
 	}
@@ -287,14 +289,16 @@ public final class NumberUtilities {
 	 */
 	public static int gcd(int a, int b) {
 		// From Wikipedia
-		if (a == 0)
+		if (a == 0) {
 			return b;
+		}
 
 		while (b != 0) {
-			if (a > b)
+			if (a > b) {
 				a -= b;
-			else
+			} else {
 				b -= a;
+			}
 		}
 
 		return a;
@@ -309,14 +313,16 @@ public final class NumberUtilities {
 	 */
 	public static long gcd(long a, long b) {
 		// From Wikipedia
-		if (a == 0)
+		if (a == 0) {
 			return b;
+		}
 
 		while (b != 0) {
-			if (a > b)
+			if (a > b) {
 				a -= b;
-			else
+			} else {
 				b -= a;
+			}
 		}
 
 		return a;
@@ -514,30 +520,36 @@ public final class NumberUtilities {
 	}
 
 	public static int compareNumbers(Number a, Number b) {
-		if ((a instanceof Double || a instanceof Float) && (b instanceof Double || b instanceof Float))
+		if ((a instanceof Double || a instanceof Float) && (b instanceof Double || b instanceof Float)) {
 			return Double.compare(a.doubleValue(), b.doubleValue());
+		}
 
 		// Note UnsignedLong is missing, this's because it's longValue() method is lossy.
 		if ((a instanceof Long || a instanceof Integer || a instanceof Short || a instanceof Byte
 		     || a instanceof AtomicLong || a instanceof AtomicInteger)
 		    && (b instanceof Long || b instanceof Integer || b instanceof Short || b instanceof Byte
-		        || b instanceof AtomicLong || b instanceof AtomicInteger))
+		        || b instanceof AtomicLong || b instanceof AtomicInteger)) {
 			return Long.compare(a.longValue(), b.longValue());
+		}
 
 		// Handle incompatible or larger types with BigDecimals.
 		return toBigDecimal(a).compareTo(toBigDecimal(b));
 	}
 
 	public static BigDecimal toBigDecimal(Number a) {
-		if (a instanceof Float || a instanceof Double)
-			return new BigDecimal(a.doubleValue());
+		if (a instanceof Float || a instanceof Double) {
+			return BigDecimal.valueOf(a.doubleValue());
+		}
 		if (a instanceof Long || a instanceof Integer || a instanceof Short || a instanceof Byte
-		    || a instanceof AtomicLong || a instanceof AtomicInteger)
+		    || a instanceof AtomicLong || a instanceof AtomicInteger) {
 			return new BigDecimal(a.longValue());
-		if (a instanceof BigInteger)
+		}
+		if (a instanceof BigInteger) {
 			return new BigDecimal((BigInteger)a);
-		if (a instanceof BigDecimal)
+		}
+		if (a instanceof BigDecimal) {
 			return (BigDecimal)a;
+		}
 
 		try {
 			return new BigDecimal(a.toString());

@@ -176,9 +176,12 @@ public class ColorGradient {
 
 		int i = 0;
 		for (int x = 0; x < n; x++) {
-			gradient[x][2] = (rgb[i++] & 0xFF) / 255f;
-			gradient[x][1] = (rgb[i++] & 0xFF) / 255f;
-			gradient[x][0] = (rgb[i++] & 0xFF) / 255f;
+			gradient[x][2] = (rgb[i] & 0xFF) / 255.0f;
+			i++;
+			gradient[x][1] = (rgb[i] & 0xFF) / 255.0f;
+			i++;
+			gradient[x][0] = (rgb[i] & 0xFF) / 255.0f;
+			i++;
 		}
 
 		gradient[n] = gradient[n - 1];

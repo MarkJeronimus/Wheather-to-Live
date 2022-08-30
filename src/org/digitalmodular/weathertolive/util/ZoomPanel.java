@@ -64,9 +64,9 @@ public class ZoomPanel extends JPanel implements MouseListener,
 	private int maxZoom = 16;
 	private int zoom    = 0;
 
-	private boolean centered                 = true;
-	private int     offsetX                  = 0;
-	private int     offsetY                  = 0;
+	private boolean centered = true;
+	private int     offsetX  = 0;
+	private int     offsetY  = 0;
 
 	private int mouseX = 0;
 	private int mouseY = 0;

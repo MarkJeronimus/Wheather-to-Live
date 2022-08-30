@@ -26,32 +26,20 @@
  */
 package org.digitalmodular.weathertolive;
 
-import javax.swing.JFrame;
-import javax.swing.SwingUtilities;
-import javax.swing.WindowConstants;
-
-import com.formdev.flatlaf.FlatDarkLaf;
-import com.formdev.flatlaf.FlatLaf;
-import com.jidesoft.plaf.LookAndFeelFactory;
+import java.awt.BorderLayout;
+import javax.swing.JComponent;
+import javax.swing.JPanel;
 
 /**
- * @author author
+ * @author Mark Jeronimus
  */
 // Created 2022-08-30
-public class WeatherToLiveMain {
-	public static void main(String... args) {
-		SwingUtilities.invokeLater(() -> {
-			FlatLaf.setup(new FlatDarkLaf());
-			LookAndFeelFactory.installJideExtension();
+public class RangeSliderWrapper extends JPanel {
+	public RangeSliderWrapper() {
+		super(new BorderLayout());
+	}
 
-			JFrame f = new JFrame();
-			f.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
-
-			f.setContentPane(new WeatherToLivePanel());
-
-			f.pack();
-			f.setLocationRelativeTo(null);
-			f.setVisible(true);
-		});
+	public void init(JComponent c) {
+		add(c, BorderLayout.CENTER);
 	}
 }

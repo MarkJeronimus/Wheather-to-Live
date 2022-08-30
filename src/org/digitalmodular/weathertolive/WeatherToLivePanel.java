@@ -26,12 +26,10 @@
  */
 package org.digitalmodular.weathertolive;
 
-import java.awt.Adjustable;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.DisplayMode;
 import javax.swing.JPanel;
-import javax.swing.JScrollBar;
 
 import org.digitalmodular.weathertolive.util.AnimationZoomPanel;
 import org.digitalmodular.weathertolive.util.GraphicsUtilities;
@@ -41,7 +39,8 @@ import org.digitalmodular.weathertolive.util.GraphicsUtilities;
  */
 // Created 2022-08-30
 public class WeatherToLivePanel extends JPanel {
-	private final AnimationZoomPanel worldPanel = new AnimationZoomPanel();
+	private final AnimationZoomPanel worldPanel     = new AnimationZoomPanel();
+	private final ParameterPanel     parameterPanel = new ParameterPanel();
 
 	@SuppressWarnings("OverridableMethodCallDuringObjectConstruction")
 	public WeatherToLivePanel() {
@@ -51,6 +50,8 @@ public class WeatherToLivePanel extends JPanel {
 		setPreferredSize(new Dimension(displayMode.getWidth() * 3 / 8, displayMode.getHeight() * 3 / 8));
 
 		add(worldPanel, BorderLayout.CENTER);
-		add(new JScrollBar(Adjustable.HORIZONTAL), BorderLayout.SOUTH);
+		add(parameterPanel, BorderLayout.SOUTH);
+
+		parameterPanel.init();
 	}
 }
