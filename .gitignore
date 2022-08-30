@@ -14,8 +14,8 @@
 /dist/
 /history
 /manifest.mf
-/nbproject/genfiles.properties
-/nbproject/private/
+/nbproject/
+/build.xml
 
 #VSCode
 /.history/*
