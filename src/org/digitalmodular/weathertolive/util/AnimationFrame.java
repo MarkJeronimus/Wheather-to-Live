@@ -10,14 +10,14 @@ import static java.util.Objects.requireNonNull;
 // Created 2017-07-18
 public class AnimationFrame {
 	private final BufferedImage image;
-	private final int           durationMillis;
+	private final long          durationNanos;
 
-	public AnimationFrame(BufferedImage image, int durationMillis) {
+	public AnimationFrame(BufferedImage image, long durationNanos) {
 		this.image = requireNonNull(image);
-		this.durationMillis = durationMillis;
+		this.durationNanos = durationNanos;
 
-		if (durationMillis < 1) {
-			throw new IllegalArgumentException("'durationMillis' must be at least 1: " + durationMillis);
+		if (durationNanos < 1) {
+			throw new IllegalArgumentException("'durationNanos' must be at least 1: " + durationNanos);
 		}
 	}
 
@@ -25,8 +25,8 @@ public class AnimationFrame {
 		return image;
 	}
 
-	public int getDurationMillis() {
-		return durationMillis;
+	public long getDurationNanos() {
+		return durationNanos;
 	}
 
 	public Dimension getSize() {
@@ -42,7 +42,7 @@ public class AnimationFrame {
 		}
 
 		AnimationFrame other = (AnimationFrame)o;
-		return getDurationMillis() == other.getDurationMillis() &&
+		return getDurationNanos() == other.getDurationNanos() &&
 		       getImage().equals(other.getImage());
 	}
 
@@ -50,7 +50,7 @@ public class AnimationFrame {
 	public int hashCode() {
 		int hashCode = 0x811C9DC5;
 		hashCode = 0x01000193 * (hashCode ^ image.hashCode());
-		hashCode = 0x01000193 * (hashCode ^ Integer.hashCode(durationMillis));
+		hashCode = 0x01000193 * (hashCode ^ Long.hashCode(durationNanos));
 		return hashCode;
 	}
 }

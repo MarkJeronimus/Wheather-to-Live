@@ -34,8 +34,6 @@ import javax.swing.Timer;
 
 import org.jetbrains.annotations.Nullable;
 
-import org.digitalmodular.utilities.graphics.image.AnimationFrame;
-
 import static org.digitalmodular.weathertolive.util.ValidatorUtilities.requireNullOrNotEmpty;
 
 /**

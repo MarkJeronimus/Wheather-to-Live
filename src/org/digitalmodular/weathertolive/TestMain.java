@@ -40,10 +40,9 @@ import javax.swing.JFrame;
 import javax.swing.SwingUtilities;
 import javax.swing.WindowConstants;
 
-import org.digitalmodular.utilities.graphics.image.AnimationFrame;
-
 import org.digitalmodular.weathertolive.dataset.Dataset;
 import org.digitalmodular.weathertolive.dataset.WorldClimDatasetFactory;
+import org.digitalmodular.weathertolive.util.AnimationFrame;
 import org.digitalmodular.weathertolive.util.AnimationZoomPanel;
 import org.digitalmodular.weathertolive.util.ColorGradient;
 import org.digitalmodular.weathertolive.util.HTTPDownloader;
