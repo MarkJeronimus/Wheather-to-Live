@@ -1,5 +1,5 @@
 /*
- * This file is part of AllUtilities.
+ * This file is part of Weather to Live.
  *
  * Copyleft 2022 Mark Jeronimus. All Rights Reversed.
  *
@@ -324,7 +324,6 @@ public final class ValidatorUtilities {
 
 	public static void requireNullOrLengthAtLeast(int min, @Nullable Object actual, String varName) {
 		if (actual == null) {
-			return;
 		} else if (!actual.getClass().isArray()) {
 			throw new AssertionError(varName + " is not an array");
 		} else if (Array.getLength(actual) < min) {

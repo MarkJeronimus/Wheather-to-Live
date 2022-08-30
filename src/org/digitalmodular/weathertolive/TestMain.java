@@ -1,5 +1,5 @@
 /*
- * This file is part of AllUtilities.
+ * This file is part of Weather to Live.
  *
  * Copyleft 2022 Mark Jeronimus. All Rights Reversed.
  *
