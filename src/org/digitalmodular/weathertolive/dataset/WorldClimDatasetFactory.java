@@ -52,7 +52,7 @@ public final class WorldClimDatasetFactory {
 	/**
 	 * @param absoluteZero Whether the values start at 0 or can go negative (should find minimum)
 	 */
-	public static Dataset createFor(String filename, boolean absoluteZero) throws IOException {
+	public static DataSet createFor(String filename, boolean absoluteZero) throws IOException {
 		String prefix = filename.substring(0, 14); // e.g. "wc2.1_10m_prec"
 
 		try (ZipFile zip = new ZipFile(new File(filename))) {
@@ -79,7 +79,7 @@ public final class WorldClimDatasetFactory {
 				rawData[month] = convertGeoTiffToRawData(geoData);
 			}
 
-			return new Dataset(rawData, width, height, absoluteZero);
+			return new DataSet(rawData, width, height, absoluteZero);
 		}
 	}
 

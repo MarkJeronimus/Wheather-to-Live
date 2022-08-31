@@ -39,7 +39,7 @@ import javax.swing.JPanel;
 import org.jetbrains.annotations.Nullable;
 
 import org.digitalmodular.weathertolive.dataset.ClimateDataSet;
-import org.digitalmodular.weathertolive.dataset.Dataset;
+import org.digitalmodular.weathertolive.dataset.DataSet;
 import org.digitalmodular.weathertolive.util.AnimationFrame;
 import org.digitalmodular.weathertolive.util.AnimationZoomPanel;
 import org.digitalmodular.weathertolive.util.ColorGradient;
@@ -104,7 +104,7 @@ public class WeatherToLivePanel extends JPanel {
 		bottomPanel.setAnimatable(canAnimate); // This will percolate to setAnimated()
 	}
 
-	private List<AnimationFrame> makeAtlasSequence(Dataset dataset) {
+	private List<AnimationFrame> makeAtlasSequence(DataSet dataset) {
 		List<AnimationFrame> atlasSequence = new ArrayList<>(12);
 
 		float[][] monthlyData = dataset.getData();
@@ -119,7 +119,7 @@ public class WeatherToLivePanel extends JPanel {
 
 			for (int i = 0; i < data.length; i++) {
 				if (Float.isNaN(data[i])) {
-					pixels[i] = Dataset.SEA_BLUE;
+					pixels[i] = DataSet.SEA_BLUE;
 				} else if (gradient != null) {
 					pixels[i] = gradient.getColor(data[i]);
 				} else {

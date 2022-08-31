@@ -42,7 +42,7 @@ import static org.digitalmodular.weathertolive.util.ValidatorUtilities.requireTh
  * @author Mark Jeronimus
  */
 // Created 2022-08-28
-public class Dataset {
+public class DataSet {
 	public static final int SEA_BLUE = 0x001020;
 
 	private final int       width;
@@ -56,7 +56,7 @@ public class Dataset {
 	/**
 	 * @param absoluteZero Whether the values start at 0 or can go negative (should find minimum)
 	 */
-	protected Dataset(float[][] rawData, int width, int height, boolean absoluteZero) {
+	protected DataSet(float[][] rawData, int width, int height, boolean absoluteZero) {
 		this.rawData = requireNonNull(rawData, "rawData");
 		requireArrayLengthExactly(12, rawData, "rawData");
 		this.width = requireAtLeast(360, width, "width");

@@ -32,21 +32,21 @@ import java.util.List;
 import static org.digitalmodular.weathertolive.util.ValidatorUtilities.requireSizeAtLeast;
 
 /**
- * Encalsulates a set of {@link Dataset}s for each parameter in the climate data set.
+ * Encalsulates a set of {@link DataSet}s for each parameter in the climate data set.
  *
  * @author Mark Jeronimus
  */
 // Created 2022-08-31
 public class ClimateDataSet {
-	private List<Dataset> datasets;
+	private List<DataSet> dataSets;
 
-	public ClimateDataSet(List<Dataset> datasets) {
-		requireSizeAtLeast(1, datasets, "datasets");
+	public ClimateDataSet(List<DataSet> dataSets) {
+		requireSizeAtLeast(1, dataSets, "datasets");
 
-		this.datasets = Collections.unmodifiableList(datasets);
+		this.dataSets = Collections.unmodifiableList(dataSets);
 	}
 
-	public List<Dataset> getDataSets() {
-		return datasets;
+	public List<DataSet> getDataSets() {
+		return dataSets;
 	}
 }
