@@ -26,47 +26,40 @@
  */
 package org.digitalmodular.weathertolive.util;
 
-import java.awt.Color;
 import java.awt.Dimension;
 import java.util.Dictionary;
 import java.util.Hashtable;
-import javax.swing.BorderFactory;
+import java.util.List;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JSlider;
+
+import static org.digitalmodular.weathertolive.util.ValidatorUtilities.requireSizeAtLeast;
 
 /**
  * @author Mark Jeronimus
  */
 // Created 2022-08-31
-public class MonthSlider extends JSlider {
+public class LabelSlider extends JSlider {
 	@SuppressWarnings("OverridableMethodCallDuringObjectConstruction")
-	public MonthSlider() {
-		super(0, 11);
+	public LabelSlider(List<String> labels) {
+		super(0, requireSizeAtLeast(2, labels, "labels").size() - 1);
 
 		setMajorTickSpacing(1);
 		setPaintTicks(true);
 		setPaintLabels(true);
-		setLabelTable(monthLabels());
+		setLabelTable(makeLabels(labels));
 		setPreferredSize(new Dimension(getPreferredSize().width / 2, getPreferredSize().height));
-		setBorder(BorderFactory.createLineBorder(Color.RED, 1));
 	}
 
-	private static Dictionary<Integer, JComponent> monthLabels() {
+	private static Dictionary<Integer, JComponent> makeLabels(List<String> labels) {
 		@SuppressWarnings("UseOfObsoleteCollectionType")
-		Hashtable<Integer, JComponent> monthLabels = new Hashtable<>(12);
-		monthLabels.put(0, smallLabel("j"));
-		monthLabels.put(1, smallLabel("f"));
-		monthLabels.put(2, smallLabel("m"));
-		monthLabels.put(3, smallLabel("a"));
-		monthLabels.put(4, smallLabel("m"));
-		monthLabels.put(5, smallLabel("j"));
-		monthLabels.put(6, smallLabel("j"));
-		monthLabels.put(7, smallLabel("a"));
-		monthLabels.put(8, smallLabel("s"));
-		monthLabels.put(9, smallLabel("o"));
-		monthLabels.put(10, smallLabel("n"));
-		monthLabels.put(11, smallLabel("d"));
+		Hashtable<Integer, JComponent> monthLabels = new Hashtable<>(labels.size());
+
+		for (int i = 0; i < labels.size(); i++) {
+			monthLabels.put(i, smallLabel(labels.get(i)));
+		}
+
 		return monthLabels;
 	}
 

@@ -27,14 +27,18 @@
 package org.digitalmodular.weathertolive;
 
 import java.awt.BorderLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.util.Arrays;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JPanel;
 import javax.swing.JSlider;
+import javax.swing.event.ChangeEvent;
 
+import org.digitalmodular.weathertolive.util.LabelSlider;
 import org.digitalmodular.weathertolive.util.ListPanel;
-import org.digitalmodular.weathertolive.util.MonthSlider;
 
 /**
  * @author Mark Jeronimus
@@ -48,7 +52,8 @@ public class BottomPanel extends JPanel {
 	private final JButton   saveButton          = new JButton("Save");
 	private final JCheckBox fastPreviewCheckbox = new JCheckBox("Fast previewing");
 	private final JCheckBox animateCheckbox     = new JCheckBox("Animate");
-	private final JSlider   monthSlider         = new MonthSlider();
+	private final JSlider   monthSlider         = new LabelSlider(Arrays.asList(
+			"j", "f", "m", "a", "m", "j", "j", "a", "s", "o", "n", "d"));
 
 	private final JPanel parametersPanel = new ListPanel(BoxLayout.X_AXIS, SPACING);
 
@@ -57,6 +62,11 @@ public class BottomPanel extends JPanel {
 		super(new BorderLayout());
 		setOpaque(true);
 
+		makeGUI();
+		attachListeners();
+	}
+
+	private void makeGUI() {
 		JPanel buttonsPanel = new ListPanel(BoxLayout.Y_AXIS, SPACING);
 		buttonsPanel.add(newButton);
 		buttonsPanel.add(loadButton);
@@ -72,6 +82,20 @@ public class BottomPanel extends JPanel {
 		optionsPanel.add(animateCheckbox);
 		optionsPanel.add(monthSlider);
 		add(optionsPanel, BorderLayout.LINE_END);
+	}
+
+	private void attachListeners() {
+		ActionListener actionPerformed = this::actionPerformed;
+
+		fastPreviewCheckbox.addActionListener(actionPerformed);
+		animateCheckbox.addActionListener(actionPerformed);
+		monthSlider.addChangeListener(this::valueChanged);
+	}
+
+	private void actionPerformed(ActionEvent e) {
+	}
+
+	private void valueChanged(ChangeEvent changeEvent) {
 	}
 
 	public void setAnimatable(boolean animatable) {

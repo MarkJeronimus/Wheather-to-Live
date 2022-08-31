@@ -50,7 +50,7 @@ public class ListPanel extends JPanel {
 		topAlignPanel.setBorder(BorderFactory.createEmptyBorder(spacing, spacing, spacing, spacing));
 
 		topAlignPanel.setLayout(new BoxLayout(topAlignPanel, axis));
-		add(topAlignPanel, BorderLayout.NORTH);
+		add(topAlignPanel, axis == BoxLayout.Y_AXIS ? BorderLayout.SOUTH : BorderLayout.LINE_START);
 	}
 
 	@Override
