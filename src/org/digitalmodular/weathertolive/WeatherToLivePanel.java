@@ -39,8 +39,8 @@ import org.digitalmodular.weathertolive.util.GraphicsUtilities;
  */
 // Created 2022-08-30
 public class WeatherToLivePanel extends JPanel {
-	private final AnimationZoomPanel worldPanel     = new AnimationZoomPanel();
-	private final ParameterPanel     parameterPanel = new ParameterPanel();
+	private final AnimationZoomPanel worldPanel  = new AnimationZoomPanel();
+	private final BottomPanel     bottomPanel = new BottomPanel();
 
 	@SuppressWarnings("OverridableMethodCallDuringObjectConstruction")
 	public WeatherToLivePanel() {
@@ -50,8 +50,6 @@ public class WeatherToLivePanel extends JPanel {
 		setPreferredSize(new Dimension(displayMode.getWidth() * 3 / 8, displayMode.getHeight() * 3 / 8));
 
 		add(worldPanel, BorderLayout.CENTER);
-		add(parameterPanel, BorderLayout.SOUTH);
-
-		parameterPanel.init();
+		add(bottomPanel, BorderLayout.SOUTH);
 	}
 }
