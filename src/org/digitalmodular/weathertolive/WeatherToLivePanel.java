@@ -50,7 +50,7 @@ import org.digitalmodular.weathertolive.util.GraphicsUtilities;
 // Created 2022-08-30
 public class WeatherToLivePanel extends JPanel {
 	private final AnimationZoomPanel worldPanel  = new AnimationZoomPanel();
-	private final BottomPanel        bottomPanel = new BottomPanel();
+	private final BottomPanel        bottomPanel = new BottomPanel(this);
 
 	private @Nullable Dataset       dataset  = null;
 	private @Nullable ColorGradient gradient = null;
@@ -89,17 +89,18 @@ public class WeatherToLivePanel extends JPanel {
 	}
 
 	public void rebuildAtlas() {
-		bottomPanel.setAnimatable(dataset != null && dataset.getData().length > 1);
-
 		if (dataset == null) {
 			worldPanel.setAnimation(Collections.emptyList());
+			bottomPanel.setAnimatable(false);
 		} else {
 			List<AnimationFrame> atlasSequence = makeAtlasSequence(dataset);
 
 			worldPanel.setAnimation(atlasSequence);
 			worldPanel.zoomFit();
-			worldPanel.startAnimation();
 		}
+
+		boolean canAnimate = dataset != null && dataset.getData().length > 1;
+		bottomPanel.setAnimatable(canAnimate); // This will percolate to setAnimated()
 	}
 
 	private List<AnimationFrame> makeAtlasSequence(Dataset dataset) {
@@ -129,5 +130,16 @@ public class WeatherToLivePanel extends JPanel {
 		}
 
 		return atlasSequence;
+	}
+
+	public void setFastPreview(boolean fastPreview) {
+	}
+
+	public void setAnimated(boolean animated) {
+		if (animated) {
+			worldPanel.startAnimation();
+		} else {
+			worldPanel.stopAnimation();
+		}
 	}
 }

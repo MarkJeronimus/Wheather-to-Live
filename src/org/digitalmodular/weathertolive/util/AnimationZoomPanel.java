@@ -34,7 +34,7 @@ import javax.swing.Timer;
 
 import org.jetbrains.annotations.Nullable;
 
-import static org.digitalmodular.weathertolive.util.ValidatorUtilities.requireNullOrNotEmpty;
+import static org.digitalmodular.weathertolive.util.ValidatorUtilities.requireNonNull;
 
 /**
  * @author Mark Jeronimus
@@ -66,11 +66,13 @@ public class AnimationZoomPanel extends ZoomPanel {
 	}
 
 	public void setAnimation(List<AnimationFrame> animation) {
+		requireNonNull(animation, "animation");
+
 		stopAnimation();
 
-		requireNullOrNotEmpty(animation, "animation");
-		this.animation = animation.isEmpty() ? animation : Collections.unmodifiableList(animation);
+		this.animation = Collections.unmodifiableList(animation);
 
+		// display first frame
 		super.setImage(animation.isEmpty() ? null : animation.get(0).getImage());
 	}
 
@@ -98,7 +100,6 @@ public class AnimationZoomPanel extends ZoomPanel {
 		long now       = System.nanoTime();
 		long remaining = nextAnimationStepTick - now;
 		if (remaining < 0) {
-			System.out.println(remaining);
 			animationFrame = (animationFrame + 1) % animation.size();
 			nextFrame();
 		}

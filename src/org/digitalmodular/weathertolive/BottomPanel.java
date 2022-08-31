@@ -39,6 +39,7 @@ import javax.swing.event.ChangeEvent;
 
 import org.digitalmodular.weathertolive.util.LabelSlider;
 import org.digitalmodular.weathertolive.util.ListPanel;
+import static org.digitalmodular.weathertolive.util.ValidatorUtilities.requireNonNull;
 
 /**
  * @author Mark Jeronimus
@@ -46,6 +47,8 @@ import org.digitalmodular.weathertolive.util.ListPanel;
 // Created 2022-08-31
 public class BottomPanel extends JPanel {
 	public static final int SPACING = 6;
+
+	private final WeatherToLivePanel parent;
 
 	private final JButton   newButton           = new JButton("New");
 	private final JButton   loadButton          = new JButton("Load");
@@ -58,8 +61,10 @@ public class BottomPanel extends JPanel {
 	private final JPanel parametersPanel = new ListPanel(BoxLayout.X_AXIS, SPACING);
 
 	@SuppressWarnings("OverridableMethodCallDuringObjectConstruction")
-	public BottomPanel() {
+	public BottomPanel(WeatherToLivePanel parent) {
 		super(new BorderLayout());
+		this.parent = requireNonNull(parent, "parent");
+
 		setOpaque(true);
 
 		makeGUI();
@@ -92,7 +97,13 @@ public class BottomPanel extends JPanel {
 		monthSlider.addChangeListener(this::valueChanged);
 	}
 
+	@SuppressWarnings("ObjectEquality")// Comparing identity, not equality
 	private void actionPerformed(ActionEvent e) {
+		if (e.getSource() == fastPreviewCheckbox) {
+			parent.setFastPreview(animateCheckbox.isSelected());
+		} else if (e.getSource() == animateCheckbox) {
+			parent.setAnimated(animateCheckbox.isSelected());
+		}
 	}
 
 	private void valueChanged(ChangeEvent changeEvent) {
