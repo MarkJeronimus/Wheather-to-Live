@@ -33,6 +33,12 @@ import static org.digitalmodular.weathertolive.util.ValidatorUtilities.requireNo
 import static org.digitalmodular.weathertolive.util.ValidatorUtilities.requireThat;
 
 /**
+ * Encapsulates the climate data for a specific parameter, for all months of an average year.
+ * <p>
+ * The data for each month is a linear array of width*height grid cells spanning the entire globe.
+ * <p>
+ * Data values of {@link Float#NaN} are sea and have no data.
+ *
  * @author Mark Jeronimus
  */
 // Created 2022-08-28

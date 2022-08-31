@@ -38,6 +38,7 @@ import javax.swing.JPanel;
 
 import org.jetbrains.annotations.Nullable;
 
+import org.digitalmodular.weathertolive.dataset.ClimateDataSet;
 import org.digitalmodular.weathertolive.dataset.Dataset;
 import org.digitalmodular.weathertolive.util.AnimationFrame;
 import org.digitalmodular.weathertolive.util.AnimationZoomPanel;
@@ -52,8 +53,8 @@ public class WeatherToLivePanel extends JPanel {
 	private final AnimationZoomPanel worldPanel  = new AnimationZoomPanel();
 	private final BottomPanel        bottomPanel = new BottomPanel(this);
 
-	private @Nullable Dataset       dataset  = null;
-	private @Nullable ColorGradient gradient = null;
+	private @Nullable ClimateDataSet climateDataSet = null;
+	private @Nullable ColorGradient  gradient       = null;
 
 	@SuppressWarnings("OverridableMethodCallDuringObjectConstruction")
 	public WeatherToLivePanel() {
@@ -66,15 +67,15 @@ public class WeatherToLivePanel extends JPanel {
 		add(bottomPanel, BorderLayout.SOUTH);
 	}
 
-	public Dataset getDataset() {
-		return dataset;
+	public @Nullable ClimateDataSet getClimateDataSet() {
+		return climateDataSet;
 	}
 
 	/**
 	 * A call of this must be followed by a call to {@link #rebuildAtlas()}!
 	 */
-	public void setDataset(@Nullable Dataset dataset) {
-		this.dataset = dataset;
+	public void setClimateDataSet(@Nullable ClimateDataSet climateDataSet) {
+		this.climateDataSet = climateDataSet;
 	}
 
 	public @Nullable ColorGradient getGradient() {
@@ -89,17 +90,17 @@ public class WeatherToLivePanel extends JPanel {
 	}
 
 	public void rebuildAtlas() {
-		if (dataset == null) {
+		if (climateDataSet == null) {
 			worldPanel.setAnimation(Collections.emptyList());
 			bottomPanel.setAnimatable(false);
 		} else {
-			List<AnimationFrame> atlasSequence = makeAtlasSequence(dataset);
+			List<AnimationFrame> atlasSequence = makeAtlasSequence(climateDataSet.getDataSets().get(0));
 
 			worldPanel.setAnimation(atlasSequence);
 			worldPanel.zoomFit();
 		}
 
-		boolean canAnimate = dataset != null && dataset.getData().length > 1;
+		boolean canAnimate = climateDataSet != null && climateDataSet.getDataSets().get(0).getData().length > 1;
 		bottomPanel.setAnimatable(canAnimate); // This will percolate to setAnimated()
 	}
 
