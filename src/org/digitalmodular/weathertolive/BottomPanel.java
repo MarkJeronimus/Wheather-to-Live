@@ -107,6 +107,7 @@ public class BottomPanel extends JPanel {
 	}
 
 	private void valueChanged(ChangeEvent changeEvent) {
+		parent.setMonth(monthSlider.getValue());
 	}
 
 	public void setAnimatable(boolean animatable) {
@@ -117,5 +118,17 @@ public class BottomPanel extends JPanel {
 
 		animateCheckbox.setEnabled(animatable);
 		monthSlider.setEnabled(animatable);
+	}
+
+	public void setAnimated(boolean animated) {
+		animateCheckbox.setSelected(animated);
+
+		if (animateCheckbox.isEnabled()) {
+			monthSlider.setEnabled(!animated);
+		}
+	}
+
+	public void setMonth(int month) {
+		monthSlider.setValue(month);
 	}
 }

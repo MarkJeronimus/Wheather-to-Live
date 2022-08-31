@@ -28,10 +28,10 @@ package org.digitalmodular.weathertolive;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 import javax.swing.JFrame;
+import javax.swing.SwingUtilities;
 import javax.swing.WindowConstants;
 
 import com.formdev.flatlaf.FlatDarkLaf;
@@ -41,7 +41,6 @@ import org.digitalmodular.weathertolive.dataset.ClimateDataSet;
 import org.digitalmodular.weathertolive.dataset.DataSet;
 import org.digitalmodular.weathertolive.dataset.WorldClimDatasetFactory;
 import org.digitalmodular.weathertolive.util.ColorGradient;
-import org.digitalmodular.weathertolive.util.GraphicsUtilities;
 
 /**
  * @author Mark Jeronimus
@@ -51,11 +50,10 @@ public final class WeatherToLiveMain {
 	public static void main(String... args) throws IOException, ExecutionException, InterruptedException {
 		ColorGradient gradient = new ColorGradient(new File("Inferno-mod.png"));
 
-		DataSet        dataSet        = WorldClimDatasetFactory.createFor("wc2.1_10m_wind.zip", true);
+		DataSet        dataSet        = WorldClimDatasetFactory.createFor("wc2.1_10m_tmax.zip", false);
 		ClimateDataSet climateDataSet = new ClimateDataSet(List.of(dataSet));
 
-//		WeatherToLivePanel panel =
-		GraphicsUtilities.getFromEDT(() -> {
+		SwingUtilities.invokeLater(() -> {
 			FlatLaf.setup(new FlatDarkLaf());
 			LookAndFeelFactory.installJideExtension();
 
@@ -72,8 +70,6 @@ public final class WeatherToLiveMain {
 			weatherToLivePanel.setClimateDataSet(climateDataSet);
 			weatherToLivePanel.setGradient(gradient);
 			weatherToLivePanel.rebuildAtlas();
-
-			return weatherToLivePanel;
 		});
 	}
 }

@@ -65,6 +65,8 @@ public class WeatherToLivePanel extends JPanel {
 
 		add(worldPanel, BorderLayout.CENTER);
 		add(bottomPanel, BorderLayout.SOUTH);
+
+		worldPanel.addAnimationListener(bottomPanel::setMonth);
 	}
 
 	public @Nullable ClimateDataSet getClimateDataSet() {
@@ -102,6 +104,7 @@ public class WeatherToLivePanel extends JPanel {
 
 		boolean canAnimate = climateDataSet != null && climateDataSet.getDataSets().get(0).getData().length > 1;
 		bottomPanel.setAnimatable(canAnimate); // This will percolate to setAnimated()
+		setMonth(0);
 	}
 
 	private List<AnimationFrame> makeAtlasSequence(DataSet dataset) {
@@ -142,5 +145,12 @@ public class WeatherToLivePanel extends JPanel {
 		} else {
 			worldPanel.stopAnimation();
 		}
+
+		bottomPanel.setAnimated(animated);
+	}
+
+	public void setMonth(int month) {
+		worldPanel.setAnimationFrame(month);
+		bottomPanel.setMonth(month);
 	}
 }

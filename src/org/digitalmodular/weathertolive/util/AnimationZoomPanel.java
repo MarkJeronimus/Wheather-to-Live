@@ -30,6 +30,9 @@ import java.awt.event.ActionEvent;
 import java.awt.image.BufferedImage;
 import java.util.Collections;
 import java.util.List;
+import java.util.Set;
+import java.util.concurrent.CopyOnWriteArraySet;
+import java.util.function.IntConsumer;
 import javax.swing.Timer;
 
 import org.jetbrains.annotations.Nullable;
@@ -47,6 +50,8 @@ public class AnimationZoomPanel extends ZoomPanel {
 
 	private int  animationFrame        = 0;
 	private long nextAnimationStepTick = 0;
+
+	private final Set<IntConsumer> animationListeners = new CopyOnWriteArraySet<>();
 
 	public AnimationZoomPanel() {
 		timer = new Timer(1, this::animationStep);
@@ -83,13 +88,23 @@ public class AnimationZoomPanel extends ZoomPanel {
 
 		animationFrame = 0;
 		nextAnimationStepTick = System.nanoTime();
-		nextFrame();
+		switchFrame();
 
 		timer.start();
 	}
 
 	public void stopAnimation() {
 		timer.stop();
+	}
+
+	public void setAnimationFrame(int animationFrame) {
+		if (animation.isEmpty()) {
+			return;
+		}
+
+		this.animationFrame = NumberUtilities.clamp(animationFrame, 0, animation.size() - 1);
+		nextAnimationStepTick = System.nanoTime();
+		switchFrame();
 	}
 
 	public void animationStep(ActionEvent ignored) {
@@ -101,11 +116,16 @@ public class AnimationZoomPanel extends ZoomPanel {
 		long remaining = nextAnimationStepTick - now;
 		if (remaining < 0) {
 			animationFrame = (animationFrame + 1) % animation.size();
-			nextFrame();
+			switchFrame();
 		}
 	}
 
-	private void nextFrame() {
+	/**
+	 * Displays the current frame and increments the next timestamp with the duration of the frame.
+	 * <p>
+	 * This assumes {@link #animationFrame} has already been incremented or overwritten.
+	 */
+	private void switchFrame() {
 		assert !animation.isEmpty();
 
 		AnimationFrame frame = animation.get(animationFrame);
@@ -113,5 +133,35 @@ public class AnimationZoomPanel extends ZoomPanel {
 		nextAnimationStepTick += frame.getDurationNanos();
 
 		super.setImage(frame.getImage());
+		fireAnimationListeners();
+	}
+
+	public void addAnimationListener(IntConsumer animationListener) {
+		animationListeners.add(animationListener);
+	}
+
+	public void removeAnimationListener(IntConsumer animationListener) {
+		animationListeners.remove(animationListener);
+	}
+
+	private void fireAnimationListeners() {
+		@Nullable RuntimeException thrown = null;
+
+		for (IntConsumer animationListener : animationListeners) {
+			try {
+				animationListener.accept(animationFrame);
+			} catch (RuntimeException ex) {
+				if (thrown == null) {
+					thrown = ex;
+				} else {
+					thrown.addSuppressed(ex);
+				}
+			}
+		}
+
+		if (thrown != null) {
+			//noinspection ProhibitedExceptionThrown
+			throw thrown;
+		}
 	}
 }
