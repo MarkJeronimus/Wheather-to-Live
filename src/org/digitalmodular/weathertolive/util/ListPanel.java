@@ -24,48 +24,44 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.digitalmodular.weathertolive;
+package org.digitalmodular.weathertolive.util;
 
 import java.awt.BorderLayout;
+import java.awt.Component;
+import javax.swing.BorderFactory;
+import javax.swing.Box;
 import javax.swing.BoxLayout;
-import javax.swing.JButton;
-import javax.swing.JCheckBox;
 import javax.swing.JPanel;
 
-import org.digitalmodular.weathertolive.util.ListPanel;
+import static org.digitalmodular.weathertolive.util.ValidatorUtilities.requireAtLeast;
 
 /**
  * @author Mark Jeronimus
  */
 // Created 2022-08-31
-public class BottomPanel extends JPanel {
-	public static final int SPACING = 6;
-
-	private final JButton   newButton           = new JButton("New");
-	private final JButton   loadButton          = new JButton("Load");
-	private final JButton   saveButton          = new JButton("Save");
-	private final JCheckBox fastPreviewCheckbox = new JCheckBox("Fast previewing");
-
-	private final JPanel parametersPanel = new ListPanel(BoxLayout.X_AXIS, SPACING);
+public class ListPanel extends JPanel {
+	private final JPanel topAlignPanel = new JPanel(null);
 
 	@SuppressWarnings("OverridableMethodCallDuringObjectConstruction")
-	public BottomPanel() {
+	public ListPanel(int axis, int spacing) {
 		super(new BorderLayout());
-		setOpaque(true);
+		requireAtLeast(0, spacing, "spacing");
 
-		JPanel buttonsPanel = new ListPanel(BoxLayout.Y_AXIS, SPACING);
-		buttonsPanel.add(newButton);
-		buttonsPanel.add(loadButton);
-		buttonsPanel.add(saveButton);
-		add(buttonsPanel, BorderLayout.LINE_START);
+		topAlignPanel.setBorder(BorderFactory.createEmptyBorder(spacing, spacing, spacing, spacing));
 
-		parametersPanel.setLayout(new BoxLayout(parametersPanel, BoxLayout.Y_AXIS));
-		parametersPanel.add(new ParameterPanel());
-		add(parametersPanel, BorderLayout.CENTER);
-
-		JPanel optionsPanel = new ListPanel(BoxLayout.Y_AXIS, SPACING);
-		optionsPanel.add(fastPreviewCheckbox);
-		add(optionsPanel, BorderLayout.LINE_END);
+		topAlignPanel.setLayout(new BoxLayout(topAlignPanel, axis));
+		add(topAlignPanel, BorderLayout.NORTH);
 	}
 
+	@Override
+	public Component add(Component comp) {
+		if (topAlignPanel.getComponentCount() > 0) {
+			topAlignPanel.add(Box.createVerticalStrut(4));
+		}
+
+		JPanel p = new JPanel(new BorderLayout());
+		p.add(comp, BorderLayout.CENTER);
+		topAlignPanel.add(p);
+		return p;
+	}
 }
