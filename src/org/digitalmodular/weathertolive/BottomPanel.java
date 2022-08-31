@@ -31,8 +31,10 @@ import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JPanel;
+import javax.swing.JSlider;
 
 import org.digitalmodular.weathertolive.util.ListPanel;
+import org.digitalmodular.weathertolive.util.MonthSlider;
 
 /**
  * @author Mark Jeronimus
@@ -45,6 +47,8 @@ public class BottomPanel extends JPanel {
 	private final JButton   loadButton          = new JButton("Load");
 	private final JButton   saveButton          = new JButton("Save");
 	private final JCheckBox fastPreviewCheckbox = new JCheckBox("Fast previewing");
+	private final JCheckBox animateCheckbox     = new JCheckBox("Animate");
+	private final JSlider   monthSlider         = new MonthSlider();
 
 	private final JPanel parametersPanel = new ListPanel(BoxLayout.X_AXIS, SPACING);
 
@@ -65,7 +69,8 @@ public class BottomPanel extends JPanel {
 
 		JPanel optionsPanel = new ListPanel(BoxLayout.Y_AXIS, SPACING);
 		optionsPanel.add(fastPreviewCheckbox);
+		optionsPanel.add(animateCheckbox);
+		optionsPanel.add(monthSlider);
 		add(optionsPanel, BorderLayout.LINE_END);
 	}
-
 }
