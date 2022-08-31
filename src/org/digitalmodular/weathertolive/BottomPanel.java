@@ -97,7 +97,7 @@ public class BottomPanel extends JPanel {
 		monthSlider.addChangeListener(this::valueChanged);
 	}
 
-	@SuppressWarnings("ObjectEquality")// Comparing identity, not equality
+	@SuppressWarnings("ObjectEquality") // Comparing identity, not equality
 	private void actionPerformed(ActionEvent e) {
 		if (e.getSource() == fastPreviewCheckbox) {
 			parent.setFastPreview(animateCheckbox.isSelected());

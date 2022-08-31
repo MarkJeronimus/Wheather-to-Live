@@ -29,6 +29,7 @@ package org.digitalmodular.weathertolive;
 import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.List;
 import java.util.concurrent.ExecutionException;
 import javax.swing.JFrame;
 import javax.swing.WindowConstants;
@@ -51,7 +52,7 @@ public final class WeatherToLiveMain {
 		ColorGradient gradient = new ColorGradient(new File("Inferno-mod.png"));
 
 		DataSet        dataSet        = WorldClimDatasetFactory.createFor("wc2.1_10m_wind.zip", true);
-		ClimateDataSet climateDataSet = new ClimateDataSet(Arrays.asList(dataSet));
+		ClimateDataSet climateDataSet = new ClimateDataSet(List.of(dataSet));
 
 //		WeatherToLivePanel panel =
 		GraphicsUtilities.getFromEDT(() -> {

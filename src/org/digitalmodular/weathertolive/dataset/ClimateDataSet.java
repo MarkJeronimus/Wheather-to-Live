@@ -38,7 +38,7 @@ import static org.digitalmodular.weathertolive.util.ValidatorUtilities.requireSi
  */
 // Created 2022-08-31
 public class ClimateDataSet {
-	private List<DataSet> dataSets;
+	private final List<DataSet> dataSets;
 
 	public ClimateDataSet(List<DataSet> dataSets) {
 		requireSizeAtLeast(1, dataSets, "datasets");
