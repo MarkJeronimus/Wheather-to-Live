@@ -45,6 +45,7 @@ public class LabelSlider extends JSlider {
 	public LabelSlider(List<String> labels) {
 		super(0, requireSizeAtLeast(2, labels, "labels").size() - 1);
 
+		setSnapToTicks(true);
 		setMajorTickSpacing(1);
 		setPaintTicks(true);
 		setPaintLabels(true);
