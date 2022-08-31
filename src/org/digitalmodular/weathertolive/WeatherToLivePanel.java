@@ -29,9 +29,19 @@ package org.digitalmodular.weathertolive;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.DisplayMode;
+import java.awt.image.BufferedImage;
+import java.awt.image.DataBufferInt;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import javax.swing.JPanel;
 
+import org.jetbrains.annotations.Nullable;
+
+import org.digitalmodular.weathertolive.dataset.Dataset;
+import org.digitalmodular.weathertolive.util.AnimationFrame;
 import org.digitalmodular.weathertolive.util.AnimationZoomPanel;
+import org.digitalmodular.weathertolive.util.ColorGradient;
 import org.digitalmodular.weathertolive.util.GraphicsUtilities;
 
 /**
@@ -40,7 +50,10 @@ import org.digitalmodular.weathertolive.util.GraphicsUtilities;
 // Created 2022-08-30
 public class WeatherToLivePanel extends JPanel {
 	private final AnimationZoomPanel worldPanel  = new AnimationZoomPanel();
-	private final BottomPanel     bottomPanel = new BottomPanel();
+	private final BottomPanel        bottomPanel = new BottomPanel();
+
+	private @Nullable Dataset       dataset  = null;
+	private @Nullable ColorGradient gradient = null;
 
 	@SuppressWarnings("OverridableMethodCallDuringObjectConstruction")
 	public WeatherToLivePanel() {
@@ -51,5 +64,70 @@ public class WeatherToLivePanel extends JPanel {
 
 		add(worldPanel, BorderLayout.CENTER);
 		add(bottomPanel, BorderLayout.SOUTH);
+	}
+
+	public Dataset getDataset() {
+		return dataset;
+	}
+
+	/**
+	 * A call of this must be followed by a call to {@link #rebuildAtlas()}!
+	 */
+	public void setDataset(@Nullable Dataset dataset) {
+		this.dataset = dataset;
+	}
+
+	public @Nullable ColorGradient getGradient() {
+		return gradient;
+	}
+
+	/**
+	 * A call of this must be followed by a call to {@link #rebuildAtlas()}!
+	 */
+	public void setGradient(@Nullable ColorGradient gradient) {
+		this.gradient = gradient;
+	}
+
+	public void rebuildAtlas() {
+		bottomPanel.setAnimatable(dataset != null && dataset.getData().length > 1);
+
+		if (dataset == null) {
+			worldPanel.setAnimation(Collections.emptyList());
+		} else {
+			List<AnimationFrame> atlasSequence = makeAtlasSequence(dataset);
+
+			worldPanel.setAnimation(atlasSequence);
+			worldPanel.zoomFit();
+			worldPanel.startAnimation();
+		}
+	}
+
+	private List<AnimationFrame> makeAtlasSequence(Dataset dataset) {
+		List<AnimationFrame> atlasSequence = new ArrayList<>(12);
+
+		float[][] monthlyData = dataset.getData();
+
+		for (int month = 0; month < 12; month++) {
+			BufferedImage image = new BufferedImage(dataset.getWidth(),
+			                                        dataset.getHeight(),
+			                                        BufferedImage.TYPE_INT_RGB);
+			int[] pixels = ((DataBufferInt)image.getRaster().getDataBuffer()).getData();
+
+			float[] data = monthlyData[month];
+
+			for (int i = 0; i < data.length; i++) {
+				if (Float.isNaN(data[i])) {
+					pixels[i] = Dataset.SEA_BLUE;
+				} else if (gradient != null) {
+					pixels[i] = gradient.getColor(data[i]);
+				} else {
+					pixels[i] = (int)(data[i] * 255);
+				}
+			}
+
+			atlasSequence.add(new AnimationFrame(image, 1_500_000_000 / 12));
+		}
+
+		return atlasSequence;
 	}
 }

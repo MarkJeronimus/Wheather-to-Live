@@ -73,4 +73,14 @@ public class BottomPanel extends JPanel {
 		optionsPanel.add(monthSlider);
 		add(optionsPanel, BorderLayout.LINE_END);
 	}
+
+	public void setAnimatable(boolean animatable) {
+		if (!animatable) {
+			animateCheckbox.setSelected(false);
+			monthSlider.setValue(0);
+		}
+
+		animateCheckbox.setEnabled(animatable);
+		monthSlider.setEnabled(animatable);
+	}
 }

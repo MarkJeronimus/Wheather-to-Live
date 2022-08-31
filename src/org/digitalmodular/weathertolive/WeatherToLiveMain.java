@@ -26,6 +26,8 @@
  */
 package org.digitalmodular.weathertolive;
 
+import java.io.File;
+import java.io.IOException;
 import javax.swing.JFrame;
 import javax.swing.SwingUtilities;
 import javax.swing.WindowConstants;
@@ -33,13 +35,19 @@ import javax.swing.WindowConstants;
 import com.formdev.flatlaf.FlatDarkLaf;
 import com.formdev.flatlaf.FlatLaf;
 import com.jidesoft.plaf.LookAndFeelFactory;
+import org.digitalmodular.weathertolive.dataset.Dataset;
+import org.digitalmodular.weathertolive.dataset.WorldClimDatasetFactory;
+import org.digitalmodular.weathertolive.util.ColorGradient;
 
 /**
- * @author author
+ * @author Mark Jeronimus
  */
 // Created 2022-08-30
-public class WeatherToLiveMain {
-	public static void main(String... args) {
+public final class WeatherToLiveMain {
+	public static void main(String... args) throws IOException {
+		Dataset       dataSet  = WorldClimDatasetFactory.createFor("wc2.1_10m_wind.zip", true);
+		ColorGradient gradient = new ColorGradient(new File("Inferno-mod.png"));
+
 		SwingUtilities.invokeLater(() -> {
 			FlatLaf.setup(new FlatDarkLaf());
 			LookAndFeelFactory.installJideExtension();
@@ -47,11 +55,16 @@ public class WeatherToLiveMain {
 			JFrame f = new JFrame();
 			f.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
 
-			f.setContentPane(new WeatherToLivePanel());
+			WeatherToLivePanel weatherToLivePanel = new WeatherToLivePanel();
+			f.setContentPane(weatherToLivePanel);
 
 			f.pack();
 			f.setLocationRelativeTo(null);
 			f.setVisible(true);
+
+			weatherToLivePanel.setDataset(dataSet);
+			weatherToLivePanel.setGradient(gradient);
+			weatherToLivePanel.rebuildAtlas();
 		});
 	}
 }

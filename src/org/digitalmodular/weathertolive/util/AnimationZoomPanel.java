@@ -41,7 +41,7 @@ import static org.digitalmodular.weathertolive.util.ValidatorUtilities.requireNu
  */
 // Created 2022-08-29
 public class AnimationZoomPanel extends ZoomPanel {
-	private @Nullable List<AnimationFrame> animation = null;
+	private List<AnimationFrame> animation = Collections.emptyList();
 
 	private final Timer timer;
 
@@ -61,21 +61,21 @@ public class AnimationZoomPanel extends ZoomPanel {
 
 	@Override
 	public void setImage(@Nullable BufferedImage image) {
-		setAnimation(null);
+		setAnimation(Collections.emptyList());
 		super.setImage(image);
 	}
 
-	public void setAnimation(@Nullable List<AnimationFrame> animation) {
+	public void setAnimation(List<AnimationFrame> animation) {
 		stopAnimation();
 
 		requireNullOrNotEmpty(animation, "animation");
-		this.animation = animation == null ? null : Collections.unmodifiableList(animation);
+		this.animation = animation.isEmpty() ? animation : Collections.unmodifiableList(animation);
 
-		super.setImage(animation == null ? null : animation.get(0).getImage());
+		super.setImage(animation.isEmpty() ? null : animation.get(0).getImage());
 	}
 
 	public void startAnimation() {
-		if (animation == null) {
+		if (animation.isEmpty()) {
 			return;
 		}
 
@@ -91,7 +91,7 @@ public class AnimationZoomPanel extends ZoomPanel {
 	}
 
 	public void animationStep(ActionEvent ignored) {
-		if (animation == null) {
+		if (animation.isEmpty()) {
 			return;
 		}
 
@@ -105,7 +105,7 @@ public class AnimationZoomPanel extends ZoomPanel {
 	}
 
 	private void nextFrame() {
-		assert animation != null;
+		assert !animation.isEmpty();
 
 		AnimationFrame frame = animation.get(animationFrame);
 

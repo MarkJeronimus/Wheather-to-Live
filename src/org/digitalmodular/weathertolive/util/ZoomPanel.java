@@ -131,7 +131,7 @@ public class ZoomPanel extends JPanel implements MouseListener,
 		this.zoom = NumberUtilities.clamp(zoom, minZoom, maxZoom);
 	}
 
-	public void resetZoom() {
+	public void zoomFit() {
 		offsetX = 0;
 		offsetY = 0;
 		zoom = 0;
@@ -502,9 +502,9 @@ public class ZoomPanel extends JPanel implements MouseListener,
 		if (e.getKeyChar() == KeyEvent.VK_ESCAPE) {
 			// Toggle between fit and 1:1
 			if (!centered) {
-				resetZoom();
+				zoomFit();
 			} else {
-				resetZoom();
+				zoomFit();
 				centered = zoom == 0;
 				zoom = 0;
 			}
