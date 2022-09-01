@@ -29,6 +29,7 @@ package org.digitalmodular.weathertolive;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.DisplayMode;
+import java.awt.GraphicsDevice;
 import java.awt.image.BufferedImage;
 import java.awt.image.DataBufferInt;
 import java.util.ArrayList;
@@ -51,6 +52,15 @@ import static org.digitalmodular.weathertolive.util.ValidatorUtilities.requireNo
  */
 // Created 2022-08-30
 public class WeatherToLivePanel extends JPanel {
+	public static final int SCALE_FACTOR;
+
+	static {
+		GraphicsDevice gd             = GraphicsUtilities.getDisplayDevice();
+		int            realWidth      = gd.getDisplayMode().getWidth();
+		float          effectiveWidth = gd.getDefaultConfiguration().getBounds().width;
+		SCALE_FACTOR = Math.round(realWidth / effectiveWidth);
+	}
+
 	private final AnimationZoomPanel worldPanel  = new AnimationZoomPanel();
 	private final BottomPanel        bottomPanel = new BottomPanel(this);
 

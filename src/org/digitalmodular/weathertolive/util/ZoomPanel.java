@@ -27,7 +27,6 @@
 package org.digitalmodular.weathertolive.util;
 
 import java.awt.Component;
-import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Point;
 import java.awt.event.ComponentEvent;
@@ -76,7 +75,6 @@ public class ZoomPanel extends JPanel implements MouseListener,
 	@SuppressWarnings("OverridableMethodCallDuringObjectConstruction")
 	public ZoomPanel() {
 		super(null);
-		setPreferredSize(new Dimension(640, 640));
 		setOpaque(true);
 
 		addMouseListener(this);
@@ -97,10 +95,6 @@ public class ZoomPanel extends JPanel implements MouseListener,
 
 		this.image = image;
 
-		if (image != null) {
-			setPreferredSize(new Dimension(image.getWidth(), image.getHeight()));
-		}
-
 		repaint();
 	}
 
@@ -117,6 +111,8 @@ public class ZoomPanel extends JPanel implements MouseListener,
 
 		this.minZoom = minZoom;
 		this.maxZoom = maxZoom;
+
+		setZoom(zoom);
 	}
 
 	public int getZoom() {

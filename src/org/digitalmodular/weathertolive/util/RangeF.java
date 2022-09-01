@@ -37,7 +37,7 @@ import static org.digitalmodular.weathertolive.util.ValidatorUtilities.requireNo
  *
  * @author Mark Jeronimus
  */
-// Created 2022-08-29 Copied from Range (double-precision variant)
+// Created 2022-08-29 Copied from class Range (double-precision variant)
 public class RangeF implements Comparable<RangeF> {
 	public static final RangeF ZERO = new RangeF(0.0f, 0.0f);
 	public static final RangeF UNIT = new RangeF(0.0f, 1.0f);

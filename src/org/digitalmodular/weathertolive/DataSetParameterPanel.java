@@ -29,17 +29,28 @@ package org.digitalmodular.weathertolive;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.image.BufferedImage;
+import java.awt.image.DataBufferInt;
 import java.text.DecimalFormat;
+import java.util.ArrayList;
+import java.util.List;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JSlider;
 import javax.swing.event.ChangeEvent;
 
 import org.jetbrains.annotations.Nullable;
 
 import com.jidesoft.swing.RangeSlider;
 import org.digitalmodular.weathertolive.dataset.FilteredDataSet;
+import org.digitalmodular.weathertolive.util.AnimationFrame;
+import org.digitalmodular.weathertolive.util.AnimationZoomPanel;
 import org.digitalmodular.weathertolive.util.PreferredNumbers;
 import org.digitalmodular.weathertolive.util.RangeF;
+import static org.digitalmodular.weathertolive.WeatherToLivePanel.SCALE_FACTOR;
+import static org.digitalmodular.weathertolive.dataset.DataSet.SEA_BLUE;
+import static org.digitalmodular.weathertolive.dataset.DataSet.THUMBNAIL_HEIGHT;
+import static org.digitalmodular.weathertolive.dataset.DataSet.THUMBNAIL_WIDTH;
 import static org.digitalmodular.weathertolive.util.ValidatorUtilities.requireNonNull;
 
 /**
@@ -54,11 +65,10 @@ public class DataSetParameterPanel extends JPanel {
 
 	private final DecimalFormat numberFormat;
 
-	private final JLabel      nameLabel      = new JLabel();
-	private final JPanel      thumbnailPanel = new JPanel();
-	private final JLabel      beginLabel     = new JLabel();
-	private final RangeSlider slider         = new RangeSlider();
-	private final JLabel      endLabel       = new JLabel();
+	private final AnimationZoomPanel thumbnailPanel = new AnimationZoomPanel();
+	private final JLabel             beginLabel     = new JLabel();
+	private final JSlider            slider         = new RangeSlider();
+	private final JLabel             endLabel       = new JLabel();
 
 	private final float sliderStepSize;
 
@@ -75,11 +85,14 @@ public class DataSetParameterPanel extends JPanel {
 		prepareSliderRange(minMax);
 
 		{
-			nameLabel.setText(dataSet.getDataSet().getName() + ' ');
+			JLabel nameLabel = new JLabel(dataSet.getDataSet().getName() + ' ');
 			add(nameLabel, BorderLayout.LINE_START);
 		}
 		{
-			thumbnailPanel.setPreferredSize(new Dimension(180, 90));
+			int zoom = -1;
+			thumbnailPanel.setZoomLimits(zoom, 15);
+			thumbnailPanel.setPreferredSize(new Dimension(THUMBNAIL_WIDTH / SCALE_FACTOR,
+			                                              THUMBNAIL_HEIGHT / SCALE_FACTOR));
 			thumbnailPanel.setBackground(Color.BLACK);
 			add(thumbnailPanel, BorderLayout.CENTER);
 		}
@@ -160,5 +173,36 @@ public class DataSetParameterPanel extends JPanel {
 	}
 
 	public void updateThumbnail() {
+		List<AnimationFrame> thumbnailSequence = new ArrayList<>(12);
+
+		RangeF[][] thumbnails = dataSet.getDataSet().getThumbnails();
+		RangeF     minMax     = dataSet.getDataSet().getMinMax();
+		int        length     = thumbnails[0].length;
+
+		for (int month = 0; month < 12; month++) {
+			BufferedImage image  = new BufferedImage(THUMBNAIL_WIDTH, THUMBNAIL_HEIGHT, BufferedImage.TYPE_INT_RGB);
+			int[]         pixels = ((DataBufferInt)image.getRaster().getDataBuffer()).getData();
+
+			RangeF[] monthThumbnail = thumbnails[0];
+
+			for (int i = 0; i < length; i++) {
+				@Nullable RangeF thumbnailPixel = monthThumbnail[i];
+				if (thumbnailPixel == null) {
+					pixels[i] = SEA_BLUE;
+				} else {
+					float value = minMax.unLerp(thumbnailPixel.getCenter());
+
+//				    if (gradient != null) {
+//				    	pixels[i] = gradient.getColor(value);
+//					} else {
+					pixels[i] = (int)(value * 255);
+//					}
+				}
+			}
+
+			thumbnailSequence.add(new AnimationFrame(image, 1_500_000_000 / 12));
+		}
+
+		thumbnailPanel.setAnimation(thumbnailSequence);
 	}
 }

@@ -27,6 +27,8 @@
 package org.digitalmodular.weathertolive.dataset;
 
 import org.digitalmodular.weathertolive.util.RangeF;
+import org.digitalmodular.weathertolive.util.RangeFBuilder;
+import static org.digitalmodular.weathertolive.WeatherToLivePanel.SCALE_FACTOR;
 import static org.digitalmodular.weathertolive.util.ValidatorUtilities.requireArrayLengthExactly;
 import static org.digitalmodular.weathertolive.util.ValidatorUtilities.requireAtLeast;
 import static org.digitalmodular.weathertolive.util.ValidatorUtilities.requireNonNull;
@@ -46,11 +48,18 @@ import static org.digitalmodular.weathertolive.util.ValidatorUtilities.requireTh
 public class DataSet {
 	public static final int SEA_BLUE = 0x001020;
 
+	public static final int THUMBNAIL_HEIGHT = 90 * SCALE_FACTOR;
+	public static final int THUMBNAIL_WIDTH  = THUMBNAIL_HEIGHT * 2;
+
+	private static final int THUMBNAIL_PIXELS = THUMBNAIL_WIDTH * THUMBNAIL_HEIGHT;
+
 	private final String    name;
 	private final int       width;
 	private final int       height;
 	private final float[][] rawData;
 	private final RangeF    minMax;
+
+	private final RangeF[][] thumbnails = new RangeF[12][THUMBNAIL_PIXELS];
 
 	/**
 	 * @param rawData      The data to store. The object is stored as-is without copying.
@@ -62,6 +71,8 @@ public class DataSet {
 		requireArrayLengthExactly(12, rawData, "rawData");
 		this.width = requireAtLeast(360, width, "width");
 		this.height = requireAtLeast(180, height, "height");
+		requireThat(width / THUMBNAIL_WIDTH * THUMBNAIL_WIDTH == width,
+		            THUMBNAIL_WIDTH + " doesn't divide 'width': " + width);
 		requireThat(width == height * 2, "'width' should be double 'height': " + width + ", " + height);
 		for (int month = 0; month < 12; month++) {
 			requireThat(rawData[month].length == width * height,
@@ -70,6 +81,8 @@ public class DataSet {
 		}
 
 		minMax = findMinMax(rawData, absoluteZero);
+
+		prepareThumbnails();
 	}
 
 	private static RangeF findMinMax(float[][] rawData, boolean absoluteZero) {
@@ -95,6 +108,37 @@ public class DataSet {
 		}
 
 		return RangeF.of(min, max);
+	}
+
+	private void prepareThumbnails() {
+		int blockSize = width / THUMBNAIL_WIDTH;
+
+		RangeFBuilder rb = new RangeFBuilder();
+
+		for (int month = 0; month < 12; month++) {
+			float[]  rawMonthData   = rawData[month];
+			RangeF[] monthThumbnail = thumbnails[month];
+			int      thumbI         = 0;
+
+			for (int y = 0; y < THUMBNAIL_HEIGHT; y++) {
+				for (int x = 0; x < THUMBNAIL_WIDTH; x++) {
+					rb.reset();
+
+					int dataI = x * blockSize + y * width * blockSize;
+					for (int v = 0; v < blockSize; v++) {
+						for (int u = 0; u < blockSize; u++) {
+							rb.add(rawMonthData[dataI]);
+							dataI++;
+						}
+
+						dataI += width - blockSize;
+					}
+
+					monthThumbnail[thumbI] = rb.buildOrNull();
+					thumbI++;
+				}
+			}
+		}
 	}
 
 	public String getName() {
@@ -123,5 +167,16 @@ public class DataSet {
 
 	public RangeF getMinMax() {
 		return minMax;
+	}
+
+	/**
+	 * Returns a view into the (mutable!) internal data.
+	 * <p>
+	 * The array has dimensions [month 0..12][pixel 0..THUMBNAIL_WIDTH*THUMBNAIL_HEIGHT].
+	 * <p>
+	 * This data is generated once in the constructor.
+	 */
+	public RangeF[][] getThumbnails() {
+		return thumbnails;
 	}
 }

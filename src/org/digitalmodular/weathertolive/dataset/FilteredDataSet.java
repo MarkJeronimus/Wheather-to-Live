@@ -36,9 +36,9 @@ import static org.digitalmodular.weathertolive.util.ValidatorUtilities.requireNo
 public class FilteredDataSet {
 	private final DataSet dataSet;
 
+	private       boolean   dirty = true;
 	private       RangeF    filterMinMax;
 	private final float[][] filteredData;
-	private       boolean   dirty = true;
 
 	public FilteredDataSet(DataSet dataSet) {
 		this.dataSet = requireNonNull(dataSet, "dataSet");
@@ -50,6 +50,10 @@ public class FilteredDataSet {
 
 	public DataSet getDataSet() {
 		return dataSet;
+	}
+
+	private void markDirty() {
+		dirty = true;
 	}
 
 	public RangeF getFilterMinMax() {
@@ -67,10 +71,6 @@ public class FilteredDataSet {
 		markDirty();
 	}
 
-	protected void markDirty() {
-		dirty = true;
-	}
-
 	/**
 	 * Returns a view into the (mutable!) raw data.
 	 * <p>
@@ -81,14 +81,14 @@ public class FilteredDataSet {
 	@SuppressWarnings("AssignmentOrReturnOfFieldWithMutableType")
 	public float[][] getFilteredData() {
 		if (dirty) {
-			regenerate();
+			doFilter();
 			dirty = false;
 		}
 
 		return filteredData;
 	}
 
-	protected void regenerate() {
+	private void doFilter() {
 		float[][] rawData = dataSet.getRawData();
 
 		for (int month = 0; month < 12; month++) {
