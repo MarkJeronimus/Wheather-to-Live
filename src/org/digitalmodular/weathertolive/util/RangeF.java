@@ -203,6 +203,15 @@ public class RangeF implements Comparable<RangeF> {
 		return begin <= value && value <= end;
 	}
 
+	/**
+	 * Tests whether the range contains the given range entirely.
+	 * <p>
+	 * Both ends are inclusive.
+	 */
+	public boolean contains(RangeF other) {
+		return begin <= other.begin && other.end <= end;
+	}
+
 	@Override
 	public int compareTo(RangeF other) {
 		int i = Float.compare(begin, other.begin);

@@ -50,10 +50,12 @@ public class DataSet {
 	private final float[][] rawData;
 	private final RangeF    minMax;
 
-	private final float[][] data;
+	private       RangeF    filterMinMax;
+	private final float[][] filteredData;
 	private       boolean   dirty = true;
 
 	/**
+	 * @param rawData      The data to store. The object is stored as-is without copying.
 	 * @param absoluteZero Whether the values start at 0 or can go negative (should find minimum)
 	 */
 	protected DataSet(float[][] rawData, int width, int height, boolean absoluteZero) {
@@ -69,8 +71,9 @@ public class DataSet {
 		}
 
 		minMax = findMinMax(rawData, absoluteZero);
+		filterMinMax = minMax;
 
-		data = new float[12][rawData[0].length];
+		filteredData = new float[12][rawData[0].length];
 	}
 
 	private static RangeF findMinMax(float[][] rawData, boolean absoluteZero) {
@@ -98,10 +101,6 @@ public class DataSet {
 		return RangeF.of(min, max);
 	}
 
-	protected void markDirty() {
-		dirty = true;
-	}
-
 	public int getWidth() {
 		return width;
 	}
@@ -110,34 +109,69 @@ public class DataSet {
 		return height;
 	}
 
+	/**
+	 * Returns a view into the (mutable!) internal data.
+	 * <p>
+	 * The array has dimensions [month 0..12][pixel 0..width*height].
+	 * <p>
+	 * This array is the same as provided to the constructor.
+	 */
+	@SuppressWarnings("AssignmentOrReturnOfFieldWithMutableType")
+	public float[][] getRawData() {
+		return rawData;
+	}
+
 	public RangeF getMinMax() {
 		return minMax;
 	}
 
+	public RangeF getFilterMinMax() {
+		return filterMinMax;
+	}
+
+	public void setFilterMinMax(RangeF filterMinMax) {
+		requireNonNull(filterMinMax, "filterMinMax");
+
+		if (this.filterMinMax.equals(filterMinMax)) {
+			return;
+		}
+
+		this.filterMinMax = filterMinMax;
+		markDirty();
+	}
+
+	protected void markDirty() {
+		dirty = true;
+	}
+
 	/**
-	 * Returns a view into the (mutable!) internal data.
+	 * Returns a view into the (mutable!) raw data.
 	 * <p>
 	 * The array has dimensions [month 0..12][pixel 0..width*height].
 	 * <p>
 	 * This data in this view is regenerated every time a parameter is changed.
 	 */
 	@SuppressWarnings("AssignmentOrReturnOfFieldWithMutableType")
-	public float[][] getData() {
+	public float[][] getFilteredData() {
 		if (dirty) {
 			regenerate();
 			dirty = false;
 		}
 
-		return data;
+		return filteredData;
 	}
 
 	protected void regenerate() {
 		for (int month = 0; month < 12; month++) {
-			float[] rawMonthData = rawData[month];
-			float[] monthData    = data[month];
+			float[] rawMonthData      = rawData[month];
+			float[] filteredMonthData = filteredData[month];
 
 			for (int i = 0; i < rawMonthData.length; i++) {
-				monthData[i] = minMax.unLerp(rawMonthData[i]);
+				if (filterMinMax.contains(rawMonthData[i])) {
+					filteredMonthData[i] = 1;
+				} else {
+					filteredMonthData[i] = 0;
+				}
 			}
 		}
 	}

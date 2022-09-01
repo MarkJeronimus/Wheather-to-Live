@@ -44,6 +44,7 @@ import org.digitalmodular.weathertolive.util.AnimationFrame;
 import org.digitalmodular.weathertolive.util.AnimationZoomPanel;
 import org.digitalmodular.weathertolive.util.ColorGradient;
 import org.digitalmodular.weathertolive.util.GraphicsUtilities;
+import org.digitalmodular.weathertolive.util.RangeF;
 
 /**
  * @author Mark Jeronimus
@@ -102,7 +103,7 @@ public class WeatherToLivePanel extends JPanel {
 			worldPanel.zoomFit();
 		}
 
-		boolean canAnimate = climateDataSet != null && climateDataSet.getDataSets().get(0).getData().length > 1;
+		boolean canAnimate = climateDataSet != null;
 		bottomPanel.setAnimatable(canAnimate); // This will percolate to setAnimated()
 		setMonth(0);
 	}
@@ -110,7 +111,9 @@ public class WeatherToLivePanel extends JPanel {
 	private List<AnimationFrame> makeAtlasSequence(DataSet dataset) {
 		List<AnimationFrame> atlasSequence = new ArrayList<>(12);
 
-		float[][] monthlyData = dataset.getData();
+		float[][] rawData = dataset.getRawData();
+		RangeF    minMax  = dataset.getMinMax();
+		int       length  = rawData[0].length;
 
 		for (int month = 0; month < 12; month++) {
 			BufferedImage image = new BufferedImage(dataset.getWidth(),
@@ -118,15 +121,17 @@ public class WeatherToLivePanel extends JPanel {
 			                                        BufferedImage.TYPE_INT_RGB);
 			int[] pixels = ((DataBufferInt)image.getRaster().getDataBuffer()).getData();
 
-			float[] data = monthlyData[month];
+			float[] rawMonthData = rawData[month];
 
-			for (int i = 0; i < data.length; i++) {
-				if (Float.isNaN(data[i])) {
+			for (int i = 0; i < length; i++) {
+				float value = minMax.unLerp(rawMonthData[i]);
+
+				if (Float.isNaN(value)) {
 					pixels[i] = DataSet.SEA_BLUE;
 				} else if (gradient != null) {
-					pixels[i] = gradient.getColor(data[i]);
+					pixels[i] = gradient.getColor(value);
 				} else {
-					pixels[i] = (int)(data[i] * 255);
+					pixels[i] = (int)(value * 255);
 				}
 			}
 
