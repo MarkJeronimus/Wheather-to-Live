@@ -78,7 +78,6 @@ public class BottomPanel extends JPanel {
 		buttonsPanel.add(saveButton);
 		add(buttonsPanel, BorderLayout.LINE_START);
 
-		parametersPanel.setLayout(new BoxLayout(parametersPanel, BoxLayout.Y_AXIS));
 		parametersPanel.add(new ParameterPanel());
 		add(parametersPanel, BorderLayout.CENTER);
 
