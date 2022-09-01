@@ -37,7 +37,7 @@ import javax.swing.event.ChangeEvent;
 import org.jetbrains.annotations.Nullable;
 
 import com.jidesoft.swing.RangeSlider;
-import org.digitalmodular.weathertolive.dataset.DataSet;
+import org.digitalmodular.weathertolive.dataset.FilteredDataSet;
 import org.digitalmodular.weathertolive.util.PreferredNumbers;
 import org.digitalmodular.weathertolive.util.RangeF;
 import static org.digitalmodular.weathertolive.util.ValidatorUtilities.requireNonNull;
@@ -50,7 +50,7 @@ public class DataSetParameterPanel extends JPanel {
 	private static final int              MIN_SLIDER_STEPS = 100;
 	private static final PreferredNumbers STEP_QUANTIZER   = new PreferredNumbers(10, 100, 125, 150, 200, 500);
 
-	private final DataSet dataSet;
+	private final FilteredDataSet dataSet;
 
 	private final DecimalFormat numberFormat;
 
@@ -63,11 +63,11 @@ public class DataSetParameterPanel extends JPanel {
 	private final float sliderStepSize;
 
 	@SuppressWarnings("OverridableMethodCallDuringObjectConstruction")
-	public DataSetParameterPanel(DataSet dataSet) {
+	public DataSetParameterPanel(FilteredDataSet dataSet) {
 		super(new BorderLayout());
 		this.dataSet = requireNonNull(dataSet, "dataSet");
 
-		RangeF minMax        = dataSet.getMinMax();
+		RangeF minMax        = dataSet.getDataSet().getMinMax();
 		int    quantizerStep = calculateQuantizerStep(minMax);
 		sliderStepSize = (float)STEP_QUANTIZER.exp(quantizerStep);
 		numberFormat = makeNumberFormat(quantizerStep);
@@ -75,7 +75,7 @@ public class DataSetParameterPanel extends JPanel {
 		prepareSliderRange(minMax);
 
 		{
-			nameLabel.setText(dataSet.getName() + ' ');
+			nameLabel.setText(dataSet.getDataSet().getName() + ' ');
 			add(nameLabel, BorderLayout.LINE_START);
 		}
 		{

@@ -52,10 +52,6 @@ public class DataSet {
 	private final float[][] rawData;
 	private final RangeF    minMax;
 
-	private       RangeF    filterMinMax;
-	private final float[][] filteredData;
-	private       boolean   dirty = true;
-
 	/**
 	 * @param rawData      The data to store. The object is stored as-is without copying.
 	 * @param absoluteZero Whether the values start at 0 or can go negative (should find minimum)
@@ -74,9 +70,6 @@ public class DataSet {
 		}
 
 		minMax = findMinMax(rawData, absoluteZero);
-		filterMinMax = minMax;
-
-		filteredData = new float[12][rawData[0].length];
 	}
 
 	private static RangeF findMinMax(float[][] rawData, boolean absoluteZero) {
@@ -130,56 +123,5 @@ public class DataSet {
 
 	public RangeF getMinMax() {
 		return minMax;
-	}
-
-	public RangeF getFilterMinMax() {
-		return filterMinMax;
-	}
-
-	public void setFilterMinMax(RangeF filterMinMax) {
-		requireNonNull(filterMinMax, "filterMinMax");
-
-		if (this.filterMinMax.equals(filterMinMax)) {
-			return;
-		}
-
-		this.filterMinMax = filterMinMax;
-		markDirty();
-	}
-
-	protected void markDirty() {
-		dirty = true;
-	}
-
-	/**
-	 * Returns a view into the (mutable!) raw data.
-	 * <p>
-	 * The array has dimensions [month 0..12][pixel 0..width*height].
-	 * <p>
-	 * This data in this view is regenerated every time a parameter is changed.
-	 */
-	@SuppressWarnings("AssignmentOrReturnOfFieldWithMutableType")
-	public float[][] getFilteredData() {
-		if (dirty) {
-			regenerate();
-			dirty = false;
-		}
-
-		return filteredData;
-	}
-
-	protected void regenerate() {
-		for (int month = 0; month < 12; month++) {
-			float[] rawMonthData      = rawData[month];
-			float[] filteredMonthData = filteredData[month];
-
-			for (int i = 0; i < rawMonthData.length; i++) {
-				if (filterMinMax.contains(rawMonthData[i])) {
-					filteredMonthData[i] = 1;
-				} else {
-					filteredMonthData[i] = 0;
-				}
-			}
-		}
 	}
 }

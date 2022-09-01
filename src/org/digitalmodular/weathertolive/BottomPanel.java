@@ -38,7 +38,7 @@ import javax.swing.JSlider;
 import javax.swing.event.ChangeEvent;
 
 import org.digitalmodular.weathertolive.dataset.ClimateDataSet;
-import org.digitalmodular.weathertolive.dataset.DataSet;
+import org.digitalmodular.weathertolive.dataset.FilteredDataSet;
 import org.digitalmodular.weathertolive.util.LabelSlider;
 import org.digitalmodular.weathertolive.util.ListPanel;
 import static org.digitalmodular.weathertolive.util.ValidatorUtilities.requireNonNull;
@@ -91,7 +91,7 @@ public class BottomPanel extends JPanel {
 
 	public void prepareFilters(ClimateDataSet climateDataSet) {
 		filterPanel.removeAll();
-		for (DataSet dataSet : climateDataSet.getDataSets()) {
+		for (FilteredDataSet dataSet : climateDataSet.getDataSets()) {
 			filterPanel.add(new DataSetParameterPanel(dataSet));
 		}
 	}

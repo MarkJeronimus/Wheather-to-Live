@@ -104,7 +104,7 @@ public class WeatherToLivePanel extends JPanel {
 	private void rebuildAtlas() {
 		assert climateDataSet != null;
 
-		List<AnimationFrame> atlasSequence = makeAtlasSequence(climateDataSet.getDataSets().get(0));
+		List<AnimationFrame> atlasSequence = makeAtlasSequence(climateDataSet.getDataSets().get(0).getDataSet());
 
 		worldPanel.setAnimation(atlasSequence);
 		worldPanel.zoomFit();
