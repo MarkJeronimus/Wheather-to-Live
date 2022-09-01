@@ -38,7 +38,6 @@ import com.formdev.flatlaf.FlatDarkLaf;
 import com.formdev.flatlaf.FlatLaf;
 import com.jidesoft.plaf.LookAndFeelFactory;
 import org.digitalmodular.weathertolive.dataset.ClimateDataSet;
-import org.digitalmodular.weathertolive.dataset.DataSet;
 import org.digitalmodular.weathertolive.dataset.WorldClimDatasetFactory;
 import org.digitalmodular.weathertolive.util.ColorGradient;
 
@@ -50,8 +49,11 @@ public final class WeatherToLiveMain {
 	public static void main(String... args) throws IOException, ExecutionException, InterruptedException {
 		ColorGradient gradient = new ColorGradient(new File("Inferno-mod.png"));
 
-		DataSet        dataSet        = WorldClimDatasetFactory.createFor("wc2.1_10m_tmax.zip", false);
-		ClimateDataSet climateDataSet = new ClimateDataSet(List.of(dataSet));
+		ClimateDataSet climateDataSet = new ClimateDataSet(List.of(
+				WorldClimDatasetFactory.createFor("wc2.1_10m_tmax.zip", false),
+				WorldClimDatasetFactory.createFor("wc2.1_10m_prec.zip", true),
+				WorldClimDatasetFactory.createFor("wc2.1_10m_wind.zip", true)
+		));
 
 		SwingUtilities.invokeLater(() -> {
 			FlatLaf.setup(new FlatDarkLaf());
@@ -69,7 +71,7 @@ public final class WeatherToLiveMain {
 
 			weatherToLivePanel.setClimateDataSet(climateDataSet);
 			weatherToLivePanel.setGradient(gradient);
-			weatherToLivePanel.rebuildAtlas();
+			weatherToLivePanel.dataChanged();
 		});
 	}
 }

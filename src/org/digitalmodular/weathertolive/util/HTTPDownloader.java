@@ -226,8 +226,9 @@ public class HTTPDownloader {
 	}
 
 	private static void addExtraRequestProperties(URLConnection connection, String[] extraRequestProperties) {
-		for (String extraRequestProperty : extraRequestProperties)
+		for (String extraRequestProperty : extraRequestProperties) {
 			addExtraRequestProperty(connection, extraRequestProperty);
+		}
 	}
 
 	private static void addExtraRequestProperty(URLConnection connection, @Nullable String s) {

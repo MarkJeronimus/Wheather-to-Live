@@ -37,6 +37,8 @@ import javax.swing.JPanel;
 import javax.swing.JSlider;
 import javax.swing.event.ChangeEvent;
 
+import org.digitalmodular.weathertolive.dataset.ClimateDataSet;
+import org.digitalmodular.weathertolive.dataset.DataSet;
 import org.digitalmodular.weathertolive.util.LabelSlider;
 import org.digitalmodular.weathertolive.util.ListPanel;
 import static org.digitalmodular.weathertolive.util.ValidatorUtilities.requireNonNull;
@@ -58,7 +60,7 @@ public class BottomPanel extends JPanel {
 	private final JSlider   monthSlider         = new LabelSlider(Arrays.asList(
 			"j", "f", "m", "a", "m", "j", "j", "a", "s", "o", "n", "d"));
 
-	private final JPanel parametersPanel = new ListPanel(BoxLayout.X_AXIS, SPACING);
+	private final JPanel filterPanel = new ListPanel(BoxLayout.X_AXIS, SPACING);
 
 	@SuppressWarnings("OverridableMethodCallDuringObjectConstruction")
 	public BottomPanel(WeatherToLivePanel parent) {
@@ -78,14 +80,20 @@ public class BottomPanel extends JPanel {
 		buttonsPanel.add(saveButton);
 		add(buttonsPanel, BorderLayout.LINE_START);
 
-		parametersPanel.add(new ParameterPanel());
-		add(parametersPanel, BorderLayout.CENTER);
+		add(filterPanel, BorderLayout.CENTER);
 
 		JPanel optionsPanel = new ListPanel(BoxLayout.Y_AXIS, SPACING);
 		optionsPanel.add(fastPreviewCheckbox);
 		optionsPanel.add(animateCheckbox);
 		optionsPanel.add(monthSlider);
 		add(optionsPanel, BorderLayout.LINE_END);
+	}
+
+	public void prepareFilters(ClimateDataSet climateDataSet) {
+		filterPanel.removeAll();
+		for (DataSet dataSet : climateDataSet.getDataSets()) {
+			filterPanel.add(new DataSetParameterPanel(dataSet));
+		}
 	}
 
 	private void attachListeners() {
@@ -105,7 +113,7 @@ public class BottomPanel extends JPanel {
 		}
 	}
 
-	private void valueChanged(ChangeEvent changeEvent) {
+	private void valueChanged(ChangeEvent e) {
 		parent.setMonth(monthSlider.getValue());
 	}
 

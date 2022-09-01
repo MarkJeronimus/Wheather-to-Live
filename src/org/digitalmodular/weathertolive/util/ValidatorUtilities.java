@@ -334,37 +334,41 @@ public final class ValidatorUtilities {
 
 	public static int[] requireValuesAtLeast(int min, int[] actual, String varName) {
 		requireNonNull(actual, varName);
-		for (int i = 0; i < actual.length; i++)
+		for (int i = 0; i < actual.length; i++) {
 			if (actual[i] < min) {
 				throw new IllegalArgumentException(varName + '[' + i + "] must be at least " + min + ": " + actual[i]);
 			}
+		}
 		return actual;
 	}
 
 	public static <T> T[] requireNonNullElements(T[] actual, String varName) {
 		requireNonNull(actual, varName);
-		for (int i = 0; i < actual.length; i++)
+		for (int i = 0; i < actual.length; i++) {
 			if (actual[i] == null) {
 				throw new IllegalArgumentException(varName + '[' + i + "] can't be null");
 			}
+		}
 		return actual;
 	}
 
 	public static <T extends Iterable<E>, E> T requireNonNullElements(T actual, String varName) {
 		requireNonNull(actual, varName);
-		for (E obj : actual)
+		for (E obj : actual) {
 			if (obj == null) {
 				throw new IllegalArgumentException('\'' + varName + "' contains a null element");
 			}
+		}
 		return actual;
 	}
 
 	public static <M extends Map<K, V>, K, V> M requireNonNullElements(M actual, String varName) {
 		requireNonNull(actual, varName);
-		for (V obj : actual.values())
+		for (V obj : actual.values()) {
 			if (obj == null) {
 				throw new IllegalArgumentException('\'' + varName + "' contains a null element");
 			}
+		}
 		return actual;
 	}
 
@@ -421,10 +425,11 @@ public final class ValidatorUtilities {
 
 	public static <T> T requireOneOf(T[] allowed, T actual, String varName) {
 		requireNonNull(actual, varName);
-		for (T element : allowed)
+		for (T element : allowed) {
 			if (Objects.equals(element, actual)) {
 				return actual;
 			}
+		}
 		throw new IllegalArgumentException(
 				'\'' + varName + "' must be one of " + Arrays.toString(allowed) + ": " + actual);
 	}

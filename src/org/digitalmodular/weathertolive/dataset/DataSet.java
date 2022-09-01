@@ -30,6 +30,7 @@ import org.digitalmodular.weathertolive.util.RangeF;
 import static org.digitalmodular.weathertolive.util.ValidatorUtilities.requireArrayLengthExactly;
 import static org.digitalmodular.weathertolive.util.ValidatorUtilities.requireAtLeast;
 import static org.digitalmodular.weathertolive.util.ValidatorUtilities.requireNonNull;
+import static org.digitalmodular.weathertolive.util.ValidatorUtilities.requireStringLengthAtLeast;
 import static org.digitalmodular.weathertolive.util.ValidatorUtilities.requireThat;
 
 /**
@@ -45,6 +46,7 @@ import static org.digitalmodular.weathertolive.util.ValidatorUtilities.requireTh
 public class DataSet {
 	public static final int SEA_BLUE = 0x001020;
 
+	private final String    name;
 	private final int       width;
 	private final int       height;
 	private final float[][] rawData;
@@ -58,7 +60,8 @@ public class DataSet {
 	 * @param rawData      The data to store. The object is stored as-is without copying.
 	 * @param absoluteZero Whether the values start at 0 or can go negative (should find minimum)
 	 */
-	protected DataSet(float[][] rawData, int width, int height, boolean absoluteZero) {
+	protected DataSet(String name, float[][] rawData, int width, int height, boolean absoluteZero) {
+		this.name = requireStringLengthAtLeast(1, name, "name");
 		this.rawData = requireNonNull(rawData, "rawData");
 		requireArrayLengthExactly(12, rawData, "rawData");
 		this.width = requireAtLeast(360, width, "width");
@@ -99,6 +102,10 @@ public class DataSet {
 		}
 
 		return RangeF.of(min, max);
+	}
+
+	public String getName() {
+		return name;
 	}
 
 	public int getWidth() {

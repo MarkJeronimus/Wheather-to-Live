@@ -157,7 +157,8 @@ public class HTTPResponseStream extends InputStreamWithLength {
 	}
 
 	private void fireProgressUpdated(ProgressEvent event) {
-		for (ProgressListener listener : listeners)
+		for (ProgressListener listener : listeners) {
 			listener.progressUpdated(event);
+		}
 	}
 }

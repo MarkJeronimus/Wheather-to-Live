@@ -79,7 +79,8 @@ public final class WorldClimDatasetFactory {
 				rawData[month] = convertGeoTiffToRawData(geoData);
 			}
 
-			return new DataSet(rawData, width, height, absoluteZero);
+			String name = prefix.substring(prefix.length() - 4);
+			return new DataSet(name, rawData, width, height, absoluteZero);
 		}
 	}
 

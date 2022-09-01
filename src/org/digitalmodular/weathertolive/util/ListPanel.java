@@ -34,17 +34,21 @@ import javax.swing.BoxLayout;
 import javax.swing.JPanel;
 
 import static org.digitalmodular.weathertolive.util.ValidatorUtilities.requireAtLeast;
+import static org.digitalmodular.weathertolive.util.ValidatorUtilities.requireRange;
 
 /**
  * @author Mark Jeronimus
  */
 // Created 2022-08-31
 public class ListPanel extends JPanel {
+	private final int axis;
+
 	private final JPanel topAlignPanel = new JPanel(null);
 
 	@SuppressWarnings("OverridableMethodCallDuringObjectConstruction")
 	public ListPanel(int axis, int spacing) {
 		super(new BorderLayout());
+		this.axis = requireRange(0, 1, axis, "axis");
 		requireAtLeast(0, spacing, "spacing");
 
 		topAlignPanel.setBorder(BorderFactory.createEmptyBorder(spacing, spacing, spacing, spacing));
@@ -54,9 +58,18 @@ public class ListPanel extends JPanel {
 	}
 
 	@Override
+	public void removeAll() {
+		topAlignPanel.removeAll();
+	}
+
+	@Override
 	public Component add(Component comp) {
 		if (topAlignPanel.getComponentCount() > 0) {
-			topAlignPanel.add(Box.createVerticalStrut(4));
+			if (axis == BoxLayout.Y_AXIS) {
+				topAlignPanel.add(Box.createVerticalStrut(4));
+			} else {
+				topAlignPanel.add(Box.createHorizontalStrut(4));
+			}
 		}
 
 		JPanel p = new JPanel(new BorderLayout());

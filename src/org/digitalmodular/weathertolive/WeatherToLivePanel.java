@@ -32,7 +32,6 @@ import java.awt.DisplayMode;
 import java.awt.image.BufferedImage;
 import java.awt.image.DataBufferInt;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import javax.swing.JPanel;
 
@@ -45,6 +44,7 @@ import org.digitalmodular.weathertolive.util.AnimationZoomPanel;
 import org.digitalmodular.weathertolive.util.ColorGradient;
 import org.digitalmodular.weathertolive.util.GraphicsUtilities;
 import org.digitalmodular.weathertolive.util.RangeF;
+import static org.digitalmodular.weathertolive.util.ValidatorUtilities.requireNonNull;
 
 /**
  * @author Mark Jeronimus
@@ -75,10 +75,10 @@ public class WeatherToLivePanel extends JPanel {
 	}
 
 	/**
-	 * A call of this must be followed by a call to {@link #rebuildAtlas()}!
+	 * A call of this must eventually be followed by a call to {@link #dataChanged()}!
 	 */
-	public void setClimateDataSet(@Nullable ClimateDataSet climateDataSet) {
-		this.climateDataSet = climateDataSet;
+	public void setClimateDataSet(ClimateDataSet climateDataSet) {
+		this.climateDataSet = requireNonNull(climateDataSet, "climateDataSet");
 	}
 
 	public @Nullable ColorGradient getGradient() {
@@ -86,22 +86,28 @@ public class WeatherToLivePanel extends JPanel {
 	}
 
 	/**
-	 * A call of this must be followed by a call to {@link #rebuildAtlas()}!
+	 * A call of this must eventually be followed by a call to {@link #dataChanged()}!
 	 */
 	public void setGradient(@Nullable ColorGradient gradient) {
 		this.gradient = gradient;
 	}
 
-	public void rebuildAtlas() {
+	public void dataChanged() {
 		if (climateDataSet == null) {
-			worldPanel.setAnimation(Collections.emptyList());
-			bottomPanel.setAnimatable(false);
-		} else {
-			List<AnimationFrame> atlasSequence = makeAtlasSequence(climateDataSet.getDataSets().get(0));
-
-			worldPanel.setAnimation(atlasSequence);
-			worldPanel.zoomFit();
+			throw new IllegalStateException("setClimateDataSet() has not been called");
 		}
+
+		rebuildAtlas();
+		rebuildFilterPanel();
+	}
+
+	private void rebuildAtlas() {
+		assert climateDataSet != null;
+
+		List<AnimationFrame> atlasSequence = makeAtlasSequence(climateDataSet.getDataSets().get(0));
+
+		worldPanel.setAnimation(atlasSequence);
+		worldPanel.zoomFit();
 
 		boolean canAnimate = climateDataSet != null;
 		bottomPanel.setAnimatable(canAnimate); // This will percolate to setAnimated()
@@ -139,6 +145,12 @@ public class WeatherToLivePanel extends JPanel {
 		}
 
 		return atlasSequence;
+	}
+
+	private void rebuildFilterPanel() {
+		assert climateDataSet != null;
+
+		bottomPanel.prepareFilters(climateDataSet);
 	}
 
 	public void setFastPreview(boolean fastPreview) {
