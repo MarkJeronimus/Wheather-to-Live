@@ -29,9 +29,12 @@ package org.digitalmodular.weathertolive;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
+import java.text.DecimalFormat;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.event.ChangeEvent;
+
+import org.jetbrains.annotations.Nullable;
 
 import com.jidesoft.swing.RangeSlider;
 import org.digitalmodular.weathertolive.dataset.DataSet;
@@ -49,11 +52,13 @@ public class DataSetParameterPanel extends JPanel {
 
 	private final DataSet dataSet;
 
-	private final JLabel      nameLabel        = new JLabel();
-	private final JPanel      thumbnailPanel   = new JPanel();
-	private final JLabel      sliderBeginLabel = new JLabel("000.0");
-	private final RangeSlider slider           = new RangeSlider();
-	private final JLabel      sliderEndLabel   = new JLabel("000.0");
+	private final DecimalFormat numberFormat;
+
+	private final JLabel      nameLabel      = new JLabel();
+	private final JPanel      thumbnailPanel = new JPanel();
+	private final JLabel      beginLabel     = new JLabel();
+	private final RangeSlider slider         = new RangeSlider();
+	private final JLabel      endLabel       = new JLabel();
 
 	private final float sliderStepSize;
 
@@ -61,6 +66,13 @@ public class DataSetParameterPanel extends JPanel {
 	public DataSetParameterPanel(DataSet dataSet) {
 		super(new BorderLayout());
 		this.dataSet = requireNonNull(dataSet, "dataSet");
+
+		RangeF minMax        = dataSet.getMinMax();
+		int    quantizerStep = calculateQuantizerStep(minMax);
+		sliderStepSize = (float)STEP_QUANTIZER.exp(quantizerStep);
+		numberFormat = makeNumberFormat(quantizerStep);
+		prepareLabelWidths(minMax);
+		prepareSliderRange(minMax);
 
 		{
 			nameLabel.setText(dataSet.getName() + ' ');
@@ -74,16 +86,12 @@ public class DataSetParameterPanel extends JPanel {
 		{
 			JPanel p = new JPanel(new BorderLayout());
 
-			{
-				sliderBeginLabel.setPreferredSize(sliderBeginLabel.getMinimumSize());
-				p.add(sliderBeginLabel, BorderLayout.LINE_START);
-			}
+			p.add(beginLabel, BorderLayout.LINE_START);
 			{
 				slider.setMajorTickSpacing(10000);
 				slider.setMinorTickSpacing(10);
 				slider.setPaintTicks(true);
 				slider.setPaintLabels(true);
-				sliderStepSize = prepareSliderRange(dataSet.getMinMax());
 				slider.addChangeListener(this::valueChanged);
 
 				int size = slider.getFont().getSize();
@@ -91,34 +99,50 @@ public class DataSetParameterPanel extends JPanel {
 
 				p.add(slider, BorderLayout.CENTER);
 			}
-			{
-				sliderEndLabel.setPreferredSize(sliderEndLabel.getMinimumSize());
-				p.add(sliderEndLabel, BorderLayout.LINE_END);
-			}
+			p.add(endLabel, BorderLayout.LINE_END);
 
 			add(p, BorderLayout.SOUTH);
 		}
 
-//		setPreferredSize(getMinimumSize());
+		valueChanged(null); // Initialize real label values
 	}
 
-	private float prepareSliderRange(RangeF minMax) {
-		float span           = minMax.getSpan();
-		float stepSize       = span / MIN_SLIDER_STEPS;
-		float sliderStepSize = (float)STEP_QUANTIZER.exp(STEP_QUANTIZER.log(stepSize));
+	private static int calculateQuantizerStep(RangeF minMax) {
+		float span          = minMax.getSpan();
+		float stepSize      = span / MIN_SLIDER_STEPS;
+		int   quantizerStep = STEP_QUANTIZER.log(stepSize);
+		return quantizerStep;
+	}
 
+	private static DecimalFormat makeNumberFormat(int quantizerStep) {
+		int numDecimals = -2 - (int)Math.floor(quantizerStep / (float)STEP_QUANTIZER.getNumValuesPerBase());
+		if (numDecimals <= 0) {
+			return new DecimalFormat("0");
+		} else {
+			String pattern = "0." + "0".repeat(numDecimals);
+			return new DecimalFormat(pattern);
+		}
+	}
+
+	private void prepareLabelWidths(RangeF minMax) {
+		updateLabels(minMax);
+		int width = beginLabel.getMinimumSize().width;
+		width = Math.max(width, endLabel.getMinimumSize().width);
+
+		beginLabel.setPreferredSize(new Dimension(width, beginLabel.getMinimumSize().height));
+		endLabel.setPreferredSize(new Dimension(width, endLabel.getMinimumSize().height));
+	}
+
+	private void prepareSliderRange(RangeF minMax) {
 		int min = (int)Math.floor(minMax.getBegin() / sliderStepSize);
 		int max = (int)Math.ceil(minMax.getEnd() / sliderStepSize);
 		slider.getModel().setRangeProperties(min, max - min, min, max, false);
-
-		return sliderStepSize;
 	}
 
-	private void valueChanged(ChangeEvent e) {
+	private void valueChanged(@Nullable ChangeEvent e) {
 		RangeF minMax = getMinMax();
 
-		sliderBeginLabel.setText("" + minMax.getBegin());
-		sliderEndLabel.setText("" + minMax.getEnd());
+		updateLabels(minMax);
 
 		dataSet.setFilterMinMax(minMax);
 		updateThumbnail();
@@ -128,6 +152,11 @@ public class DataSetParameterPanel extends JPanel {
 		int begin = slider.getValue();
 		int end   = begin + slider.getExtent();
 		return RangeF.of(begin * sliderStepSize, end * sliderStepSize);
+	}
+
+	private void updateLabels(RangeF minMax) {
+		beginLabel.setText(numberFormat.format(minMax.getBegin()));
+		endLabel.setText(numberFormat.format(minMax.getEnd()));
 	}
 
 	public void updateThumbnail() {

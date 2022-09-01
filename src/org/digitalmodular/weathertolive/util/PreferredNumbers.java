@@ -107,6 +107,17 @@ public class PreferredNumbers {
 		logBase = Math.log(base);
 	}
 
+	public int getBase() {
+		return base;
+	}
+
+	/**
+	 * @return The number of values that span a magnitude of size {@link #getBase() base};
+	 */
+	public int getNumValuesPerBase() {
+		return values.length;
+	}
+
 	/**
 	 * Calculates the value for the index. An index of 0 always corresponds to the first element of the values array
 	 * used when instantiating.
