@@ -26,6 +26,8 @@
  */
 package org.digitalmodular.weathertolive.dataset;
 
+import org.jetbrains.annotations.Nullable;
+
 import org.digitalmodular.weathertolive.util.RangeF;
 import static org.digitalmodular.weathertolive.util.ValidatorUtilities.requireNonNull;
 
@@ -36,9 +38,13 @@ import static org.digitalmodular.weathertolive.util.ValidatorUtilities.requireNo
 public class FilteredDataSet {
 	private final DataSet dataSet;
 
-	private       boolean   dirty = true;
-	private       RangeF    filterMinMax;
+	private RangeF filterMinMax;
+
+	private       boolean   mainDataDirty = true;
 	private final float[][] filteredData;
+
+	private       boolean   thumbnailDataDirty = true;
+	private final float[][] filteredThumbnails = new float[12][DataSet.THUMBNAIL_PIXELS];
 
 	public FilteredDataSet(DataSet dataSet) {
 		this.dataSet = requireNonNull(dataSet, "dataSet");
@@ -53,7 +59,8 @@ public class FilteredDataSet {
 	}
 
 	private void markDirty() {
-		dirty = true;
+		mainDataDirty = true;
+		thumbnailDataDirty = true;
 	}
 
 	public RangeF getFilterMinMax() {
@@ -80,15 +87,32 @@ public class FilteredDataSet {
 	 */
 	@SuppressWarnings("AssignmentOrReturnOfFieldWithMutableType")
 	public float[][] getFilteredData() {
-		if (dirty) {
-			doFilter();
-			dirty = false;
+		if (mainDataDirty) {
+			filterMainData();
+			mainDataDirty = false;
 		}
 
 		return filteredData;
 	}
 
-	private void doFilter() {
+	/**
+	 * Returns a view into the (mutable!) raw data.
+	 * <p>
+	 * The array has dimensions [month 0..12][pixel 0..width*height].
+	 * <p>
+	 * This data in this view is regenerated every time a parameter is changed.
+	 */
+	@SuppressWarnings("AssignmentOrReturnOfFieldWithMutableType")
+	public float[][] getFilteredThumbnails() {
+		if (thumbnailDataDirty) {
+			filterThumbnailData();
+			thumbnailDataDirty = false;
+		}
+
+		return filteredThumbnails;
+	}
+
+	private void filterMainData() {
 		float[][] rawData = dataSet.getRawData();
 
 		for (int month = 0; month < 12; month++) {
@@ -96,10 +120,32 @@ public class FilteredDataSet {
 			float[] filteredMonthData = filteredData[month];
 
 			for (int i = 0; i < rawMonthData.length; i++) {
-				if (filterMinMax.contains(rawMonthData[i])) {
+				if (Float.isNaN(rawMonthData[i])) {
+					filteredMonthData[i] = Float.NaN;
+				} else if (filterMinMax.contains(rawMonthData[i])) {
 					filteredMonthData[i] = 1;
 				} else {
 					filteredMonthData[i] = 0;
+				}
+			}
+		}
+	}
+
+	private void filterThumbnailData() {
+		@Nullable RangeF[][] thumbnails = dataSet.getThumbnails();
+
+		for (int month = 0; month < 12; month++) {
+			@Nullable RangeF[] rawMonthData          = thumbnails[month];
+			float[]            filteredThumbnailData = filteredThumbnails[month];
+
+			for (int i = 0; i < rawMonthData.length; i++) {
+				@Nullable RangeF rawMonthDatum = rawMonthData[i];
+				if (rawMonthDatum == null) {
+					filteredThumbnailData[i] = Float.NaN;
+				} else if (filterMinMax.intersects(rawMonthDatum)) {
+					filteredThumbnailData[i] = 1;
+				} else {
+					filteredThumbnailData[i] = 0;
 				}
 			}
 		}

@@ -49,6 +49,8 @@ import org.digitalmodular.weathertolive.util.ImagePanel;
 import org.digitalmodular.weathertolive.util.PreferredNumbers;
 import org.digitalmodular.weathertolive.util.RangeF;
 import static org.digitalmodular.weathertolive.WeatherToLivePanel.SCALE_FACTOR;
+import static org.digitalmodular.weathertolive.dataset.DataSet.FILTER_HIGHLIGHT;
+import static org.digitalmodular.weathertolive.dataset.DataSet.LAND_GREEN;
 import static org.digitalmodular.weathertolive.dataset.DataSet.SEA_BLUE;
 import static org.digitalmodular.weathertolive.dataset.DataSet.THUMBNAIL_HEIGHT;
 import static org.digitalmodular.weathertolive.dataset.DataSet.THUMBNAIL_WIDTH;
@@ -176,28 +178,23 @@ public class DataSetParameterPanel extends JPanel {
 	public void updateThumbnail() {
 		List<AnimationFrame> thumbnailSequence = new ArrayList<>(12);
 
-		RangeF[][] thumbnails = dataSet.getDataSet().getThumbnails();
-		RangeF     minMax     = dataSet.getDataSet().getMinMax();
-		int        length     = thumbnails[0].length;
+		float[][] thumbnails = dataSet.getFilteredThumbnails();
+		int       length     = thumbnails[0].length;
 
 		for (int month = 0; month < 12; month++) {
 			BufferedImage image  = new BufferedImage(THUMBNAIL_WIDTH, THUMBNAIL_HEIGHT, BufferedImage.TYPE_INT_RGB);
 			int[]         pixels = ((DataBufferInt)image.getRaster().getDataBuffer()).getData();
 
-			RangeF[] monthThumbnail = thumbnails[0];
+			float[] monthThumbnail = thumbnails[0];
 
 			for (int i = 0; i < length; i++) {
-				@Nullable RangeF thumbnailPixel = monthThumbnail[i];
-				if (thumbnailPixel == null) {
+				float thumbnailPixel = monthThumbnail[i];
+				if (Float.isNaN(thumbnailPixel)) {
 					pixels[i] = SEA_BLUE;
+				} else if (thumbnailPixel > 0.0f) {
+					pixels[i] = FILTER_HIGHLIGHT;
 				} else {
-					float value = minMax.unLerp(thumbnailPixel.getCenter());
-
-//				    if (gradient != null) {
-//				    	pixels[i] = gradient.getColor(value);
-//					} else {
-					pixels[i] = (int)(value * 255);
-//					}
+					pixels[i] = LAND_GREEN;
 				}
 			}
 

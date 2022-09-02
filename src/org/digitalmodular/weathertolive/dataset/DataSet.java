@@ -26,6 +26,8 @@
  */
 package org.digitalmodular.weathertolive.dataset;
 
+import org.jetbrains.annotations.Nullable;
+
 import org.digitalmodular.weathertolive.util.RangeF;
 import org.digitalmodular.weathertolive.util.RangeFBuilder;
 import static org.digitalmodular.weathertolive.WeatherToLivePanel.SCALE_FACTOR;
@@ -46,12 +48,14 @@ import static org.digitalmodular.weathertolive.util.ValidatorUtilities.requireTh
  */
 // Created 2022-08-28
 public class DataSet {
-	public static final int SEA_BLUE = 0x001020;
+	public static final int SEA_BLUE         = 0x001020;
+	public static final int LAND_GREEN       = 0x304000;
+	public static final int FILTER_HIGHLIGHT = 0xFFFF00;
 
 	public static final int THUMBNAIL_HEIGHT = 90 * SCALE_FACTOR;
 	public static final int THUMBNAIL_WIDTH  = THUMBNAIL_HEIGHT * 2;
 
-	private static final int THUMBNAIL_PIXELS = THUMBNAIL_WIDTH * THUMBNAIL_HEIGHT;
+	static final int THUMBNAIL_PIXELS = THUMBNAIL_WIDTH * THUMBNAIL_HEIGHT;
 
 	private final String    name;
 	private final int       width;
@@ -59,7 +63,9 @@ public class DataSet {
 	private final float[][] rawData;
 	private final RangeF    minMax;
 
-	private final RangeF[][] thumbnails = new RangeF[12][THUMBNAIL_PIXELS];
+	// Confusing syntax for: Non-null array (pointer / object) of non-null arrays of @Nullable elements.
+	// https://checkerframework.org/jsr308/specification/java-annotation-design.html#array-syntax
+	private final @Nullable RangeF[][] thumbnails = new RangeF[12][THUMBNAIL_PIXELS];
 
 	/**
 	 * @param rawData      The data to store. The object is stored as-is without copying.
@@ -116,9 +122,9 @@ public class DataSet {
 		RangeFBuilder rb = new RangeFBuilder();
 
 		for (int month = 0; month < 12; month++) {
-			float[]  rawMonthData   = rawData[month];
-			RangeF[] monthThumbnail = thumbnails[month];
-			int      thumbI         = 0;
+			float[]            rawMonthData   = rawData[month];
+			@Nullable RangeF[] monthThumbnail = thumbnails[month];
+			int                thumbI         = 0;
 
 			for (int y = 0; y < THUMBNAIL_HEIGHT; y++) {
 				for (int x = 0; x < THUMBNAIL_WIDTH; x++) {
@@ -176,7 +182,7 @@ public class DataSet {
 	 * <p>
 	 * This data is generated once in the constructor.
 	 */
-	public RangeF[][] getThumbnails() {
+	public @Nullable RangeF[][] getThumbnails() {
 		return thumbnails;
 	}
 }

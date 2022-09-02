@@ -212,6 +212,17 @@ public class RangeF implements Comparable<RangeF> {
 		return begin <= other.begin && other.end <= end;
 	}
 
+	/**
+	 * Tests whether the range contains any part of the given range.
+	 * <p>
+	 * Both ends are inclusive.
+	 */
+	public boolean intersects(RangeF other) {
+		float begin = Math.max(this.begin, other.begin);
+		float end   = Math.min(this.end, other.end);
+		return begin <= end;
+	}
+
 	@Override
 	public int compareTo(RangeF other) {
 		int i = Float.compare(begin, other.begin);
