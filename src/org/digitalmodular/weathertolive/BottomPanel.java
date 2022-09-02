@@ -146,8 +146,8 @@ public class BottomPanel extends JPanel {
 
 	// Called from the outside, so don't call this from monthChanged()
 	public void setMonth(int month) {
-		for (int i = 0; i < filterPanel.getComponentCount(); i++) {
-			filterPanel.getParameterPanel(i).setMonth(month);
+		for (int i = 0; i < filterPanel.getNumChildren(); i++) {
+			filterPanel.getChild(i).setMonth(month);
 		}
 
 		monthSlider.setValue(month);
@@ -170,8 +170,8 @@ public class BottomPanel extends JPanel {
 	 * Called from outside, to update the inside.
 	 */
 	public void dataChanged() {
-		for (int i = 0; i < filterPanel.getComponentCount(); i++) {
-			filterPanel.getParameterPanel(i).dataChanged();
+		for (int i = 0; i < filterPanel.getNumChildren(); i++) {
+			filterPanel.getChild(i).dataChanged();
 		}
 	}
 }

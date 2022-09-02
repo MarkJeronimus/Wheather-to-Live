@@ -79,7 +79,11 @@ public class ListPanel extends JPanel {
 		return p;
 	}
 
-	public DataSetParameterPanel getParameterPanel(int index) {
+	public int getNumChildren() {
+		return topAlignPanel.getComponentCount();
+	}
+
+	public DataSetParameterPanel getChild(int index) {
 		JPanel p = (JPanel)topAlignPanel.getComponent(index);
 		return (DataSetParameterPanel)p.getComponent(0);
 	}
