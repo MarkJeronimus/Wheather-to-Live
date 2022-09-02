@@ -45,9 +45,9 @@ import com.jidesoft.swing.RangeSlider;
 import org.digitalmodular.weathertolive.dataset.FilteredDataSet;
 import org.digitalmodular.weathertolive.util.AnimationFrame;
 import org.digitalmodular.weathertolive.util.Animator;
+import org.digitalmodular.weathertolive.util.ImagePanel;
 import org.digitalmodular.weathertolive.util.PreferredNumbers;
 import org.digitalmodular.weathertolive.util.RangeF;
-import org.digitalmodular.weathertolive.util.ZoomPanel;
 import static org.digitalmodular.weathertolive.WeatherToLivePanel.SCALE_FACTOR;
 import static org.digitalmodular.weathertolive.dataset.DataSet.SEA_BLUE;
 import static org.digitalmodular.weathertolive.dataset.DataSet.THUMBNAIL_HEIGHT;
@@ -66,10 +66,10 @@ public class DataSetParameterPanel extends JPanel {
 
 	private final DecimalFormat numberFormat;
 
-	private final ZoomPanel thumbnailPanel = new ZoomPanel();
-	private final JLabel    beginLabel     = new JLabel();
-	private final JSlider   slider         = new RangeSlider();
-	private final JLabel    endLabel       = new JLabel();
+	private final ImagePanel thumbnailPanel = new ImagePanel(null, true);
+	private final JLabel     beginLabel     = new JLabel();
+	private final JSlider    slider         = new RangeSlider();
+	private final JLabel     endLabel       = new JLabel();
 
 	private final Animator animator = new Animator(thumbnailPanel::setImage);
 
@@ -92,8 +92,6 @@ public class DataSetParameterPanel extends JPanel {
 			add(nameLabel, BorderLayout.LINE_START);
 		}
 		{
-			int zoom = -1;
-			thumbnailPanel.setZoomLimits(zoom, 15);
 			thumbnailPanel.setPreferredSize(new Dimension(THUMBNAIL_WIDTH / SCALE_FACTOR,
 			                                              THUMBNAIL_HEIGHT / SCALE_FACTOR));
 			thumbnailPanel.setBackground(Color.BLACK);
