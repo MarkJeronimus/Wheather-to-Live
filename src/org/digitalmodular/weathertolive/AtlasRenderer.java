@@ -193,11 +193,11 @@ public class AtlasRenderer {
 		assert filteredDataSets != null;
 
 		for (FilteredDataSet filteredDataSet : filteredDataSets) {
-			float[] filteredMonthData = filteredDataSet.getFilteredData()[month];
-			int     length            = filteredMonthData.length;
+			int[] filteredMonthData = filteredDataSet.getFilteredData()[month];
+			int   length            = filteredMonthData.length;
 
 			for (int i = 0; i < length; i++) {
-				if (filteredMonthData[i] <= 0.0f) {
+				if (filteredMonthData[i] == 0) {
 					pixels[i] = DataSet.FILTER_SHADE;
 				}
 			}

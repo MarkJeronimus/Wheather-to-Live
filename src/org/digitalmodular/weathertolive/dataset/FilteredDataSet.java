@@ -41,17 +41,17 @@ public class FilteredDataSet {
 	private RangeF filterMinMax;
 
 	private       boolean   mainDataDirty = true;
-	private final float[][] filteredData;
+	private final int[][] filteredData;
 
 	private       boolean   thumbnailDataDirty = true;
-	private final float[][] filteredThumbnails = new float[12][DataSet.THUMBNAIL_PIXELS];
+	private final int[][] filteredThumbnails = new int[12][DataSet.THUMBNAIL_PIXELS];
 
 	public FilteredDataSet(DataSet dataSet) {
 		this.dataSet = requireNonNull(dataSet, "dataSet");
 
 		filterMinMax = dataSet.getMinMax();
 
-		filteredData = new float[12][dataSet.getRawData()[0].length];
+		filteredData = new int[12][dataSet.getRawData()[0].length];
 	}
 
 	public DataSet getDataSet() {
@@ -86,7 +86,7 @@ public class FilteredDataSet {
 	 * This data in this view is regenerated every time a parameter is changed.
 	 */
 	@SuppressWarnings("AssignmentOrReturnOfFieldWithMutableType")
-	public float[][] getFilteredData() {
+	public int[][] getFilteredData() {
 		if (mainDataDirty) {
 			filterMainData();
 			mainDataDirty = false;
@@ -103,7 +103,7 @@ public class FilteredDataSet {
 	 * This data in this view is regenerated every time a parameter is changed.
 	 */
 	@SuppressWarnings("AssignmentOrReturnOfFieldWithMutableType")
-	public float[][] getFilteredThumbnails() {
+	public int[][] getFilteredThumbnails() {
 		if (thumbnailDataDirty) {
 			filterThumbnailData();
 			thumbnailDataDirty = false;
@@ -117,11 +117,11 @@ public class FilteredDataSet {
 
 		for (int month = 0; month < 12; month++) {
 			float[] rawMonthData      = rawData[month];
-			float[] filteredMonthData = filteredData[month];
+			int[] filteredMonthData = filteredData[month];
 
 			for (int i = 0; i < rawMonthData.length; i++) {
 				if (Float.isNaN(rawMonthData[i])) {
-					filteredMonthData[i] = Float.NaN;
+					filteredMonthData[i] = -1;
 				} else if (filterMinMax.contains(rawMonthData[i])) {
 					filteredMonthData[i] = 1;
 				} else {
@@ -136,12 +136,12 @@ public class FilteredDataSet {
 
 		for (int month = 0; month < 12; month++) {
 			@Nullable RangeF[] rawMonthData          = thumbnails[month];
-			float[]            filteredThumbnailData = filteredThumbnails[month];
+			int[]            filteredThumbnailData = filteredThumbnails[month];
 
 			for (int i = 0; i < rawMonthData.length; i++) {
 				@Nullable RangeF rawMonthDatum = rawMonthData[i];
 				if (rawMonthDatum == null) {
-					filteredThumbnailData[i] = Float.NaN;
+					filteredThumbnailData[i] = -1;
 				} else if (filterMinMax.intersects(rawMonthDatum)) {
 					filteredThumbnailData[i] = 1;
 				} else {

@@ -204,8 +204,8 @@ public class DataSetParameterPanel extends JPanel {
 	public void updateThumbnail() {
 		List<AnimationFrame> thumbnailSequence = new ArrayList<>(12);
 
-		float[][] thumbnails = filteredDataSet.getFilteredThumbnails();
-		int       length     = thumbnails[0].length;
+		int[][] thumbnails = filteredDataSet.getFilteredThumbnails();
+		int     length     = thumbnails[0].length;
 
 		for (int month = 0; month < 12; month++) {
 			BufferedImage image = new BufferedImage(THUMBNAIL_WIDTH,
@@ -213,14 +213,14 @@ public class DataSetParameterPanel extends JPanel {
 			                                        BufferedImage.TYPE_INT_RGB);
 			int[] pixels = ((DataBufferInt)image.getRaster().getDataBuffer()).getData();
 
-			float[] monthThumbnail = thumbnails[month];
+			int[] monthThumbnail = thumbnails[month];
 
 			for (int i = 0; i < length; i++) {
 				float thumbnailPixel = monthThumbnail[i];
 
-				if (Float.isNaN(thumbnailPixel)) {
+				if (thumbnailPixel == -1) {
 					pixels[i] = SEA_BLUE;
-				} else if (thumbnailPixel > 0.0f) {
+				} else if (thumbnailPixel > 0) {
 					pixels[i] = FILTER_HIGHLIGHT;
 				} else {
 					pixels[i] = LAND_GREEN;
