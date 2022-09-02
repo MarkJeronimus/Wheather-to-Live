@@ -158,6 +158,7 @@ public class DataSetParameterPanel extends JPanel {
 		slider.getModel().setRangeProperties(min, max - min, min, max, false);
 	}
 
+	// Slider listener
 	private void valueChanged(@Nullable ChangeEvent e) {
 		RangeF minMax = getMinMax();
 

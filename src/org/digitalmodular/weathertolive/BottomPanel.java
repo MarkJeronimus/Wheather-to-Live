@@ -121,6 +121,7 @@ public class BottomPanel extends JPanel {
 		}
 	}
 
+	// Slider listener
 	private void monthChanged(ChangeEvent e) {
 		parent.setMonth(monthSlider.getValue());
 	}
@@ -133,6 +134,7 @@ public class BottomPanel extends JPanel {
 		}
 	}
 
+	// Called from the outside, so don't call this from monthChanged()
 	public void setMonth(int month) {
 		monthSlider.setValue(month);
 	}

@@ -93,7 +93,13 @@ public class ZoomPanel extends JPanel implements MouseListener,
 			return;
 		}
 
+		boolean wasEmpty = this.image == null;
+
 		this.image = image;
+
+		if (wasEmpty) {
+			zoomFit();
+		}
 
 		repaint();
 	}
