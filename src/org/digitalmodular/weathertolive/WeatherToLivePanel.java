@@ -60,8 +60,6 @@ public class WeatherToLivePanel extends JPanel {
 
 	private final Animator animator = new Animator(worldPanel::setImage);
 
-	private @Nullable ClimateDataSet climateDataSet = null;
-
 	private final AtlasRenderer atlasRenderer = new AtlasRenderer(animator::setAnimation);
 
 	@SuppressWarnings("OverridableMethodCallDuringObjectConstruction")
@@ -73,14 +71,10 @@ public class WeatherToLivePanel extends JPanel {
 
 		add(worldPanel, BorderLayout.CENTER);
 
-		bottomPanel.setParameterChangedCallback(this::parameterChanged);
+		bottomPanel.setParameterChangedCallback(this::dataChanged);
 		add(bottomPanel, BorderLayout.SOUTH);
 
 		animator.addAnimationListener(bottomPanel::setMonth);
-	}
-
-	public @Nullable ClimateDataSet getClimateDataSet() {
-		return climateDataSet;
 	}
 
 	/**
@@ -106,7 +100,8 @@ public class WeatherToLivePanel extends JPanel {
 	}
 
 	public void dataChanged() {
-		atlasRenderer.reRender();
+		atlasRenderer.dataChanged();
+		bottomPanel.dataChanged();
 	}
 
 	public void setFastPreview(boolean fastPreview) {
@@ -126,9 +121,5 @@ public class WeatherToLivePanel extends JPanel {
 		animator.setAnimationFrame(month);
 		bottomPanel.setMonth(month);
 		atlasRenderer.setVisibleMonth(month);
-	}
-
-	private void parameterChanged() {
-		atlasRenderer.reRender();
 	}
 }

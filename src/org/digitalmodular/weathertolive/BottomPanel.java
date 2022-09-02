@@ -62,7 +62,7 @@ public class BottomPanel extends JPanel {
 	private final JSlider   monthSlider         = new LabelSlider(Arrays.asList(
 			"j", "f", "m", "a", "m", "j", "j", "a", "s", "o", "n", "d"));
 
-	private final JPanel filterPanel = new ListPanel(BoxLayout.X_AXIS, SPACING);
+	private final ListPanel filterPanel = new ListPanel(BoxLayout.X_AXIS, SPACING);
 
 	@SuppressWarnings("FieldHasSetterButNoGetter")
 	private @Nullable Runnable parameterChangedCallback = null;
@@ -136,6 +136,10 @@ public class BottomPanel extends JPanel {
 
 	// Called from the outside, so don't call this from monthChanged()
 	public void setMonth(int month) {
+		for (int i = 0; i < filterPanel.getComponentCount(); i++) {
+			filterPanel.getParameterPanel(i).setMonth(month);
+		}
+
 		monthSlider.setValue(month);
 	}
 
@@ -143,9 +147,21 @@ public class BottomPanel extends JPanel {
 		this.parameterChangedCallback = parameterChangedCallback;
 	}
 
+	/**
+	 * Called from inside, to update the outside.
+	 */
 	private void parameterChanged() {
 		if (parameterChangedCallback != null) {
 			parameterChangedCallback.run();
+		}
+	}
+
+	/**
+	 * Called from outside, to update the inside.
+	 */
+	public void dataChanged() {
+		for (int i = 0; i < filterPanel.getComponentCount(); i++) {
+			filterPanel.getParameterPanel(i).dataChanged();
 		}
 	}
 }

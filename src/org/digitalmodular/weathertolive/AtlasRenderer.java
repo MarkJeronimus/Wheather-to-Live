@@ -114,7 +114,7 @@ public class AtlasRenderer {
 	}
 
 	// TODO offload work from the GUI thread.
-	public void reRender() {
+	public void dataChanged() {
 		if (filteredDataSets == null) {
 			clear();
 			renderUpdateCallback.accept(imageSequence);

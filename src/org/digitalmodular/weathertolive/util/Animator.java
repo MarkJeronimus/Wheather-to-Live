@@ -76,7 +76,11 @@ public class Animator {
 
 		this.animation = Collections.unmodifiableList(animation);
 
-		if (!sameLength) {
+		if (sameLength) {
+			AnimationFrame frame = animation.get(animationFrame);
+
+			imageSink.accept(frame.getImage());
+		} else {
 			stopAnimation();
 
 			// display first frame

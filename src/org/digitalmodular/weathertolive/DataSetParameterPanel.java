@@ -165,7 +165,6 @@ public class DataSetParameterPanel extends JPanel {
 		updateLabels(minMax);
 
 		filteredDataSet.setFilterMinMax(minMax);
-		updateThumbnail();
 
 		if (parameterChangedCallback != null) {
 			parameterChangedCallback.run();
@@ -183,6 +182,21 @@ public class DataSetParameterPanel extends JPanel {
 		endLabel.setText(numberFormat.format(minMax.getEnd()));
 	}
 
+	public void setMonth(int month) {
+		animator.setAnimationFrame(month);
+	}
+
+	public void setParameterChangedCallback(@Nullable Runnable parameterChangedCallback) {
+		this.parameterChangedCallback = parameterChangedCallback;
+	}
+
+	/**
+	 * Called from outside, to update the inside.
+	 */
+	public void dataChanged() {
+		updateThumbnail();
+	}
+
 	public void updateThumbnail() {
 		List<AnimationFrame> thumbnailSequence = new ArrayList<>(12);
 
@@ -195,7 +209,7 @@ public class DataSetParameterPanel extends JPanel {
 			                                        BufferedImage.TYPE_INT_RGB);
 			int[] pixels = ((DataBufferInt)image.getRaster().getDataBuffer()).getData();
 
-			float[] monthThumbnail = thumbnails[0];
+			float[] monthThumbnail = thumbnails[month];
 
 			for (int i = 0; i < length; i++) {
 				float thumbnailPixel = monthThumbnail[i];
@@ -213,9 +227,5 @@ public class DataSetParameterPanel extends JPanel {
 		}
 
 		animator.setAnimation(thumbnailSequence);
-	}
-
-	public void setParameterChangedCallback(@Nullable Runnable parameterChangedCallback) {
-		this.parameterChangedCallback = parameterChangedCallback;
 	}
 }

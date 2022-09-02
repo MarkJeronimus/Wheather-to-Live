@@ -33,6 +33,7 @@ import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.JPanel;
 
+import org.digitalmodular.weathertolive.DataSetParameterPanel;
 import static org.digitalmodular.weathertolive.util.ValidatorUtilities.requireAtLeast;
 import static org.digitalmodular.weathertolive.util.ValidatorUtilities.requireRange;
 
@@ -76,5 +77,10 @@ public class ListPanel extends JPanel {
 		p.add(comp, BorderLayout.CENTER);
 		topAlignPanel.add(p);
 		return p;
+	}
+
+	public DataSetParameterPanel getParameterPanel(int index) {
+		JPanel p = (JPanel)topAlignPanel.getComponent(index);
+		return (DataSetParameterPanel)p.getComponent(0);
 	}
 }
