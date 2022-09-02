@@ -80,11 +80,13 @@ public class ListPanel extends JPanel {
 	}
 
 	public int getNumChildren() {
-		return topAlignPanel.getComponentCount();
+		// Odd indices are fillers
+		return (topAlignPanel.getComponentCount() + 1) >> 1;
 	}
 
 	public DataSetParameterPanel getChild(int index) {
-		JPanel p = (JPanel)topAlignPanel.getComponent(index);
+		// Odd indices are fillers
+		JPanel p = (JPanel)topAlignPanel.getComponent(index * 2);
 		return (DataSetParameterPanel)p.getComponent(0);
 	}
 }

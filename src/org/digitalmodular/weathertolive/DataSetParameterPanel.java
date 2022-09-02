@@ -38,6 +38,7 @@ import java.util.function.Consumer;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JSlider;
+import javax.swing.SwingConstants;
 import javax.swing.event.ChangeEvent;
 
 import org.jetbrains.annotations.Nullable;
@@ -63,7 +64,7 @@ import static org.digitalmodular.weathertolive.util.ValidatorUtilities.requireNo
  */
 // Created 2022-08-30
 public class DataSetParameterPanel extends JPanel {
-	private static final int              MIN_SLIDER_STEPS = 100;
+	private static final int              MIN_SLIDER_STEPS = 60;
 	private static final PreferredNumbers STEP_QUANTIZER   = new PreferredNumbers(10, 100, 125, 150, 200, 500);
 
 	private final FilteredDataSet filteredDataSet;
@@ -98,7 +99,8 @@ public class DataSetParameterPanel extends JPanel {
 
 		{
 			JLabel nameLabel = new JLabel(filteredDataSet.getDataSet().getName() + ' ');
-			add(nameLabel, BorderLayout.LINE_START);
+			nameLabel.setHorizontalAlignment(SwingConstants.CENTER);
+			add(nameLabel, BorderLayout.NORTH);
 		}
 		{
 			thumbnailPanel.setPreferredSize(new Dimension(THUMBNAIL_WIDTH / SCALE_FACTOR,
@@ -109,20 +111,24 @@ public class DataSetParameterPanel extends JPanel {
 		{
 			JPanel p = new JPanel(new BorderLayout());
 
-			p.add(beginLabel, BorderLayout.LINE_START);
+			{
+				beginLabel.setHorizontalAlignment(SwingConstants.TRAILING);
+				p.add(beginLabel, BorderLayout.LINE_START);
+			}
 			{
 				slider.setMajorTickSpacing(10000);
 				slider.setMinorTickSpacing(10);
 				slider.setPaintTicks(true);
-				slider.setPaintLabels(true);
 				slider.addChangeListener(this::valueChanged);
 
-				int size = slider.getFont().getSize();
-				slider.setFont(slider.getFont().deriveFont(size * 0.8f));
-
+				p.setPreferredSize(new Dimension(thumbnailPanel.getPreferredSize().width,
+				                                 slider.getPreferredSize().height));
 				p.add(slider, BorderLayout.CENTER);
 			}
-			p.add(endLabel, BorderLayout.LINE_END);
+			{
+				endLabel.setHorizontalAlignment(SwingConstants.LEADING);
+				p.add(endLabel, BorderLayout.LINE_END);
+			}
 
 			add(p, BorderLayout.SOUTH);
 		}

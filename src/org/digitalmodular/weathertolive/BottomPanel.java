@@ -27,6 +27,7 @@
 package org.digitalmodular.weathertolive;
 
 import java.awt.BorderLayout;
+import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.Arrays;
@@ -36,7 +37,9 @@ import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 import javax.swing.JSlider;
+import javax.swing.ScrollPaneConstants;
 import javax.swing.event.ChangeEvent;
 
 import org.jetbrains.annotations.Nullable;
@@ -82,20 +85,36 @@ public class BottomPanel extends JPanel {
 	}
 
 	private void makeGUI() {
-		JPanel buttonsPanel = new ListPanel(BoxLayout.Y_AXIS, SPACING);
-		buttonsPanel.add(newButton);
-		buttonsPanel.add(loadButton);
-		buttonsPanel.add(saveButton);
-		add(buttonsPanel, BorderLayout.LINE_START);
+		{
+			JPanel p = new ListPanel(BoxLayout.Y_AXIS, SPACING);
+			p.add(newButton);
+			p.add(loadButton);
+			p.add(saveButton);
+			add(p, BorderLayout.LINE_START);
+		}
+		{
+			JScrollPane sp = new JScrollPane(ScrollPaneConstants.VERTICAL_SCROLLBAR_NEVER,
+			                                 ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+			sp.setBorder(null);
 
-		add(filterPanel, BorderLayout.CENTER);
+			{
+				JPanel p = new JPanel(new FlowLayout());
 
-		JPanel optionsPanel = new ListPanel(BoxLayout.Y_AXIS, SPACING);
-		optionsPanel.add(fastPreviewCheckbox);
-		optionsPanel.add(animateCheckbox);
-		optionsPanel.add(monthSlider);
-		optionsPanel.add(aggregateYearCheckbox);
-		add(optionsPanel, BorderLayout.LINE_END);
+				p.add(filterPanel);
+
+				sp.getViewport().add(p);
+			}
+
+			add(sp, BorderLayout.CENTER);
+		}
+		{
+			JPanel p = new ListPanel(BoxLayout.Y_AXIS, SPACING);
+			p.add(fastPreviewCheckbox);
+			p.add(animateCheckbox);
+			p.add(monthSlider);
+			p.add(aggregateYearCheckbox);
+			add(p, BorderLayout.LINE_END);
+		}
 	}
 
 	public void prepareFilters(ClimateDataSet climateDataSet) {

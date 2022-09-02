@@ -51,22 +51,19 @@ public final class WeatherToLiveMain {
 
 		ClimateDataSet climateDataSet = new ClimateDataSet(List.of(
 				WorldClimDatasetFactory.createFor("wc2.1_10m_tmin.zip",
-				                                  "<html>Minimum<br>temperature <br>(&deg;C)",
+				                                  "<html>Minimum temp (&deg;C)",
 				                                  false),
 				WorldClimDatasetFactory.createFor("wc2.1_10m_tavg.zip",
-				                                  "<html>Average<br>temperature <br>(&deg;C)",
+				                                  "<html>Average temp (&deg;C)",
 				                                  false),
 				WorldClimDatasetFactory.createFor("wc2.1_10m_tmax.zip",
-				                                  "<html>Minimum<br>temperature <br>(&deg;C)",
+				                                  "<html>Maximum temp (&deg;C)",
 				                                  false),
 				WorldClimDatasetFactory.createFor("wc2.1_10m_prec.zip",
-				                                  "<html>Precipitation <br>(mm)",
+				                                  "<html>Precipitation (mm)",
 				                                  true),
 				WorldClimDatasetFactory.createFor("wc2.1_10m_wind.zip",
-				                                  "<html>Wind<br>speed <br>(m/s)",
-				                                  true),
-				WorldClimDatasetFactory.createFor("wc2.1_10m_srad.zip",
-				                                  "<html>Solar<br>radiation <br>(kJ/m2/day)",
+				                                  "<html>Wind speed (m/s)",
 				                                  true)
 		));
 

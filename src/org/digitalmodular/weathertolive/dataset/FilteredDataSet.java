@@ -40,10 +40,10 @@ public class FilteredDataSet {
 
 	private RangeF filterMinMax;
 
-	private       boolean   mainDataDirty = true;
+	private       boolean mainDataDirty = true;
 	private final int[][] filteredData;
 
-	private       boolean   thumbnailDataDirty = true;
+	private       boolean thumbnailDataDirty = true;
 	private final int[][] filteredThumbnails = new int[12][DataSet.THUMBNAIL_PIXELS];
 
 	public FilteredDataSet(DataSet dataSet) {
@@ -117,7 +117,7 @@ public class FilteredDataSet {
 
 		for (int month = 0; month < 12; month++) {
 			float[] rawMonthData      = rawData[month];
-			int[] filteredMonthData = filteredData[month];
+			int[]   filteredMonthData = filteredData[month];
 
 			for (int i = 0; i < rawMonthData.length; i++) {
 				if (Float.isNaN(rawMonthData[i])) {
@@ -136,7 +136,7 @@ public class FilteredDataSet {
 
 		for (int month = 0; month < 12; month++) {
 			@Nullable RangeF[] rawMonthData          = thumbnails[month];
-			int[]            filteredThumbnailData = filteredThumbnails[month];
+			int[]              filteredThumbnailData = filteredThumbnails[month];
 
 			for (int i = 0; i < rawMonthData.length; i++) {
 				@Nullable RangeF rawMonthDatum = rawMonthData[i];
