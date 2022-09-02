@@ -50,9 +50,11 @@ public final class WorldClimDatasetFactory {
 	}
 
 	/**
+	 * @param dataSetName  The name to show in the GUI. Can use basic HTML.
 	 * @param absoluteZero Whether the values start at 0 or can go negative (should find minimum)
 	 */
-	public static FilteredDataSet createFor(String filename, boolean absoluteZero) throws IOException {
+	public static FilteredDataSet createFor(String filename, String dataSetName, boolean absoluteZero)
+			throws IOException {
 		String prefix = filename.substring(0, 14); // e.g. "wc2.1_10m_prec"
 
 		try (ZipFile zip = new ZipFile(new File(filename))) {
@@ -79,8 +81,7 @@ public final class WorldClimDatasetFactory {
 				rawData[month] = convertGeoTiffToRawData(geoData);
 			}
 
-			String  name    = prefix.substring(prefix.length() - 4);
-			DataSet dataSet = new DataSet(name, rawData, width, height, absoluteZero);
+			DataSet dataSet = new DataSet(dataSetName, rawData, width, height, absoluteZero);
 			return new FilteredDataSet(dataSet);
 		}
 	}

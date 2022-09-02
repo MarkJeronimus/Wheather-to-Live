@@ -38,7 +38,16 @@ import org.digitalmodular.weathertolive.util.TextProgressListener;
  * @author Mark Jeronimus
  */
 // Created 2022-08-26
-public class TestMain {
+public class DownloadStuffMain {
+	public static void main(String... args) throws IOException {
+		downloadDataSet("wc2.1_10m_tmin.zip");
+//		downloadDataSet("wc2.1_10m_tmax.zip");
+		downloadDataSet("wc2.1_10m_tavg.zip");
+//		downloadDataSet("wc2.1_10m_prec.zip");
+		downloadDataSet("wc2.1_10m_srad.zip");
+//		downloadDataSet("wc2.1_10m_wind.zip");
+	}
+
 	private static void downloadDataSet(String filename) throws IOException {
 		URL  url  = new URL("https://biogeo.ucdavis.edu/data/worldclim/v2.1/base/" + filename);
 		Path file = Paths.get(filename);

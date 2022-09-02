@@ -50,7 +50,24 @@ public final class WeatherToLiveMain {
 		ColorGradient gradient = new ColorGradient(new File("Inferno-mod.png"));
 
 		ClimateDataSet climateDataSet = new ClimateDataSet(List.of(
-				WorldClimDatasetFactory.createFor("wc2.1_10m_tmax.zip", false)
+				WorldClimDatasetFactory.createFor("wc2.1_10m_tmin.zip",
+				                                  "<html>Minimum<br>temperature <br>(&deg;C)",
+				                                  false),
+				WorldClimDatasetFactory.createFor("wc2.1_10m_tavg.zip",
+				                                  "<html>Average<br>temperature <br>(&deg;C)",
+				                                  false),
+				WorldClimDatasetFactory.createFor("wc2.1_10m_tmax.zip",
+				                                  "<html>Minimum<br>temperature <br>(&deg;C)",
+				                                  false),
+				WorldClimDatasetFactory.createFor("wc2.1_10m_prec.zip",
+				                                  "<html>Precipitation <br>(mm)",
+				                                  true),
+				WorldClimDatasetFactory.createFor("wc2.1_10m_wind.zip",
+				                                  "<html>Wind<br>speed <br>(m/s)",
+				                                  true),
+				WorldClimDatasetFactory.createFor("wc2.1_10m_srad.zip",
+				                                  "<html>Solar<br>radiation <br>(kJ/m2/day)",
+				                                  true)
 		));
 
 		SwingUtilities.invokeLater(() -> {
