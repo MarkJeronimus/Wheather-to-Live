@@ -78,7 +78,7 @@ public class WeatherToLivePanel extends JPanel {
 	}
 
 	/**
-	 * A call of this must eventually be followed by a call to {@link #dataChanged()}!
+	 * A call of this must eventually be followed by a call to {@link #dataChanged(int)}!
 	 */
 	public void setClimateDataSet(ClimateDataSet climateDataSet) {
 		if (climateDataSet == null) {
@@ -93,13 +93,14 @@ public class WeatherToLivePanel extends JPanel {
 	}
 
 	/**
-	 * A call of this must eventually be followed by a call to {@link #dataChanged()}!
+	 * A call of this must eventually be followed by a call to {@link #dataChanged(int)}!
 	 */
 	public void setGradient(@Nullable ColorGradient gradient) {
 		atlasRenderer.setGradient(gradient);
 	}
 
-	public void dataChanged() {
+	public void dataChanged(int dataSetIndex) {
+		atlasRenderer.setBackgroundDatasetIndex(dataSetIndex);
 		atlasRenderer.dataChanged();
 		bottomPanel.dataChanged();
 	}

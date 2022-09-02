@@ -69,7 +69,7 @@ public final class WeatherToLiveMain {
 
 			weatherToLivePanel.setClimateDataSet(climateDataSet);
 			weatherToLivePanel.setGradient(gradient);
-			weatherToLivePanel.dataChanged();
+			weatherToLivePanel.dataChanged(-1);
 		});
 	}
 }

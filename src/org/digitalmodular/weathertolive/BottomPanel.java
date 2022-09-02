@@ -30,6 +30,8 @@ import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.Arrays;
+import java.util.List;
+import java.util.function.Consumer;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
@@ -65,7 +67,7 @@ public class BottomPanel extends JPanel {
 	private final ListPanel filterPanel = new ListPanel(BoxLayout.X_AXIS, SPACING);
 
 	@SuppressWarnings("FieldHasSetterButNoGetter")
-	private @Nullable Runnable parameterChangedCallback = null;
+	private @Nullable Consumer<Integer> parameterChangedCallback = null;
 
 	@SuppressWarnings("OverridableMethodCallDuringObjectConstruction")
 	public BottomPanel(WeatherToLivePanel parent) {
@@ -96,8 +98,11 @@ public class BottomPanel extends JPanel {
 
 	public void prepareFilters(ClimateDataSet climateDataSet) {
 		filterPanel.removeAll();
-		for (FilteredDataSet dataSet : climateDataSet.getDataSets()) {
-			DataSetParameterPanel parameter = new DataSetParameterPanel(dataSet);
+
+		List<FilteredDataSet> dataSets = climateDataSet.getDataSets();
+
+		for (int i = 0; i < dataSets.size(); i++) {
+			DataSetParameterPanel parameter = new DataSetParameterPanel(dataSets.get(i), i);
 			parameter.setParameterChangedCallback(this::parameterChanged);
 
 			filterPanel.add(parameter);
@@ -143,16 +148,16 @@ public class BottomPanel extends JPanel {
 		monthSlider.setValue(month);
 	}
 
-	public void setParameterChangedCallback(@Nullable Runnable parameterChangedCallback) {
+	public void setParameterChangedCallback(@Nullable Consumer<Integer> parameterChangedCallback) {
 		this.parameterChangedCallback = parameterChangedCallback;
 	}
 
 	/**
 	 * Called from inside, to update the outside.
 	 */
-	private void parameterChanged() {
+	private void parameterChanged(int dataSetIndex) {
 		if (parameterChangedCallback != null) {
-			parameterChangedCallback.run();
+			parameterChangedCallback.accept(dataSetIndex);
 		}
 	}
 

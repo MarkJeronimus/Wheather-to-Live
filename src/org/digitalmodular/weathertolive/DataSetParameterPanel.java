@@ -34,6 +34,7 @@ import java.awt.image.DataBufferInt;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Consumer;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JSlider;
@@ -54,6 +55,7 @@ import static org.digitalmodular.weathertolive.dataset.DataSet.LAND_GREEN;
 import static org.digitalmodular.weathertolive.dataset.DataSet.SEA_BLUE;
 import static org.digitalmodular.weathertolive.dataset.DataSet.THUMBNAIL_HEIGHT;
 import static org.digitalmodular.weathertolive.dataset.DataSet.THUMBNAIL_WIDTH;
+import static org.digitalmodular.weathertolive.util.ValidatorUtilities.requireAtLeast;
 import static org.digitalmodular.weathertolive.util.ValidatorUtilities.requireNonNull;
 
 /**
@@ -65,6 +67,7 @@ public class DataSetParameterPanel extends JPanel {
 	private static final PreferredNumbers STEP_QUANTIZER   = new PreferredNumbers(10, 100, 125, 150, 200, 500);
 
 	private final FilteredDataSet filteredDataSet;
+	private final int             dataSetIndex;
 
 	private final DecimalFormat numberFormat;
 
@@ -78,12 +81,13 @@ public class DataSetParameterPanel extends JPanel {
 	private final float sliderStepSize;
 
 	@SuppressWarnings("FieldHasSetterButNoGetter")
-	private @Nullable Runnable parameterChangedCallback = null;
+	private @Nullable Consumer<Integer> parameterChangedCallback = null;
 
 	@SuppressWarnings("OverridableMethodCallDuringObjectConstruction")
-	public DataSetParameterPanel(FilteredDataSet filteredDataSet) {
+	public DataSetParameterPanel(FilteredDataSet filteredDataSet, int dataSetIndex) {
 		super(new BorderLayout());
 		this.filteredDataSet = requireNonNull(filteredDataSet, "filteredDataSet");
+		this.dataSetIndex = requireAtLeast(0, dataSetIndex, "dataSetIndex");
 
 		RangeF minMax        = filteredDataSet.getDataSet().getMinMax();
 		int    quantizerStep = calculateQuantizerStep(minMax);
@@ -167,7 +171,7 @@ public class DataSetParameterPanel extends JPanel {
 		filteredDataSet.setFilterMinMax(minMax);
 
 		if (parameterChangedCallback != null) {
-			parameterChangedCallback.run();
+			parameterChangedCallback.accept(dataSetIndex);
 		}
 	}
 
@@ -186,7 +190,7 @@ public class DataSetParameterPanel extends JPanel {
 		animator.setAnimationFrame(month);
 	}
 
-	public void setParameterChangedCallback(@Nullable Runnable parameterChangedCallback) {
+	public void setParameterChangedCallback(@Nullable Consumer<Integer> parameterChangedCallback) {
 		this.parameterChangedCallback = parameterChangedCallback;
 	}
 
