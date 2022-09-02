@@ -29,6 +29,7 @@ package org.digitalmodular.weathertolive;
 import java.awt.image.BufferedImage;
 import java.awt.image.DataBufferInt;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.function.Consumer;
 
@@ -55,8 +56,9 @@ public class AtlasRenderer {
 
 	private @Nullable List<FilteredDataSet> filteredDataSets       = null;
 	private @Nullable ColorGradient         gradient               = null;
-	private           int                   visibleMonth           = 0;
+	private           int                   currentMonth           = 0;
 	private           int                   backgroundDatasetIndex = -1;
+	private           boolean               aggregateYear          = false;
 
 	private final List<@Nullable AnimationFrame> imageSequence = new ArrayList<>(12);
 
@@ -90,12 +92,12 @@ public class AtlasRenderer {
 		this.gradient = gradient;
 	}
 
-	public int getVisibleMonth() {
-		return visibleMonth;
+	public int getCurrentMonth() {
+		return currentMonth;
 	}
 
-	public void setVisibleMonth(int visibleMonth) {
-		this.visibleMonth = requireRange(0, 11, visibleMonth, "visibleMonth");
+	public void setCurrentMonth(int currentMonth) {
+		this.currentMonth = requireRange(0, 11, currentMonth, "currentMonth");
 	}
 
 	public int getBackgroundDatasetIndex() {
@@ -113,6 +115,14 @@ public class AtlasRenderer {
 		                                           "backgroundDatasetIndex");
 	}
 
+	public boolean isAggregateYear() {
+		return aggregateYear;
+	}
+
+	public void setAggregateYear(boolean aggregateYear) {
+		this.aggregateYear = aggregateYear;
+	}
+
 	// TODO offload work from the GUI thread.
 	public void dataChanged() {
 		if (filteredDataSets == null) {
@@ -121,21 +131,56 @@ public class AtlasRenderer {
 			return;
 		}
 
+		int @Nullable [] aggregateFilteredPixels = null;
+		if (aggregateYear) {
+			aggregateFilteredPixels = renderAggregateYear();
+		}
+
 		int width  = filteredDataSets.get(0).getDataSet().getWidth();
 		int height = filteredDataSets.get(0).getDataSet().getHeight();
 
 		for (int i = 0; i < 12; i++) {
-			int month = (visibleMonth + i) % 12;
+			int month = (currentMonth + i) % 12;
 
 			BufferedImage image  = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
 			int[]         pixels = ((DataBufferInt)image.getRaster().getDataBuffer()).getData();
 
 			renderBackground(month, pixels);
-			renderFilteredPixels(month, pixels);
+
+			if (aggregateFilteredPixels != null) {
+				renderAggregateFilteredPixels(aggregateFilteredPixels, pixels);
+			} else {
+				renderFilteredPixels(month, pixels);
+			}
 
 			imageSequence.set(month, new AnimationFrame(image, FRAME_DURATION));
 			renderUpdateCallback.accept(imageSequence);
 		}
+	}
+
+	private int[] renderAggregateYear() {
+		assert filteredDataSets != null;
+
+		int width  = filteredDataSets.get(0).getDataSet().getWidth();
+		int height = filteredDataSets.get(0).getDataSet().getHeight();
+
+		int[] aggregateFilteredPixels = new int[width * height];
+		Arrays.fill(aggregateFilteredPixels, 1);
+
+		for (int month = 0; month < 12; month++) {
+			for (FilteredDataSet filteredDataSet : filteredDataSets) {
+				int[] filteredMonthData = filteredDataSet.getFilteredData()[month];
+				int   length            = filteredMonthData.length;
+
+				for (int i = 0; i < length; i++) {
+					if (filteredMonthData[i] == 0) {
+						aggregateFilteredPixels[i] = 0;
+					}
+				}
+			}
+		}
+
+		return aggregateFilteredPixels;
 	}
 
 	private void renderBackground(int month, int[] pixels) {
@@ -186,6 +231,16 @@ public class AtlasRenderer {
 			}
 
 			pixels[i] = color;
+		}
+	}
+
+	private static void renderAggregateFilteredPixels(int[] aggregateFilteredPixels, int[] pixels) {
+		int length = aggregateFilteredPixels.length;
+
+		for (int i = 0; i < length; i++) {
+			if (aggregateFilteredPixels[i] == 0) {
+				pixels[i] = DataSet.FILTER_SHADE;
+			}
 		}
 	}
 

@@ -56,13 +56,14 @@ public class BottomPanel extends JPanel {
 
 	private final WeatherToLivePanel parent;
 
-	private final JButton   newButton           = new JButton("New");
-	private final JButton   loadButton          = new JButton("Load");
-	private final JButton   saveButton          = new JButton("Save");
-	private final JCheckBox fastPreviewCheckbox = new JCheckBox("Fast previewing");
-	private final JCheckBox animateCheckbox     = new JCheckBox("Animate");
-	private final JSlider   monthSlider         = new LabelSlider(Arrays.asList(
+	private final JButton   newButton             = new JButton("New");
+	private final JButton   loadButton            = new JButton("Load");
+	private final JButton   saveButton            = new JButton("Save");
+	private final JCheckBox fastPreviewCheckbox   = new JCheckBox("Fast previewing");
+	private final JCheckBox animateCheckbox       = new JCheckBox("Animate");
+	private final JSlider   monthSlider           = new LabelSlider(Arrays.asList(
 			"j", "f", "m", "a", "m", "j", "j", "a", "s", "o", "n", "d"));
+	private final JCheckBox aggregateYearCheckbox = new JCheckBox("Filter entire year");
 
 	private final ListPanel filterPanel = new ListPanel(BoxLayout.X_AXIS, SPACING);
 
@@ -93,6 +94,7 @@ public class BottomPanel extends JPanel {
 		optionsPanel.add(fastPreviewCheckbox);
 		optionsPanel.add(animateCheckbox);
 		optionsPanel.add(monthSlider);
+		optionsPanel.add(aggregateYearCheckbox);
 		add(optionsPanel, BorderLayout.LINE_END);
 	}
 
@@ -115,6 +117,7 @@ public class BottomPanel extends JPanel {
 		fastPreviewCheckbox.addActionListener(actionPerformed);
 		animateCheckbox.addActionListener(actionPerformed);
 		monthSlider.addChangeListener(this::monthChanged);
+		aggregateYearCheckbox.addActionListener(actionPerformed);
 	}
 
 	@SuppressWarnings("ObjectEquality") // Comparing identity, not equality
@@ -123,6 +126,8 @@ public class BottomPanel extends JPanel {
 			parent.setFastPreview(animateCheckbox.isSelected());
 		} else if (e.getSource() == animateCheckbox) {
 			parent.setAnimated(animateCheckbox.isSelected());
+		} else if (e.getSource() == aggregateYearCheckbox) {
+			parent.setAggregateYear(aggregateYearCheckbox.isSelected());
 		}
 	}
 

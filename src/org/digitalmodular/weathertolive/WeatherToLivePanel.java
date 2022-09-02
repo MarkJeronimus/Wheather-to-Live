@@ -121,6 +121,11 @@ public class WeatherToLivePanel extends JPanel {
 	public void setMonth(int month) {
 		animator.setAnimationFrame(month);
 		bottomPanel.setMonth(month);
-		atlasRenderer.setVisibleMonth(month);
+		atlasRenderer.setCurrentMonth(month);
+	}
+
+	public void setAggregateYear(boolean aggregateYear) {
+		atlasRenderer.setAggregateYear(aggregateYear);
+		atlasRenderer.dataChanged();
 	}
 }
