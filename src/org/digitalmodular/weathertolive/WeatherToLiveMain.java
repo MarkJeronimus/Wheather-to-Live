@@ -49,6 +49,7 @@ public final class WeatherToLiveMain {
 	public static void main(String... args) throws IOException, ExecutionException, InterruptedException {
 		ColorGradient gradient = new ColorGradient(new File("Inferno-mod.png"));
 
+		long t = System.nanoTime();
 		ClimateDataSet climateDataSet = new ClimateDataSet(List.of(
 				WorldClimDatasetFactory.createFor("wc2.1_10m_tmin.zip",
 				                                  "<html>Minimum temp (&deg;C)",
@@ -66,6 +67,7 @@ public final class WeatherToLiveMain {
 				                                  "<html>Wind speed (m/s)",
 				                                  true)
 		));
+		System.out.println("Loading took " + (System.nanoTime() - t) / 1.0e9f + " s");
 
 		SwingUtilities.invokeLater(() -> {
 			FlatLaf.setup(new FlatDarkLaf());
