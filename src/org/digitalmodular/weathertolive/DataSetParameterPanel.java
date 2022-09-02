@@ -64,7 +64,7 @@ public class DataSetParameterPanel extends JPanel {
 	private static final int              MIN_SLIDER_STEPS = 100;
 	private static final PreferredNumbers STEP_QUANTIZER   = new PreferredNumbers(10, 100, 125, 150, 200, 500);
 
-	private final FilteredDataSet dataSet;
+	private final FilteredDataSet filteredDataSet;
 
 	private final DecimalFormat numberFormat;
 
@@ -77,12 +77,15 @@ public class DataSetParameterPanel extends JPanel {
 
 	private final float sliderStepSize;
 
-	@SuppressWarnings("OverridableMethodCallDuringObjectConstruction")
-	public DataSetParameterPanel(FilteredDataSet dataSet) {
-		super(new BorderLayout());
-		this.dataSet = requireNonNull(dataSet, "dataSet");
+	@SuppressWarnings("FieldHasSetterButNoGetter")
+	private @Nullable Runnable parameterChangedCallback = null;
 
-		RangeF minMax        = dataSet.getDataSet().getMinMax();
+	@SuppressWarnings("OverridableMethodCallDuringObjectConstruction")
+	public DataSetParameterPanel(FilteredDataSet filteredDataSet) {
+		super(new BorderLayout());
+		this.filteredDataSet = requireNonNull(filteredDataSet, "filteredDataSet");
+
+		RangeF minMax        = filteredDataSet.getDataSet().getMinMax();
 		int    quantizerStep = calculateQuantizerStep(minMax);
 		sliderStepSize = (float)STEP_QUANTIZER.exp(quantizerStep);
 		numberFormat = makeNumberFormat(quantizerStep);
@@ -90,7 +93,7 @@ public class DataSetParameterPanel extends JPanel {
 		prepareSliderRange(minMax);
 
 		{
-			JLabel nameLabel = new JLabel(dataSet.getDataSet().getName() + ' ');
+			JLabel nameLabel = new JLabel(filteredDataSet.getDataSet().getName() + ' ');
 			add(nameLabel, BorderLayout.LINE_START);
 		}
 		{
@@ -160,8 +163,12 @@ public class DataSetParameterPanel extends JPanel {
 
 		updateLabels(minMax);
 
-		dataSet.setFilterMinMax(minMax);
+		filteredDataSet.setFilterMinMax(minMax);
 		updateThumbnail();
+
+		if (parameterChangedCallback != null) {
+			parameterChangedCallback.run();
+		}
 	}
 
 	public RangeF getMinMax() {
@@ -178,7 +185,7 @@ public class DataSetParameterPanel extends JPanel {
 	public void updateThumbnail() {
 		List<AnimationFrame> thumbnailSequence = new ArrayList<>(12);
 
-		float[][] thumbnails = dataSet.getFilteredThumbnails();
+		float[][] thumbnails = filteredDataSet.getFilteredThumbnails();
 		int       length     = thumbnails[0].length;
 
 		for (int month = 0; month < 12; month++) {
@@ -202,5 +209,9 @@ public class DataSetParameterPanel extends JPanel {
 		}
 
 		animator.setAnimation(thumbnailSequence);
+	}
+
+	public void setParameterChangedCallback(@Nullable Runnable parameterChangedCallback) {
+		this.parameterChangedCallback = parameterChangedCallback;
 	}
 }

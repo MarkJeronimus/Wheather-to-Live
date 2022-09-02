@@ -37,6 +37,8 @@ import javax.swing.JPanel;
 import javax.swing.JSlider;
 import javax.swing.event.ChangeEvent;
 
+import org.jetbrains.annotations.Nullable;
+
 import org.digitalmodular.weathertolive.dataset.ClimateDataSet;
 import org.digitalmodular.weathertolive.dataset.FilteredDataSet;
 import org.digitalmodular.weathertolive.util.LabelSlider;
@@ -61,6 +63,9 @@ public class BottomPanel extends JPanel {
 			"j", "f", "m", "a", "m", "j", "j", "a", "s", "o", "n", "d"));
 
 	private final JPanel filterPanel = new ListPanel(BoxLayout.X_AXIS, SPACING);
+
+	@SuppressWarnings("FieldHasSetterButNoGetter")
+	private @Nullable Runnable parameterChangedCallback = null;
 
 	@SuppressWarnings("OverridableMethodCallDuringObjectConstruction")
 	public BottomPanel(WeatherToLivePanel parent) {
@@ -92,7 +97,10 @@ public class BottomPanel extends JPanel {
 	public void prepareFilters(ClimateDataSet climateDataSet) {
 		filterPanel.removeAll();
 		for (FilteredDataSet dataSet : climateDataSet.getDataSets()) {
-			filterPanel.add(new DataSetParameterPanel(dataSet));
+			DataSetParameterPanel parameter = new DataSetParameterPanel(dataSet);
+			parameter.setParameterChangedCallback(this::parameterChanged);
+
+			filterPanel.add(parameter);
 		}
 	}
 
@@ -101,7 +109,7 @@ public class BottomPanel extends JPanel {
 
 		fastPreviewCheckbox.addActionListener(actionPerformed);
 		animateCheckbox.addActionListener(actionPerformed);
-		monthSlider.addChangeListener(this::valueChanged);
+		monthSlider.addChangeListener(this::monthChanged);
 	}
 
 	@SuppressWarnings("ObjectEquality") // Comparing identity, not equality
@@ -113,7 +121,7 @@ public class BottomPanel extends JPanel {
 		}
 	}
 
-	private void valueChanged(ChangeEvent e) {
+	private void monthChanged(ChangeEvent e) {
 		parent.setMonth(monthSlider.getValue());
 	}
 
@@ -137,5 +145,15 @@ public class BottomPanel extends JPanel {
 
 	public void setMonth(int month) {
 		monthSlider.setValue(month);
+	}
+
+	public void setParameterChangedCallback(@Nullable Runnable parameterChangedCallback) {
+		this.parameterChangedCallback = parameterChangedCallback;
+	}
+
+	private void parameterChanged() {
+		if (parameterChangedCallback != null) {
+			parameterChangedCallback.run();
+		}
 	}
 }

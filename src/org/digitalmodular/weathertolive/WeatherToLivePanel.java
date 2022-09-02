@@ -63,6 +63,7 @@ public class WeatherToLivePanel extends JPanel {
 	}
 
 	private final ZoomPanel   worldPanel  = new ZoomPanel();
+	@SuppressWarnings("ThisEscapedInObjectConstruction")
 	private final BottomPanel bottomPanel = new BottomPanel(this);
 
 	private final Animator animator = new Animator(worldPanel::setImage);
@@ -78,6 +79,8 @@ public class WeatherToLivePanel extends JPanel {
 		setPreferredSize(new Dimension(displayMode.getWidth() * 3 / 8, displayMode.getHeight() * 3 / 8));
 
 		add(worldPanel, BorderLayout.CENTER);
+
+		bottomPanel.setParameterChangedCallback(this::parameterChanged);
 		add(bottomPanel, BorderLayout.SOUTH);
 
 		animator.addAnimationListener(bottomPanel::setMonth);
@@ -182,5 +185,9 @@ public class WeatherToLivePanel extends JPanel {
 	public void setMonth(int month) {
 		animator.setAnimationFrame(month);
 		bottomPanel.setMonth(month);
+	}
+
+	private void parameterChanged() {
+		System.out.println("parameterChanged");
 	}
 }
