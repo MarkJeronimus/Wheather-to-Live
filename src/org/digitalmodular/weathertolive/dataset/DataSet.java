@@ -49,8 +49,9 @@ import static org.digitalmodular.weathertolive.util.ValidatorUtilities.requireTh
 // Created 2022-08-28
 public class DataSet {
 	public static final int SEA_BLUE         = 0x001020;
-	public static final int LAND_GREEN       = 0x304000;
+	public static final int LAND_GREEN       = 0x104000;
 	public static final int FILTER_HIGHLIGHT = 0xFFFF00;
+	public static final int FILTER_SHADE     = 0x000000;
 
 	public static final int THUMBNAIL_HEIGHT = 90 * SCALE_FACTOR;
 	public static final int THUMBNAIL_WIDTH  = THUMBNAIL_HEIGHT * 2;

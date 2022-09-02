@@ -72,12 +72,16 @@ public class Animator {
 	public void setAnimation(List<AnimationFrame> animation) {
 		requireNonNull(animation, "animation");
 
-		stopAnimation();
+		boolean sameLength = this.animation.size() == animation.size();
 
 		this.animation = Collections.unmodifiableList(animation);
 
-		// display first frame
-		setAnimationFrame(0);
+		if (!sameLength) {
+			stopAnimation();
+
+			// display first frame
+			setAnimationFrame(0);
+		}
 	}
 
 	public void startAnimation() {

@@ -189,13 +189,16 @@ public class DataSetParameterPanel extends JPanel {
 		int       length     = thumbnails[0].length;
 
 		for (int month = 0; month < 12; month++) {
-			BufferedImage image  = new BufferedImage(THUMBNAIL_WIDTH, THUMBNAIL_HEIGHT, BufferedImage.TYPE_INT_RGB);
-			int[]         pixels = ((DataBufferInt)image.getRaster().getDataBuffer()).getData();
+			BufferedImage image = new BufferedImage(THUMBNAIL_WIDTH,
+			                                        THUMBNAIL_HEIGHT,
+			                                        BufferedImage.TYPE_INT_RGB);
+			int[] pixels = ((DataBufferInt)image.getRaster().getDataBuffer()).getData();
 
 			float[] monthThumbnail = thumbnails[0];
 
 			for (int i = 0; i < length; i++) {
 				float thumbnailPixel = monthThumbnail[i];
+
 				if (Float.isNaN(thumbnailPixel)) {
 					pixels[i] = SEA_BLUE;
 				} else if (thumbnailPixel > 0.0f) {

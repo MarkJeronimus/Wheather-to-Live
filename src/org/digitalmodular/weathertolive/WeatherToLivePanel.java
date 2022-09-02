@@ -30,23 +30,15 @@ import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.DisplayMode;
 import java.awt.GraphicsDevice;
-import java.awt.image.BufferedImage;
-import java.awt.image.DataBufferInt;
-import java.util.ArrayList;
-import java.util.List;
 import javax.swing.JPanel;
 
 import org.jetbrains.annotations.Nullable;
 
 import org.digitalmodular.weathertolive.dataset.ClimateDataSet;
-import org.digitalmodular.weathertolive.dataset.DataSet;
-import org.digitalmodular.weathertolive.util.AnimationFrame;
 import org.digitalmodular.weathertolive.util.Animator;
 import org.digitalmodular.weathertolive.util.ColorGradient;
 import org.digitalmodular.weathertolive.util.GraphicsUtilities;
-import org.digitalmodular.weathertolive.util.RangeF;
 import org.digitalmodular.weathertolive.util.ZoomPanel;
-import static org.digitalmodular.weathertolive.util.ValidatorUtilities.requireNonNull;
 
 /**
  * @author Mark Jeronimus
@@ -69,7 +61,8 @@ public class WeatherToLivePanel extends JPanel {
 	private final Animator animator = new Animator(worldPanel::setImage);
 
 	private @Nullable ClimateDataSet climateDataSet = null;
-	private @Nullable ColorGradient  gradient       = null;
+
+	private final AtlasRenderer atlasRenderer = new AtlasRenderer(animator::setAnimation);
 
 	@SuppressWarnings("OverridableMethodCallDuringObjectConstruction")
 	public WeatherToLivePanel() {
@@ -94,77 +87,26 @@ public class WeatherToLivePanel extends JPanel {
 	 * A call of this must eventually be followed by a call to {@link #dataChanged()}!
 	 */
 	public void setClimateDataSet(ClimateDataSet climateDataSet) {
-		this.climateDataSet = requireNonNull(climateDataSet, "climateDataSet");
-	}
+		if (climateDataSet == null) {
+			throw new IllegalStateException("setClimateDataSet() has not been called");
+		}
 
-	public @Nullable ColorGradient getGradient() {
-		return gradient;
+		atlasRenderer.setFilteredDataSets(climateDataSet.getDataSets());
+		atlasRenderer.setBackgroundDatasetIndex(0);
+		bottomPanel.prepareFilters(climateDataSet);
+
+		setMonth(0);
 	}
 
 	/**
 	 * A call of this must eventually be followed by a call to {@link #dataChanged()}!
 	 */
 	public void setGradient(@Nullable ColorGradient gradient) {
-		this.gradient = gradient;
+		atlasRenderer.setGradient(gradient);
 	}
 
 	public void dataChanged() {
-		if (climateDataSet == null) {
-			throw new IllegalStateException("setClimateDataSet() has not been called");
-		}
-
-		rebuildAtlas();
-		rebuildFilterPanel();
-	}
-
-	private void rebuildAtlas() {
-		assert climateDataSet != null;
-
-		List<AnimationFrame> atlasSequence = makeAtlasSequence(climateDataSet.getDataSets().get(0).getDataSet());
-
-		animator.setAnimation(atlasSequence);
-		worldPanel.zoomFit();
-
-		setMonth(0);
-	}
-
-	private List<AnimationFrame> makeAtlasSequence(DataSet dataset) {
-		List<AnimationFrame> atlasSequence = new ArrayList<>(12);
-
-		float[][] rawData = dataset.getRawData();
-		RangeF    minMax  = dataset.getMinMax();
-		int       length  = rawData[0].length;
-
-		for (int month = 0; month < 12; month++) {
-			BufferedImage image = new BufferedImage(dataset.getWidth(),
-			                                        dataset.getHeight(),
-			                                        BufferedImage.TYPE_INT_RGB);
-			int[] pixels = ((DataBufferInt)image.getRaster().getDataBuffer()).getData();
-
-			float[] rawMonthData = rawData[month];
-
-			for (int i = 0; i < length; i++) {
-				float value = minMax.unLerp(rawMonthData[i]);
-
-				if (Float.isNaN(value)) {
-					pixels[i] = DataSet.SEA_BLUE;
-				} else if (gradient != null) {
-					pixels[i] = gradient.getColor(value);
-				} else {
-					pixels[i] = (int)(value * 255);
-				}
-			}
-
-			atlasSequence.add(new AnimationFrame(image, 1_500_000_000 / 12));
-		}
-
-		return atlasSequence;
-	}
-
-	private void rebuildFilterPanel() {
-		assert climateDataSet != null;
-
-		bottomPanel.prepareFilters(climateDataSet);
+		atlasRenderer.reRender();
 	}
 
 	public void setFastPreview(boolean fastPreview) {
@@ -183,9 +125,10 @@ public class WeatherToLivePanel extends JPanel {
 	public void setMonth(int month) {
 		animator.setAnimationFrame(month);
 		bottomPanel.setMonth(month);
+		atlasRenderer.setVisibleMonth(month);
 	}
 
 	private void parameterChanged() {
-		System.out.println("parameterChanged");
+		atlasRenderer.reRender();
 	}
 }
