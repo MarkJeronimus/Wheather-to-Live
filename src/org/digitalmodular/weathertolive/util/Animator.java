@@ -32,6 +32,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.CopyOnWriteArraySet;
+import java.util.function.Consumer;
 import java.util.function.IntConsumer;
 import javax.swing.Timer;
 
@@ -43,7 +44,9 @@ import static org.digitalmodular.weathertolive.util.ValidatorUtilities.requireNo
  * @author Mark Jeronimus
  */
 // Created 2022-08-29
-public class AnimationZoomPanel extends ZoomPanel {
+public class Animator {
+	private final Consumer<BufferedImage> imageSink;
+
 	private List<AnimationFrame> animation = Collections.emptyList();
 
 	private final Timer timer;
@@ -53,7 +56,9 @@ public class AnimationZoomPanel extends ZoomPanel {
 
 	private final Set<IntConsumer> animationListeners = new CopyOnWriteArraySet<>();
 
-	public AnimationZoomPanel() {
+	public Animator(Consumer<BufferedImage> imageSink) {
+		this.imageSink = requireNonNull(imageSink, "imageSink");
+
 		timer = new Timer(1, this::animationStep);
 		timer.setRepeats(true);
 		timer.setCoalesce(true);
@@ -64,12 +69,6 @@ public class AnimationZoomPanel extends ZoomPanel {
 		return animation;
 	}
 
-	@Override
-	public void setImage(@Nullable BufferedImage image) {
-		setAnimation(Collections.emptyList());
-		super.setImage(image);
-	}
-
 	public void setAnimation(List<AnimationFrame> animation) {
 		requireNonNull(animation, "animation");
 
@@ -78,7 +77,7 @@ public class AnimationZoomPanel extends ZoomPanel {
 		this.animation = Collections.unmodifiableList(animation);
 
 		// display first frame
-		super.setImage(animation.isEmpty() ? null : animation.get(0).getImage());
+		setAnimationFrame(0);
 	}
 
 	public void startAnimation() {
@@ -86,15 +85,17 @@ public class AnimationZoomPanel extends ZoomPanel {
 			return;
 		}
 
-		animationFrame = 0;
 		nextAnimationStepTick = System.nanoTime();
-		switchFrame();
 
 		timer.start();
 	}
 
 	public void stopAnimation() {
 		timer.stop();
+	}
+
+	public int getAnimationFrame() {
+		return animationFrame;
 	}
 
 	public void setAnimationFrame(int animationFrame) {
@@ -132,7 +133,7 @@ public class AnimationZoomPanel extends ZoomPanel {
 
 		nextAnimationStepTick += frame.getDurationNanos();
 
-		super.setImage(frame.getImage());
+		imageSink.accept(frame.getImage());
 		fireAnimationListeners();
 	}
 

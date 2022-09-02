@@ -30,11 +30,7 @@ import java.io.IOException;
 import java.net.URL;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import javax.swing.JFrame;
-import javax.swing.SwingUtilities;
-import javax.swing.WindowConstants;
 
-import org.digitalmodular.weathertolive.util.AnimationZoomPanel;
 import org.digitalmodular.weathertolive.util.HTTPDownloader;
 import org.digitalmodular.weathertolive.util.TextProgressListener;
 
@@ -42,22 +38,7 @@ import org.digitalmodular.weathertolive.util.TextProgressListener;
  * @author Mark Jeronimus
  */
 // Created 2022-08-26
-public class TestMain extends AnimationZoomPanel {
-	public static void main(String... args) throws IOException {
-		downloadDataSet("wc2.1_10m_prec.zip");
-
-		SwingUtilities.invokeLater(() -> {
-			JFrame f = new JFrame();
-			f.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
-
-			f.setContentPane(new TestMain());
-
-			f.pack();
-			f.setLocationRelativeTo(null);
-			f.setVisible(true);
-		});
-	}
-
+public class TestMain {
 	private static void downloadDataSet(String filename) throws IOException {
 		URL  url  = new URL("https://biogeo.ucdavis.edu/data/worldclim/v2.1/base/" + filename);
 		Path file = Paths.get(filename);

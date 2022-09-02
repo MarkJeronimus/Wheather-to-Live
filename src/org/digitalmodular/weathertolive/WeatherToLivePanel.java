@@ -41,10 +41,11 @@ import org.jetbrains.annotations.Nullable;
 import org.digitalmodular.weathertolive.dataset.ClimateDataSet;
 import org.digitalmodular.weathertolive.dataset.DataSet;
 import org.digitalmodular.weathertolive.util.AnimationFrame;
-import org.digitalmodular.weathertolive.util.AnimationZoomPanel;
+import org.digitalmodular.weathertolive.util.Animator;
 import org.digitalmodular.weathertolive.util.ColorGradient;
 import org.digitalmodular.weathertolive.util.GraphicsUtilities;
 import org.digitalmodular.weathertolive.util.RangeF;
+import org.digitalmodular.weathertolive.util.ZoomPanel;
 import static org.digitalmodular.weathertolive.util.ValidatorUtilities.requireNonNull;
 
 /**
@@ -61,8 +62,10 @@ public class WeatherToLivePanel extends JPanel {
 		SCALE_FACTOR = Math.round(realWidth / effectiveWidth);
 	}
 
-	private final AnimationZoomPanel worldPanel  = new AnimationZoomPanel();
-	private final BottomPanel        bottomPanel = new BottomPanel(this);
+	private final ZoomPanel   worldPanel  = new ZoomPanel();
+	private final BottomPanel bottomPanel = new BottomPanel(this);
+
+	private final Animator animator = new Animator(worldPanel::setImage);
 
 	private @Nullable ClimateDataSet climateDataSet = null;
 	private @Nullable ColorGradient  gradient       = null;
@@ -77,7 +80,7 @@ public class WeatherToLivePanel extends JPanel {
 		add(worldPanel, BorderLayout.CENTER);
 		add(bottomPanel, BorderLayout.SOUTH);
 
-		worldPanel.addAnimationListener(bottomPanel::setMonth);
+		animator.addAnimationListener(bottomPanel::setMonth);
 	}
 
 	public @Nullable ClimateDataSet getClimateDataSet() {
@@ -116,7 +119,7 @@ public class WeatherToLivePanel extends JPanel {
 
 		List<AnimationFrame> atlasSequence = makeAtlasSequence(climateDataSet.getDataSets().get(0).getDataSet());
 
-		worldPanel.setAnimation(atlasSequence);
+		animator.setAnimation(atlasSequence);
 		worldPanel.zoomFit();
 
 		boolean canAnimate = climateDataSet != null;
@@ -168,16 +171,16 @@ public class WeatherToLivePanel extends JPanel {
 
 	public void setAnimated(boolean animated) {
 		if (animated) {
-			worldPanel.startAnimation();
+			animator.startAnimation();
 		} else {
-			worldPanel.stopAnimation();
+			animator.stopAnimation();
 		}
 
 		bottomPanel.setAnimated(animated);
 	}
 
 	public void setMonth(int month) {
-		worldPanel.setAnimationFrame(month);
+		animator.setAnimationFrame(month);
 		bottomPanel.setMonth(month);
 	}
 }

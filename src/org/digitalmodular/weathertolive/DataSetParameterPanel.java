@@ -44,9 +44,10 @@ import org.jetbrains.annotations.Nullable;
 import com.jidesoft.swing.RangeSlider;
 import org.digitalmodular.weathertolive.dataset.FilteredDataSet;
 import org.digitalmodular.weathertolive.util.AnimationFrame;
-import org.digitalmodular.weathertolive.util.AnimationZoomPanel;
+import org.digitalmodular.weathertolive.util.Animator;
 import org.digitalmodular.weathertolive.util.PreferredNumbers;
 import org.digitalmodular.weathertolive.util.RangeF;
+import org.digitalmodular.weathertolive.util.ZoomPanel;
 import static org.digitalmodular.weathertolive.WeatherToLivePanel.SCALE_FACTOR;
 import static org.digitalmodular.weathertolive.dataset.DataSet.SEA_BLUE;
 import static org.digitalmodular.weathertolive.dataset.DataSet.THUMBNAIL_HEIGHT;
@@ -65,10 +66,12 @@ public class DataSetParameterPanel extends JPanel {
 
 	private final DecimalFormat numberFormat;
 
-	private final AnimationZoomPanel thumbnailPanel = new AnimationZoomPanel();
-	private final JLabel             beginLabel     = new JLabel();
-	private final JSlider            slider         = new RangeSlider();
-	private final JLabel             endLabel       = new JLabel();
+	private final ZoomPanel thumbnailPanel = new ZoomPanel();
+	private final JLabel    beginLabel     = new JLabel();
+	private final JSlider   slider         = new RangeSlider();
+	private final JLabel    endLabel       = new JLabel();
+
+	private final Animator animator = new Animator(thumbnailPanel::setImage);
 
 	private final float sliderStepSize;
 
@@ -203,6 +206,6 @@ public class DataSetParameterPanel extends JPanel {
 			thumbnailSequence.add(new AnimationFrame(image, 1_500_000_000 / 12));
 		}
 
-		thumbnailPanel.setAnimation(thumbnailSequence);
+		animator.setAnimation(thumbnailSequence);
 	}
 }
