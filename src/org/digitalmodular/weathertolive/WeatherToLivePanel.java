@@ -125,8 +125,6 @@ public class WeatherToLivePanel extends JPanel {
 		animator.setAnimation(atlasSequence);
 		worldPanel.zoomFit();
 
-		boolean canAnimate = climateDataSet != null;
-		bottomPanel.setAnimatable(canAnimate); // This will percolate to setAnimated()
 		setMonth(0);
 	}
 

@@ -125,16 +125,6 @@ public class BottomPanel extends JPanel {
 		parent.setMonth(monthSlider.getValue());
 	}
 
-	public void setAnimatable(boolean animatable) {
-		if (!animatable) {
-			animateCheckbox.setSelected(false);
-			monthSlider.setValue(0);
-		}
-
-		animateCheckbox.setEnabled(animatable);
-		monthSlider.setEnabled(animatable);
-	}
-
 	public void setAnimated(boolean animated) {
 		animateCheckbox.setSelected(animated);
 
