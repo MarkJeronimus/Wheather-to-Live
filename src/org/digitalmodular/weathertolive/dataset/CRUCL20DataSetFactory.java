@@ -33,6 +33,8 @@ import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.regex.Pattern;
 
+import static org.digitalmodular.weathertolive.dataset.ClimateDataSetMetadata.ClimateDataSetData;
+
 /**
  * @author Mark Jeronimus
  */
@@ -48,16 +50,8 @@ public final class CRUCL20DataSetFactory {
 
 	private static final Pattern SPACES_PATTERN = Pattern.compile(" +");
 
-	/**
-	 * @param dataSetName  The name to show in the GUI. Can use basic HTML.
-	 * @param absoluteZero Whether the values start at 0 or can go negative (should find minimum)
-	 */
-	public static FilterDataSet createFor(String filename,
-	                                      String dataSetName,
-	                                      boolean absoluteZero,
-	                                      int gamma,
-	                                      String gradientFilename)
-			throws IOException {
+	public static FilterDataSet createFor(ClimateDataSetData setMetadata) throws IOException {
+		String filename = setMetadata.filename;
 
 		float[][] rawData = new float[12][WIDTH * HEIGHT];
 		for (int month = 0; month < 12; month++) {
@@ -80,7 +74,13 @@ public final class CRUCL20DataSetFactory {
 			}
 		}
 
-		DataSet dataSet = new DataSet(dataSetName, rawData, WIDTH, HEIGHT, absoluteZero, gamma, gradientFilename);
+		DataSet dataSet = new DataSet(setMetadata.dataSetName,
+		                              rawData,
+		                              WIDTH,
+		                              HEIGHT,
+		                              setMetadata.absoluteZero,
+		                              setMetadata.gamma,
+		                              setMetadata.gradientFilename);
 		return new FilterDataSet(dataSet);
 	}
 

@@ -40,6 +40,8 @@ import javax.imageio.ImageIO;
 
 import org.jetbrains.annotations.Nullable;
 
+import static org.digitalmodular.weathertolive.dataset.ClimateDataSetMetadata.ClimateDataSetData;
+
 /**
  * @author Mark Jeronimus
  */
@@ -49,17 +51,9 @@ public final class WorldClim21DataSetFactory {
 		throw new AssertionError();
 	}
 
-	/**
-	 * @param dataSetName  The name to show in the GUI. Can use basic HTML.
-	 * @param absoluteZero Whether the values start at 0 or can go negative (should find minimum)
-	 */
-	public static FilterDataSet createFor(String filename,
-	                                      String dataSetName,
-	                                      boolean absoluteZero,
-	                                      int gamma,
-	                                      String gradientFilename)
-			throws IOException {
-		String prefix = filename.substring(0, 14); // e.g. "wc2.1_10m_prec"
+	public static FilterDataSet createFor(ClimateDataSetData setMetadata) throws IOException {
+		String filename = setMetadata.filename;
+		String prefix   = filename.substring(0, 14); // e.g. "wc2.1_10m_prec"
 
 		try (ZipFile zip = new ZipFile(new File(filename))) {
 			float[][] rawData = new float[12][];
@@ -85,7 +79,13 @@ public final class WorldClim21DataSetFactory {
 				rawData[month] = convertGeoTiffToRawData(geoData);
 			}
 
-			DataSet dataSet = new DataSet(dataSetName, rawData, width, height, absoluteZero, gamma, gradientFilename);
+			DataSet dataSet = new DataSet(setMetadata.dataSetName,
+			                              rawData,
+			                              width,
+			                              height,
+			                              setMetadata.absoluteZero,
+			                              setMetadata.gamma,
+			                              setMetadata.gradientFilename);
 			return new FilterDataSet(dataSet);
 		}
 	}

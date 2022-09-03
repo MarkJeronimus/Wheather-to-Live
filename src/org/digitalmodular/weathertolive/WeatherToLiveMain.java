@@ -27,7 +27,7 @@
 package org.digitalmodular.weathertolive;
 
 import java.io.IOException;
-import java.util.List;
+import java.nio.file.Paths;
 import java.util.concurrent.ExecutionException;
 import javax.swing.JFrame;
 import javax.swing.SwingUtilities;
@@ -36,8 +36,13 @@ import javax.swing.WindowConstants;
 import com.formdev.flatlaf.FlatDarkLaf;
 import com.formdev.flatlaf.FlatLaf;
 import com.jidesoft.plaf.LookAndFeelFactory;
-import org.digitalmodular.weathertolive.dataset.CRUCL20DataSetFactory;
 import org.digitalmodular.weathertolive.dataset.ClimateDataSet;
+import org.digitalmodular.weathertolive.dataset.ClimateDataSetLoader;
+import org.digitalmodular.weathertolive.dataset.ClimateDataSetMetadata;
+import org.digitalmodular.weathertolive.util.MultiProgressListener;
+import org.digitalmodular.weathertolive.util.ProgressEvent;
+import org.digitalmodular.weathertolive.util.ProgressListener;
+import org.digitalmodular.weathertolive.util.TextProgressListener;
 
 /**
  * @author Mark Jeronimus
@@ -45,19 +50,16 @@ import org.digitalmodular.weathertolive.dataset.ClimateDataSet;
 // Created 2022-08-30
 public final class WeatherToLiveMain {
 	public static void main(String... args) throws IOException, ExecutionException, InterruptedException {
-		String tempGradient = "gradient-temperature.png";
-		String precGradient = "gradient-precipitation.png";
-		String windGradient = "gradient-wind.png";
+		ClimateDataSetMetadata metadata = new ClimateDataSetMetadata(Paths.get("config-worldclim-2.1-10min.tsv"));
 
-		long t = System.nanoTime();
-		ClimateDataSet climateDataSet = new ClimateDataSet(List.of(
-				CRUCL20DataSetFactory.createFor("grid_10min_tmp.dat",
-				                                "grid_10min_tmp.dat",
-				                                false,
-				                                1,
-				                                tempGradient)
-		));
-		System.out.println("Loading took " + (System.nanoTime() - t) / 1.0e9f + " s");
+		ClimateDataSet climateDataSet = ClimateDataSetLoader.load(metadata, new MultiProgressListener() {
+			private final ProgressListener listener = new TextProgressListener(System.out, 4000);
+
+			@Override
+			public void multiProgressUpdated(int progressBarIndex, ProgressEvent evt) {
+				listener.progressUpdated(evt);
+			}
+		});
 
 		SwingUtilities.invokeLater(() -> {
 			FlatLaf.setup(new FlatDarkLaf());
