@@ -101,7 +101,7 @@ public class DataSetParameterPanel extends JPanel {
 		this.dataSetIndex = requireAtLeast(0, dataSetIndex, "dataSetIndex");
 
 		RangeF minMax        = filterDataSet.getDataSet().getMinMax();
-		int    quantizerStep = calculateQuantizerStep(minMax);
+		int    quantizerStep = calculateQuantizerStep(minMax.getSpan() / filterDataSet.getDataSet().getGamma());
 		sliderStepSize = (float)STEP_QUANTIZER.exp(quantizerStep);
 		numberFormat = makeNumberFormat(quantizerStep);
 		prepareLabelWidths(minMax);
@@ -125,8 +125,7 @@ public class DataSetParameterPanel extends JPanel {
 				p.add(beginLabel, BorderLayout.LINE_START);
 			}
 			{
-				slider.setMajorTickSpacing(10000);
-				slider.setMinorTickSpacing(10);
+				slider.setMajorTickSpacing(slider.getExtent() / 10);
 				slider.setPaintTicks(true);
 				slider.addChangeListener(this::sliderChanged);
 
@@ -147,8 +146,7 @@ public class DataSetParameterPanel extends JPanel {
 		sliderChanged(null); // Initialize real label values
 	}
 
-	private static int calculateQuantizerStep(RangeF minMax) {
-		float span          = minMax.getSpan();
+	private static int calculateQuantizerStep(float span) {
 		float stepSize      = span / MIN_SLIDER_STEPS;
 		int   quantizerStep = STEP_QUANTIZER.log(stepSize);
 		return quantizerStep;
