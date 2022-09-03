@@ -73,6 +73,8 @@ public class BottomPanel extends JPanel {
 	@SuppressWarnings("FieldHasSetterButNoGetter")
 	private @Nullable Consumer<Integer> parameterChangedCallback = null;
 
+	private boolean machineEvent = false;
+
 	@SuppressWarnings("OverridableMethodCallDuringObjectConstruction")
 	public BottomPanel(WeatherToLivePanel parent) {
 		super(new BorderLayout());
@@ -141,35 +143,61 @@ public class BottomPanel extends JPanel {
 
 	@SuppressWarnings("ObjectEquality") // Comparing identity, not equality
 	private void actionPerformed(ActionEvent e) {
-		if (e.getSource() == fastPreviewCheckbox) {
-			parent.setFastPreview(animateCheckbox.isSelected());
-		} else if (e.getSource() == animateCheckbox) {
-			parent.setAnimated(animateCheckbox.isSelected());
-		} else if (e.getSource() == aggregateYearCheckbox) {
-			parent.setAggregateYear(aggregateYearCheckbox.isSelected());
+		if (machineEvent) {
+			return;
+		}
+
+		machineEvent = true;
+		try {
+			if (e.getSource() == fastPreviewCheckbox) {
+				parent.setFastPreview(animateCheckbox.isSelected());
+			} else if (e.getSource() == animateCheckbox) {
+				parent.setAnimated(animateCheckbox.isSelected());
+			} else if (e.getSource() == aggregateYearCheckbox) {
+				parent.setAggregateYear(aggregateYearCheckbox.isSelected());
+			}
+		} finally {
+			machineEvent = false;
 		}
 	}
 
 	// Slider listener
 	private void monthChanged(ChangeEvent e) {
-		parent.setMonth(monthSlider.getValue());
+		if (machineEvent) {
+			return;
+		}
+
+		machineEvent = true;
+		try {
+			parent.setMonth(monthSlider.getValue());
+			parent.setAnimated(false);
+		} finally {
+			machineEvent = false;
+		}
 	}
 
+	// Called from the outside, so don't call this from listeners
 	public void setAnimated(boolean animated) {
-		animateCheckbox.setSelected(animated);
-
-		if (animateCheckbox.isEnabled()) {
-			monthSlider.setEnabled(!animated);
+		machineEvent = true;
+		try {
+			animateCheckbox.setSelected(animated);
+		} finally {
+			machineEvent = false;
 		}
 	}
 
-	// Called from the outside, so don't call this from monthChanged()
+	// Called from the outside, so don't call this from listeners
 	public void setMonth(int month) {
-		for (int i = 0; i < filterPanel.getNumChildren(); i++) {
-			filterPanel.getChild(i).setMonth(month);
-		}
+		machineEvent = true;
+		try {
+			for (int i = 0; i < filterPanel.getNumChildren(); i++) {
+				filterPanel.getChild(i).setMonth(month);
+			}
 
-		monthSlider.setValue(month);
+			monthSlider.setValue(month);
+		} finally {
+			machineEvent = false;
+		}
 	}
 
 	public void setParameterChangedCallback(@Nullable Consumer<Integer> parameterChangedCallback) {
