@@ -44,8 +44,8 @@ import org.jetbrains.annotations.Nullable;
  * @author Mark Jeronimus
  */
 // Created 2022-08-28
-public final class WorldClimDatasetFactory {
-	private WorldClimDatasetFactory() {
+public final class WorldClim21DataSetFactory {
+	private WorldClim21DataSetFactory() {
 		throw new AssertionError();
 	}
 
@@ -53,11 +53,11 @@ public final class WorldClimDatasetFactory {
 	 * @param dataSetName  The name to show in the GUI. Can use basic HTML.
 	 * @param absoluteZero Whether the values start at 0 or can go negative (should find minimum)
 	 */
-	public static FilteredDataSet createFor(String filename,
-	                                        String dataSetName,
-	                                        boolean absoluteZero,
-	                                        int gamma,
-	                                        String gradientFilename)
+	public static FilterDataSet createFor(String filename,
+	                                      String dataSetName,
+	                                      boolean absoluteZero,
+	                                      int gamma,
+	                                      String gradientFilename)
 			throws IOException {
 		String prefix = filename.substring(0, 14); // e.g. "wc2.1_10m_prec"
 
@@ -86,7 +86,7 @@ public final class WorldClimDatasetFactory {
 			}
 
 			DataSet dataSet = new DataSet(dataSetName, rawData, width, height, absoluteZero, gamma, gradientFilename);
-			return new FilteredDataSet(dataSet);
+			return new FilterDataSet(dataSet);
 		}
 	}
 

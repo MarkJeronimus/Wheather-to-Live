@@ -45,7 +45,7 @@ import javax.swing.event.ChangeEvent;
 import org.jetbrains.annotations.Nullable;
 
 import org.digitalmodular.weathertolive.dataset.ClimateDataSet;
-import org.digitalmodular.weathertolive.dataset.FilteredDataSet;
+import org.digitalmodular.weathertolive.dataset.FilterDataSet;
 import org.digitalmodular.weathertolive.util.LabelSlider;
 import org.digitalmodular.weathertolive.util.ListPanel;
 import static org.digitalmodular.weathertolive.util.ValidatorUtilities.requireNonNull;
@@ -120,10 +120,10 @@ public class BottomPanel extends JPanel {
 	public void prepareFilters(ClimateDataSet climateDataSet) {
 		filterPanel.removeAll();
 
-		List<FilteredDataSet> dataSets = climateDataSet.getDataSets();
+		List<FilterDataSet> filterDataSets = climateDataSet.getFilterDataSets();
 
-		for (int i = 0; i < dataSets.size(); i++) {
-			DataSetParameterPanel parameter = new DataSetParameterPanel(dataSets.get(i), i);
+		for (int i = 0; i < filterDataSets.size(); i++) {
+			DataSetParameterPanel parameter = new DataSetParameterPanel(filterDataSets.get(i), i);
 			parameter.setParameterChangedCallback(this::parameterChanged);
 
 			filterPanel.add(parameter);

@@ -44,7 +44,7 @@ import javax.swing.event.ChangeEvent;
 import org.jetbrains.annotations.Nullable;
 
 import com.jidesoft.swing.RangeSlider;
-import org.digitalmodular.weathertolive.dataset.FilteredDataSet;
+import org.digitalmodular.weathertolive.dataset.FilterDataSet;
 import org.digitalmodular.weathertolive.util.AnimationFrame;
 import org.digitalmodular.weathertolive.util.Animator;
 import org.digitalmodular.weathertolive.util.ImagePanel;
@@ -68,8 +68,8 @@ public class DataSetParameterPanel extends JPanel {
 	private static final int              MIN_SLIDER_STEPS = 60;
 	private static final PreferredNumbers STEP_QUANTIZER   = new PreferredNumbers(10, 100, 125, 150, 200, 500);
 
-	private final FilteredDataSet filteredDataSet;
-	private final int             dataSetIndex;
+	private final FilterDataSet filterDataSet;
+	private final int           dataSetIndex;
 
 	private final DecimalFormat numberFormat;
 
@@ -86,12 +86,12 @@ public class DataSetParameterPanel extends JPanel {
 	private @Nullable Consumer<Integer> parameterChangedCallback = null;
 
 	@SuppressWarnings("OverridableMethodCallDuringObjectConstruction")
-	public DataSetParameterPanel(FilteredDataSet filteredDataSet, int dataSetIndex) {
+	public DataSetParameterPanel(FilterDataSet filterDataSet, int dataSetIndex) {
 		super(new BorderLayout());
-		this.filteredDataSet = requireNonNull(filteredDataSet, "filteredDataSet");
+		this.filterDataSet = requireNonNull(filterDataSet, "filterDataSet");
 		this.dataSetIndex = requireAtLeast(0, dataSetIndex, "dataSetIndex");
 
-		RangeF minMax        = filteredDataSet.getDataSet().getMinMax();
+		RangeF minMax        = filterDataSet.getDataSet().getMinMax();
 		int    quantizerStep = calculateQuantizerStep(minMax);
 		sliderStepSize = (float)STEP_QUANTIZER.exp(quantizerStep);
 		numberFormat = makeNumberFormat(quantizerStep);
@@ -99,7 +99,7 @@ public class DataSetParameterPanel extends JPanel {
 		prepareSliderRange(minMax);
 
 		{
-			JLabel nameLabel = new JLabel(filteredDataSet.getDataSet().getName() + ' ');
+			JLabel nameLabel = new JLabel(filterDataSet.getDataSet().getName() + ' ');
 			nameLabel.setHorizontalAlignment(SwingConstants.CENTER);
 			add(nameLabel, BorderLayout.NORTH);
 		}
@@ -175,7 +175,7 @@ public class DataSetParameterPanel extends JPanel {
 
 		updateLabels(minMax);
 
-		filteredDataSet.setFilterMinMax(minMax);
+		filterDataSet.setFilterMinMax(minMax);
 
 		if (parameterChangedCallback != null) {
 			parameterChangedCallback.accept(dataSetIndex);
@@ -186,13 +186,13 @@ public class DataSetParameterPanel extends JPanel {
 		float begin = slider.getValue();
 		float end   = begin + slider.getExtent();
 
-		int gamma = filteredDataSet.getDataSet().getGamma();
+		int gamma = filterDataSet.getDataSet().getGamma();
 
 		if (gamma == 1) {
 			begin *= sliderStepSize;
 			end *= sliderStepSize;
 		} else {
-			RangeF minMax = filteredDataSet.getDataSet().getMinMax();
+			RangeF minMax = filterDataSet.getDataSet().getMinMax();
 
 			begin = minMax.unLerp(begin);
 			end = minMax.unLerp(end);
@@ -230,7 +230,7 @@ public class DataSetParameterPanel extends JPanel {
 	public void updateThumbnail() {
 		List<AnimationFrame> thumbnailSequence = new ArrayList<>(12);
 
-		int[][] thumbnails = filteredDataSet.getFilteredThumbnails();
+		int[][] thumbnails = filterDataSet.getFilteredThumbnails();
 		int     length     = thumbnails[0].length;
 
 		for (int month = 0; month < 12; month++) {

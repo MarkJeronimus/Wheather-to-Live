@@ -82,7 +82,7 @@ public class WeatherToLivePanel extends JPanel {
 			throw new IllegalStateException("setClimateDataSet() has not been called");
 		}
 
-		atlasRenderer.setFilteredDataSets(climateDataSet.getDataSets());
+		atlasRenderer.setFilterDataSets(climateDataSet.getFilterDataSets());
 		atlasRenderer.setBackgroundDatasetIndex(0);
 		bottomPanel.prepareFilters(climateDataSet);
 

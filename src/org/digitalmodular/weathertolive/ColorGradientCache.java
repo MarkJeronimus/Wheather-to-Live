@@ -39,8 +39,8 @@ import org.digitalmodular.weathertolive.util.ColorGradient;
  * @author Mark Jeronimus
  */
 // Created 2022-09-03
-public final class GradientCache {
-	private GradientCache() {
+public final class ColorGradientCache {
+	private ColorGradientCache() {
 		throw new AssertionError();
 	}
 

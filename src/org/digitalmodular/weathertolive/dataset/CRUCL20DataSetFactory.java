@@ -52,11 +52,11 @@ public final class CRUCL20DataSetFactory {
 	 * @param dataSetName  The name to show in the GUI. Can use basic HTML.
 	 * @param absoluteZero Whether the values start at 0 or can go negative (should find minimum)
 	 */
-	public static FilteredDataSet createFor(String filename,
-	                                        String dataSetName,
-	                                        boolean absoluteZero,
-	                                        int gamma,
-	                                        String gradientFilename)
+	public static FilterDataSet createFor(String filename,
+	                                      String dataSetName,
+	                                      boolean absoluteZero,
+	                                      int gamma,
+	                                      String gradientFilename)
 			throws IOException {
 
 		float[][] rawData = new float[12][WIDTH * HEIGHT];
@@ -81,7 +81,7 @@ public final class CRUCL20DataSetFactory {
 		}
 
 		DataSet dataSet = new DataSet(dataSetName, rawData, WIDTH, HEIGHT, absoluteZero, gamma, gradientFilename);
-		return new FilteredDataSet(dataSet);
+		return new FilterDataSet(dataSet);
 	}
 
 	private static void parseLine(String[] fields, float[][] rawData) {

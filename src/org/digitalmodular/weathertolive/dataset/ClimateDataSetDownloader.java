@@ -41,8 +41,8 @@ import org.digitalmodular.weathertolive.util.ProgressListener;
  * @author Mark Jeronimus
  */
 // Created 2022-09-03
-public final class DataSetDownloader {
-	private DataSetDownloader() {
+public final class ClimateDataSetDownloader {
+	private ClimateDataSetDownloader() {
 		throw new AssertionError();
 	}
 

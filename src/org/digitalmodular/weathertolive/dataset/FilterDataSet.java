@@ -35,7 +35,7 @@ import static org.digitalmodular.weathertolive.util.ValidatorUtilities.requireNo
  * @author Mark Jeronimus
  */
 // Created 2022-09-01
-public class FilteredDataSet {
+public class FilterDataSet {
 	private final DataSet dataSet;
 
 	private RangeF filterMinMax;
@@ -46,7 +46,7 @@ public class FilteredDataSet {
 	private       boolean thumbnailDataDirty = true;
 	private final int[][] filteredThumbnails = new int[12][DataSet.THUMBNAIL_PIXELS];
 
-	public FilteredDataSet(DataSet dataSet) {
+	public FilterDataSet(DataSet dataSet) {
 		this.dataSet = requireNonNull(dataSet, "dataSet");
 
 		filterMinMax = dataSet.getMinMax();

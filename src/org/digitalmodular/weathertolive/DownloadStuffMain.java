@@ -29,8 +29,8 @@ package org.digitalmodular.weathertolive;
 import java.io.IOException;
 import java.nio.file.Paths;
 
+import org.digitalmodular.weathertolive.dataset.ClimateDataSetDownloader;
 import org.digitalmodular.weathertolive.dataset.ClimateDataSetMetadata;
-import org.digitalmodular.weathertolive.dataset.DataSetDownloader;
 import org.digitalmodular.weathertolive.util.MultiProgressListener;
 import org.digitalmodular.weathertolive.util.ProgressEvent;
 import org.digitalmodular.weathertolive.util.ProgressListener;
@@ -44,7 +44,7 @@ public final class DownloadStuffMain {
 	public static void main(String... args) throws IOException {
 		ClimateDataSetMetadata metadata = new ClimateDataSetMetadata(Paths.get("config-cru-cl-2.0-10min.tsv"));
 
-		DataSetDownloader.download(metadata, new MultiProgressListener() {
+		ClimateDataSetDownloader.download(metadata, new MultiProgressListener() {
 			private final ProgressListener listener = new TextProgressListener(System.out, 4000);
 
 			@Override

@@ -38,15 +38,15 @@ import static org.digitalmodular.weathertolive.util.ValidatorUtilities.requireSi
  */
 // Created 2022-08-31
 public class ClimateDataSet {
-	private final List<FilteredDataSet> dataSets;
+	private final List<FilterDataSet> filterDataSets;
 
-	public ClimateDataSet(List<FilteredDataSet> dataSets) {
-		requireSizeAtLeast(1, dataSets, "datasets");
+	public ClimateDataSet(List<FilterDataSet> filterDataSets) {
+		requireSizeAtLeast(1, filterDataSets, "filterDataSets");
 
-		this.dataSets = Collections.unmodifiableList(dataSets);
+		this.filterDataSets = Collections.unmodifiableList(filterDataSets);
 	}
 
-	public List<FilteredDataSet> getDataSets() {
-		return dataSets;
+	public List<FilterDataSet> getFilterDataSets() {
+		return filterDataSets;
 	}
 }

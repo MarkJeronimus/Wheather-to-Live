@@ -45,7 +45,7 @@ import net.jcip.annotations.GuardedBy;
 import org.jetbrains.annotations.Nullable;
 
 import org.digitalmodular.weathertolive.dataset.DataSet;
-import org.digitalmodular.weathertolive.dataset.FilteredDataSet;
+import org.digitalmodular.weathertolive.dataset.FilterDataSet;
 import org.digitalmodular.weathertolive.util.AnimationFrame;
 import org.digitalmodular.weathertolive.util.ColorGradient;
 import org.digitalmodular.weathertolive.util.RangeF;
@@ -65,10 +65,10 @@ public class AtlasRenderer {
 
 	private final Consumer<List<AnimationFrame>> renderUpdateCallback;
 
-	private @Nullable List<FilteredDataSet> filteredDataSets       = null;
-	private           int                   currentMonth           = 0;
-	private           int                   backgroundDatasetIndex = -1;
-	private           boolean               aggregateYear          = false;
+	private @Nullable List<FilterDataSet> filterDataSets         = null;
+	private           int                 currentMonth           = 0;
+	private           int                 backgroundDatasetIndex = -1;
+	private           boolean             aggregateYear          = false;
 
 	private final List<@Nullable AnimationFrame> imageSequence = new ArrayList<>(12);
 
@@ -93,13 +93,13 @@ public class AtlasRenderer {
 	}
 
 	@SuppressWarnings("AssignmentOrReturnOfFieldWithMutableType")
-	public @Nullable List<FilteredDataSet> getFilteredDataSets() {
-		return filteredDataSets;
+	public @Nullable List<FilterDataSet> getFilterDataSets() {
+		return filterDataSets;
 	}
 
 	@SuppressWarnings("AssignmentOrReturnOfFieldWithMutableType")
-	public void setFilteredDataSets(@Nullable List<FilteredDataSet> filteredDataSets) {
-		this.filteredDataSets = filteredDataSets;
+	public void setFilterDataSets(@Nullable List<FilterDataSet> filterDataSets) {
+		this.filterDataSets = filterDataSets;
 	}
 
 	public int getCurrentMonth() {
@@ -115,12 +115,12 @@ public class AtlasRenderer {
 	}
 
 	public void setBackgroundDatasetIndex(int backgroundDatasetIndex) {
-		if (filteredDataSets == null) {
-			throw new IllegalStateException("'filteredDataSets' is null");
+		if (filterDataSets == null) {
+			throw new IllegalStateException("'filterDataSets' is null");
 		}
 
 		this.backgroundDatasetIndex = requireRange(-1,
-		                                           filteredDataSets.size() - 1,
+		                                           filterDataSets.size() - 1,
 		                                           backgroundDatasetIndex,
 		                                           "backgroundDatasetIndex");
 	}
@@ -165,7 +165,7 @@ public class AtlasRenderer {
 		taskRunning.set(true);
 
 		try {
-			if (filteredDataSets == null) {
+			if (filterDataSets == null) {
 				clear();
 				renderUpdateCallback.accept(imageSequence);
 				return;
@@ -205,10 +205,10 @@ public class AtlasRenderer {
 	}
 
 	private void renderMonth(int month, int @Nullable [] aggregateFilteredPixels) {
-		assert filteredDataSets != null;
+		assert filterDataSets != null;
 
-		int width  = filteredDataSets.get(0).getDataSet().getWidth();
-		int height = filteredDataSets.get(0).getDataSet().getHeight();
+		int width  = filterDataSets.get(0).getDataSet().getWidth();
+		int height = filterDataSets.get(0).getDataSet().getHeight();
 
 		BufferedImage image  = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
 		int[]         pixels = ((DataBufferInt)image.getRaster().getDataBuffer()).getData();
@@ -230,17 +230,17 @@ public class AtlasRenderer {
 	}
 
 	private int[] renderAggregateYear() {
-		assert filteredDataSets != null;
+		assert filterDataSets != null;
 
-		int width  = filteredDataSets.get(0).getDataSet().getWidth();
-		int height = filteredDataSets.get(0).getDataSet().getHeight();
+		int width  = filterDataSets.get(0).getDataSet().getWidth();
+		int height = filterDataSets.get(0).getDataSet().getHeight();
 
 		int[] aggregateFilteredPixels = new int[width * height];
 		Arrays.fill(aggregateFilteredPixels, 1);
 
 		for (int month = 0; month < 12; month++) {
-			for (FilteredDataSet filteredDataSet : filteredDataSets) {
-				int[] filteredMonthData = filteredDataSet.getFilteredData()[month];
+			for (FilterDataSet filterDataSet : filterDataSets) {
+				int[] filteredMonthData = filterDataSet.getFilteredData()[month];
 				int   length            = filteredMonthData.length;
 
 				for (int i = 0; i < length; i++) {
@@ -259,14 +259,14 @@ public class AtlasRenderer {
 	}
 
 	private void renderBackground(int month, int[] pixels) {
-		assert filteredDataSets != null;
+		assert filterDataSets != null;
 
 		if (backgroundDatasetIndex >= 0) {
-			DataSet dataSet = filteredDataSets.get(backgroundDatasetIndex).getDataSet();
+			DataSet dataSet = filterDataSets.get(backgroundDatasetIndex).getDataSet();
 			renderParameterBackground(dataSet, month, pixels);
 		} else {
 			// TODO use NASA Blue Marble or something
-			float[] atlas = filteredDataSets.get(0).getDataSet().getRawData()[0];
+			float[] atlas = filterDataSets.get(0).getDataSet().getRawData()[0];
 			renderAtlasBackground(atlas, pixels);
 		}
 	}
@@ -275,7 +275,7 @@ public class AtlasRenderer {
 		float[][]               rawData  = dataSet.getRawData();
 		RangeF                  minMax   = dataSet.getMinMax();
 		int                     gamma    = dataSet.getGamma();
-		@Nullable ColorGradient gradient = GradientCache.getGradient(dataSet.getGradientFilename());
+		@Nullable ColorGradient gradient = ColorGradientCache.getGradient(dataSet.getGradientFilename());
 		int                     length   = rawData[0].length;
 
 		float[] rawMonthData = rawData[month];
@@ -334,10 +334,10 @@ public class AtlasRenderer {
 	}
 
 	private void renderFilteredPixels(int month, int[] pixels) {
-		assert filteredDataSets != null;
+		assert filterDataSets != null;
 
-		for (FilteredDataSet filteredDataSet : filteredDataSets) {
-			int[] filteredMonthData = filteredDataSet.getFilteredData()[month];
+		for (FilterDataSet filterDataSet : filterDataSets) {
+			int[] filteredMonthData = filterDataSet.getFilteredData()[month];
 			int   length            = filteredMonthData.length;
 
 			for (int i = 0; i < length; i++) {
