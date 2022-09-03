@@ -35,6 +35,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.zip.ZipEntry;
+import java.util.zip.ZipException;
 import java.util.zip.ZipFile;
 import javax.imageio.ImageIO;
 
@@ -87,6 +88,8 @@ public final class WorldClim21DataSetFactory {
 			                              setMetadata.gamma,
 			                              setMetadata.gradientFilename);
 			return new FilterDataSet(dataSet);
+		} catch (ZipException ex) {
+			throw new IOException(ex.getMessage() + ": " + filename, ex);
 		}
 	}
 
