@@ -40,8 +40,6 @@ import javax.imageio.ImageIO;
 
 import org.jetbrains.annotations.Nullable;
 
-import org.digitalmodular.weathertolive.util.ColorGradient;
-
 /**
  * @author Mark Jeronimus
  */
@@ -59,7 +57,7 @@ public final class WorldClimDatasetFactory {
 	                                        String dataSetName,
 	                                        boolean absoluteZero,
 	                                        int gamma,
-	                                        ColorGradient gradient)
+	                                        String gradientFilename)
 			throws IOException {
 		String prefix = filename.substring(0, 14); // e.g. "wc2.1_10m_prec"
 
@@ -87,7 +85,7 @@ public final class WorldClimDatasetFactory {
 				rawData[month] = convertGeoTiffToRawData(geoData);
 			}
 
-			DataSet dataSet = new DataSet(dataSetName, rawData, width, height, absoluteZero, gamma, gradient);
+			DataSet dataSet = new DataSet(dataSetName, rawData, width, height, absoluteZero, gamma, gradientFilename);
 			return new FilteredDataSet(dataSet);
 		}
 	}

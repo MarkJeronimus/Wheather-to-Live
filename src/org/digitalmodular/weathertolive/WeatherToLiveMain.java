@@ -26,7 +26,6 @@
  */
 package org.digitalmodular.weathertolive;
 
-import java.io.File;
 import java.io.IOException;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
@@ -39,7 +38,6 @@ import com.formdev.flatlaf.FlatLaf;
 import com.jidesoft.plaf.LookAndFeelFactory;
 import org.digitalmodular.weathertolive.dataset.ClimateDataSet;
 import org.digitalmodular.weathertolive.dataset.WorldClimDatasetFactory;
-import org.digitalmodular.weathertolive.util.ColorGradient;
 
 /**
  * @author Mark Jeronimus
@@ -47,9 +45,9 @@ import org.digitalmodular.weathertolive.util.ColorGradient;
 // Created 2022-08-30
 public final class WeatherToLiveMain {
 	public static void main(String... args) throws IOException, ExecutionException, InterruptedException {
-		ColorGradient tempGradient = new ColorGradient(new File("gradient-temperature.png"));
-		ColorGradient precGradient = new ColorGradient(new File("gradient-precipitation.png"));
-		ColorGradient windGradient = new ColorGradient(new File("gradient-wind.png"));
+		String tempGradient = "gradient-temperature.png";
+		String precGradient = "gradient-precipitation.png";
+		String windGradient = "gradient-wind.png";
 
 		long t = System.nanoTime();
 		ClimateDataSet climateDataSet = new ClimateDataSet(List.of(

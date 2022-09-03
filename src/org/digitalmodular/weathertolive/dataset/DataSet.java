@@ -28,7 +28,6 @@ package org.digitalmodular.weathertolive.dataset;
 
 import org.jetbrains.annotations.Nullable;
 
-import org.digitalmodular.weathertolive.util.ColorGradient;
 import org.digitalmodular.weathertolive.util.RangeF;
 import org.digitalmodular.weathertolive.util.RangeFBuilder;
 import static org.digitalmodular.weathertolive.WeatherToLivePanel.SCALE_FACTOR;
@@ -59,14 +58,14 @@ public class DataSet {
 
 	static final int THUMBNAIL_PIXELS = THUMBNAIL_WIDTH * THUMBNAIL_HEIGHT;
 
-	private final String        name;
-	private final int           width;
-	private final int           height;
-	private final float[][]     rawData;
-	private final boolean       absoluteZero;
-	private final RangeF        minMax;
-	private final int           gamma;
-	private final ColorGradient gradient;
+	private final String    name;
+	private final int       width;
+	private final int       height;
+	private final float[][] rawData;
+	private final boolean   absoluteZero;
+	private final RangeF    minMax;
+	private final int       gamma;
+	private final String    gradientFilename;
 
 	// Confusing syntax for: Non-null array (pointer / object) of non-null arrays of @Nullable elements.
 	// https://checkerframework.org/jsr308/specification/java-annotation-design.html#array-syntax
@@ -82,7 +81,7 @@ public class DataSet {
 	                  int height,
 	                  boolean absoluteZero,
 	                  int gamma,
-	                  ColorGradient gradient) {
+	                  String gradientFilename) {
 		this.name = requireStringLengthAtLeast(1, name, "name");
 		this.rawData = requireNonNull(rawData, "rawData");
 		requireArrayLengthExactly(12, rawData, "rawData");
@@ -99,7 +98,7 @@ public class DataSet {
 		this.absoluteZero = absoluteZero;
 		minMax = findMinMax(rawData, absoluteZero);
 		this.gamma = requireAtLeast(1, gamma, "gamma");
-		this.gradient = requireNonNull(gradient, "gradient");
+		this.gradientFilename = requireStringLengthAtLeast(1, gradientFilename, "gradientFilename");
 
 		prepareThumbnails();
 	}
@@ -192,8 +191,8 @@ public class DataSet {
 		return gamma;
 	}
 
-	public ColorGradient getGradient() {
-		return gradient;
+	public String getGradientFilename() {
+		return gradientFilename;
 	}
 
 	/**

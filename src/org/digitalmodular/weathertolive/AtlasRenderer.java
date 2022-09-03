@@ -272,11 +272,11 @@ public class AtlasRenderer {
 	}
 
 	private void renderParameterBackground(DataSet dataSet, int month, int[] pixels) {
-		float[][]     rawData  = dataSet.getRawData();
-		RangeF        minMax   = dataSet.getMinMax();
-		int           gamma    = dataSet.getGamma();
-		ColorGradient gradient = dataSet.getGradient();
-		int           length   = rawData[0].length;
+		float[][]               rawData  = dataSet.getRawData();
+		RangeF                  minMax   = dataSet.getMinMax();
+		int                     gamma    = dataSet.getGamma();
+		@Nullable ColorGradient gradient = GradientCache.getGradient(dataSet.getGradientFilename());
+		int                     length   = rawData[0].length;
 
 		float[] rawMonthData = rawData[month];
 
