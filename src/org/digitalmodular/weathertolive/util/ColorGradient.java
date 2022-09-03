@@ -46,6 +46,7 @@ import javax.imageio.ImageIO;
  * @author Mark Jeronimus
  */
 // Created 2013-02-16
+@SuppressWarnings("OverloadedVarargsMethod")
 public class ColorGradient {
 	/**
 	 * The pages list of RGB triples control points of the gradient. Last two indices should be equal to allow
@@ -58,7 +59,7 @@ public class ColorGradient {
 	 * Creates a smooth gradient that is a plain gray scale.
 	 */
 	public ColorGradient() {
-		this(new float[][]{{0, 0, 0}, {1, 1, 1}});
+		this(new float[][]{{0.0f, 0.0f, 0.0f}, {1.0f, 1.0f, 1.0f}});
 	}
 
 	/**

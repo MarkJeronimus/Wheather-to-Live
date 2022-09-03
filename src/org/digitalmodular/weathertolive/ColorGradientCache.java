@@ -66,7 +66,7 @@ public final class ColorGradientCache {
 		try {
 			return new ColorGradient(new File(filename));
 		} catch (IOException ignored) {
-			return new ColorGradient(); // Fallback to gray scale
+			return new ColorGradient(new float[][]{{0.1f, 0.1f, 0.1f}, {1.0f, 1.0f, 1.0f}}); // Fallback to gray scale
 		}
 	}
 }
