@@ -37,6 +37,7 @@ import com.formdev.flatlaf.FlatDarkLaf;
 import com.formdev.flatlaf.FlatLaf;
 import com.jidesoft.plaf.LookAndFeelFactory;
 import org.digitalmodular.weathertolive.dataset.ClimateDataSet;
+import org.digitalmodular.weathertolive.dataset.ClimateDataSetDownloader;
 import org.digitalmodular.weathertolive.dataset.ClimateDataSetLoader;
 import org.digitalmodular.weathertolive.dataset.ClimateDataSetMetadata;
 import org.digitalmodular.weathertolive.util.MultiProgressListener;
@@ -51,6 +52,15 @@ import org.digitalmodular.weathertolive.util.TextProgressListener;
 public final class WeatherToLiveMain {
 	public static void main(String... args) throws IOException, ExecutionException, InterruptedException {
 		ClimateDataSetMetadata metadata = new ClimateDataSetMetadata(Paths.get("config-worldclim-2.1-10min.tsv"));
+
+		ClimateDataSetDownloader.download(metadata, new MultiProgressListener() {
+			private final ProgressListener listener = new TextProgressListener(System.out, 4000);
+
+			@Override
+			public void multiProgressUpdated(int progressBarIndex, ProgressEvent evt) {
+				listener.progressUpdated(evt);
+			}
+		});
 
 		ClimateDataSet climateDataSet = ClimateDataSetLoader.load(metadata, new MultiProgressListener() {
 			private final ProgressListener listener = new TextProgressListener(System.out, 4000);

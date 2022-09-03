@@ -14,5 +14,5 @@ grid_10min_rd0.dat.gz 	<html>Wet days (>0.1mm)         	true        	2    	gradi
 grid_10min_wnd.dat.gz 	<html>10m wind speed (m/s)      	true        	3    	gradient-wind.png
 grid_10min_reh.dat.gz 	<html>Relative humidity (%RH)   	true        	1    	gradient-precipitation.png
 grid_10min_frs.dat.gz 	<html>Ground-frost (days/mo)    	true        	1    	gradient-precipitation.png
-grid_10min_sunp.dat.gz 	<html>Sunshine (% of day length)	true        	1    	gradient-temperature.png
-grid_10min_elv.dat.gz 	<html>Elevation (km)            	false        	3    	<grayscale>
+grid_10min_sunp.dat.gz	<html>Sunshine (% of day length)	true        	1    	gradient-temperature.png
+grid_10min_elv.dat.gz 	<html>Elevation (km)            	false       	3    	<grayscale>
