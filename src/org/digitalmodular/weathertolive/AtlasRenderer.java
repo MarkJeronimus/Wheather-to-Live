@@ -31,8 +31,17 @@ import java.awt.image.DataBufferInt;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.locks.Condition;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 import java.util.function.Consumer;
 
+import net.jcip.annotations.GuardedBy;
 import org.jetbrains.annotations.Nullable;
 
 import org.digitalmodular.weathertolive.dataset.DataSet;
@@ -52,6 +61,8 @@ public class AtlasRenderer {
 	private static final AnimationFrame EMPTY_FRAME    = new AnimationFrame(
 			new BufferedImage(1, 1, BufferedImage.TYPE_INT_RGB), FRAME_DURATION);
 
+	private static final ExecutorService EXECUTOR = Executors.newCachedThreadPool();
+
 	private final Consumer<List<AnimationFrame>> renderUpdateCallback;
 
 	private @Nullable List<FilteredDataSet> filteredDataSets       = null;
@@ -61,6 +72,14 @@ public class AtlasRenderer {
 	private           boolean               aggregateYear          = false;
 
 	private final List<@Nullable AnimationFrame> imageSequence = new ArrayList<>(12);
+
+	private final Lock      lock      = new ReentrantLock();
+	private final Condition condition = lock.newCondition();
+
+	@GuardedBy("lock")
+	private @Nullable Future<?>     rootFuture   = null;
+	private final     AtomicBoolean taskAborting = new AtomicBoolean();
+	private final     AtomicBoolean taskRunning  = new AtomicBoolean();
 
 	public AtlasRenderer(Consumer<List<AnimationFrame>> renderUpdateCallback) {
 		this.renderUpdateCallback = requireNonNull(renderUpdateCallback, "renderUpdateCallback");
@@ -125,37 +144,98 @@ public class AtlasRenderer {
 
 	// TODO offload work from the GUI thread.
 	public void dataChanged() {
-		if (filteredDataSets == null) {
-			clear();
-			renderUpdateCallback.accept(imageSequence);
-			return;
-		}
+		lock.lock();
+		try {
+			System.out.println("dataChanged()");
+			if (taskRunning.get()) {
+				taskAborting.set(true);
 
-		int @Nullable [] aggregateFilteredPixels = null;
-		if (aggregateYear) {
-			aggregateFilteredPixels = renderAggregateYear();
+				try {
+					while (taskRunning.get()) {
+						condition.await(100, TimeUnit.MILLISECONDS);
+					}
+
+				} catch (InterruptedException ex) {
+					throw new RuntimeException(ex);
+				}
+			}
+
+			taskAborting.set(false);
+			rootFuture = EXECUTOR.submit(this::renderTask);
+		} finally {
+			lock.unlock();
 		}
+	}
+
+	void renderTask() {
+		System.out.println("renderTask()");
+		long t = System.nanoTime();
+
+		taskRunning.set(true);
+
+		try {
+			if (filteredDataSets == null) {
+				clear();
+				renderUpdateCallback.accept(imageSequence);
+				return;
+			}
+
+			int @Nullable [] aggregateFilteredPixels = null;
+			if (aggregateYear) {
+				aggregateFilteredPixels = renderAggregateYear();
+
+				// Note to self: Don't abort here. Let it render at least a frame (at the cost of responsiveness)
+			}
+
+			for (int i = 0; i < 12; i++) {
+				int month = (currentMonth + i) % 12;
+				System.out.println("month: " + month);
+
+				renderMonth(month, aggregateFilteredPixels);
+
+				if (taskAborting.get()) {
+					return;
+				}
+			}
+		} finally {
+			if (taskAborting.get()) {
+				System.out.println("Calculation aborted");
+			}
+			System.out.println("Calculation took " + (System.nanoTime() - t) / 1.0e6f + " ms");
+
+			lock.lock();
+			try {
+				taskRunning.set(false);
+				condition.signalAll();
+			} finally {
+				lock.unlock();
+			}
+		}
+	}
+
+	private void renderMonth(int month, int @Nullable [] aggregateFilteredPixels) {
+		assert filteredDataSets != null;
 
 		int width  = filteredDataSets.get(0).getDataSet().getWidth();
 		int height = filteredDataSets.get(0).getDataSet().getHeight();
 
-		for (int i = 0; i < 12; i++) {
-			int month = (currentMonth + i) % 12;
+		BufferedImage image  = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
+		int[]         pixels = ((DataBufferInt)image.getRaster().getDataBuffer()).getData();
 
-			BufferedImage image  = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
-			int[]         pixels = ((DataBufferInt)image.getRaster().getDataBuffer()).getData();
+		renderBackground(month, pixels);
 
-			renderBackground(month, pixels);
-
-			if (aggregateFilteredPixels != null) {
-				renderAggregateFilteredPixels(aggregateFilteredPixels, pixels);
-			} else {
-				renderFilteredPixels(month, pixels);
-			}
-
-			imageSequence.set(month, new AnimationFrame(image, FRAME_DURATION));
-			renderUpdateCallback.accept(imageSequence);
+		if (taskAborting.get()) {
+			return;
 		}
+
+		if (aggregateFilteredPixels != null) {
+			renderAggregateFilteredPixels(aggregateFilteredPixels, pixels);
+		} else {
+			renderFilteredPixels(month, pixels);
+		}
+
+		imageSequence.set(month, new AnimationFrame(image, FRAME_DURATION));
+		renderUpdateCallback.accept(imageSequence);
 	}
 
 	private int[] renderAggregateYear() {
@@ -176,6 +256,10 @@ public class AtlasRenderer {
 					if (filteredMonthData[i] == 0) {
 						aggregateFilteredPixels[i] = 0;
 					}
+				}
+
+				if (checkStopCondition()) {
+					return aggregateFilteredPixels;
 				}
 			}
 		}
@@ -217,9 +301,11 @@ public class AtlasRenderer {
 
 			pixels[i] = color;
 		}
+
+		checkStopCondition();
 	}
 
-	private static void renderAtlasBackground(float[] atlas, int[] pixels) {
+	private void renderAtlasBackground(float[] atlas, int[] pixels) {
 		int length = atlas.length;
 
 		for (int i = 0; i < length; i++) {
@@ -232,9 +318,11 @@ public class AtlasRenderer {
 
 			pixels[i] = color;
 		}
+
+		checkStopCondition();
 	}
 
-	private static void renderAggregateFilteredPixels(int[] aggregateFilteredPixels, int[] pixels) {
+	private void renderAggregateFilteredPixels(int[] aggregateFilteredPixels, int[] pixels) {
 		int length = aggregateFilteredPixels.length;
 
 		for (int i = 0; i < length; i++) {
@@ -242,6 +330,8 @@ public class AtlasRenderer {
 				pixels[i] = DataSet.FILTER_SHADE;
 			}
 		}
+
+		checkStopCondition();
 	}
 
 	private void renderFilteredPixels(int month, int[] pixels) {
@@ -256,6 +346,21 @@ public class AtlasRenderer {
 					pixels[i] = DataSet.FILTER_SHADE;
 				}
 			}
+		}
+
+		checkStopCondition();
+	}
+
+	private boolean checkStopCondition() {
+		lock.lock();
+		try {
+			if (taskAborting.get()) {
+				return true;
+			}
+
+			return false;
+		} finally {
+			lock.unlock();
 		}
 	}
 }

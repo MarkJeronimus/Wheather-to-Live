@@ -100,13 +100,9 @@ public class WeatherToLivePanel extends JPanel {
 	}
 
 	public void dataChanged(int dataSetIndex) {
-		long t = System.nanoTime();
-
 		atlasRenderer.setBackgroundDatasetIndex(dataSetIndex);
 		atlasRenderer.dataChanged();
 		bottomPanel.dataChanged();
-
-		System.out.println("Calculation took " + (System.nanoTime() - t) / 1.0e6f + " ms");
 	}
 
 	public void setFastPreview(boolean fastPreview) {
