@@ -36,6 +36,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
@@ -66,7 +67,7 @@ public class AtlasRenderer {
 	private final Consumer<List<AnimationFrame>> renderUpdateCallback;
 
 	private @Nullable List<FilterDataSet> filterDataSets         = null;
-	private           int                 currentMonth           = 0;
+	private           AtomicInteger       currentMonth           = new AtomicInteger();
 	private           int                 backgroundDatasetIndex = -1;
 	private           boolean             aggregateYear          = false;
 
@@ -103,11 +104,11 @@ public class AtlasRenderer {
 	}
 
 	public int getCurrentMonth() {
-		return currentMonth;
+		return currentMonth.get();
 	}
 
 	public void setCurrentMonth(int currentMonth) {
-		this.currentMonth = requireRange(0, 11, currentMonth, "currentMonth");
+		this.currentMonth.set(requireRange(0, 11, currentMonth, "currentMonth"));
 	}
 
 	public int getBackgroundDatasetIndex() {
@@ -159,6 +160,8 @@ public class AtlasRenderer {
 	}
 
 	void renderTask() {
+		int currentMonthCopy = currentMonth.get();
+
 		System.out.println("renderTask()");
 		long t = System.nanoTime();
 
@@ -179,7 +182,7 @@ public class AtlasRenderer {
 			}
 
 			for (int i = 0; i < 12; i++) {
-				int month = (currentMonth + i) % 12;
+				int month = (currentMonthCopy + i) % 12;
 				System.out.println("month: " + month);
 
 				renderMonth(month, aggregateFilteredPixels);
