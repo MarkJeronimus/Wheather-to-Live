@@ -27,17 +27,10 @@
 package org.digitalmodular.weathertolive.dataset;
 
 import java.io.IOException;
-import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
-
-import org.digitalmodular.weathertolive.util.HTTPDownloader;
-import org.digitalmodular.weathertolive.util.MultiProgressListener;
-import org.digitalmodular.weathertolive.util.ProgressEvent;
-import org.digitalmodular.weathertolive.util.ProgressListener;
 
 /**
  * @author Mark Jeronimus
@@ -85,6 +78,18 @@ public class ClimateDataSetMetadata {
 		downloadRoot = parseDownloadRoot(file, lines);
 
 		parseTable(file, lines);
+	}
+
+	public String getDownloadRoot() {
+		return downloadRoot;
+	}
+
+	public int getNumMetadata() {
+		return climateDataSetData.size();
+	}
+
+	public ClimateDataSetData getMetadata(int i) {
+		return climateDataSetData.get(i);
 	}
 
 	private static String parseDownloadRoot(Path file, List<String> lines) throws IOException {
@@ -173,24 +178,5 @@ public class ClimateDataSetMetadata {
 
 		throw new IOException("Expected a positive integer in field " + (index + 1) +
 		                      " on line " + (lineNr + 1) + " of " + file.getFileName());
-	}
-
-	public void download(MultiProgressListener progressListener) throws IOException {
-		int              numDataSets              = climateDataSetData.size();
-		ProgressListener downloadProgressListener = progressListener.wrapAsSingleProgressListener(1);
-
-		for (int i = 0; i < numDataSets; i++) {
-			String filename = climateDataSetData.get(i).filename;
-			URL    url      = new URL(downloadRoot + filename);
-			Path   file     = Paths.get(filename);
-
-			progressListener.multiProgressUpdated(0, new ProgressEvent(this, i, numDataSets, filename));
-
-			HTTPDownloader httpDownloader = new HTTPDownloader();
-			httpDownloader.addProgressListener(downloadProgressListener);
-			httpDownloader.downloadToFile(url, null, file);
-		}
-
-		progressListener.multiProgressUpdated(0, new ProgressEvent(this, numDataSets, numDataSets, ""));
 	}
 }

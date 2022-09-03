@@ -24,33 +24,45 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.digitalmodular.weathertolive;
+package org.digitalmodular.weathertolive.dataset;
 
 import java.io.IOException;
+import java.net.URL;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 
-import org.digitalmodular.weathertolive.dataset.ClimateDataSetMetadata;
-import org.digitalmodular.weathertolive.dataset.DataSetDownloader;
+import org.digitalmodular.weathertolive.util.HTTPDownloader;
 import org.digitalmodular.weathertolive.util.MultiProgressListener;
 import org.digitalmodular.weathertolive.util.ProgressEvent;
 import org.digitalmodular.weathertolive.util.ProgressListener;
-import org.digitalmodular.weathertolive.util.TextProgressListener;
 
 /**
  * @author Mark Jeronimus
  */
-// Created 2022-08-26
-public final class DownloadStuffMain {
-	public static void main(String... args) throws IOException {
-		ClimateDataSetMetadata metadata = new ClimateDataSetMetadata(Paths.get("config-cru-cl-2.0-10min.tsv"));
+// Created 2022-09-03
+public final class DataSetDownloader {
+	private DataSetDownloader() {
+		throw new AssertionError();
+	}
 
-		DataSetDownloader.download(metadata, new MultiProgressListener() {
-			private final ProgressListener listener = new TextProgressListener(System.out, 4000);
+	public static void download(ClimateDataSetMetadata metadata, MultiProgressListener progressListener)
+			throws IOException {
+		int              numDataSets              = metadata.getNumMetadata();
+		ProgressListener downloadProgressListener = progressListener.wrapAsSingleProgressListener(1);
 
-			@Override
-			public void multiProgressUpdated(int progressBarIndex, ProgressEvent evt) {
-				listener.progressUpdated(evt);
-			}
-		});
+		for (int i = 0; i < numDataSets; i++) {
+			String filename = metadata.getMetadata(i).filename;
+
+			URL  url  = new URL(metadata.getDownloadRoot() + filename);
+			Path file = Paths.get(filename);
+
+			progressListener.multiProgressUpdated(0, new ProgressEvent(metadata, i, numDataSets, filename));
+
+			HTTPDownloader httpDownloader = new HTTPDownloader();
+			httpDownloader.addProgressListener(downloadProgressListener);
+			httpDownloader.downloadToFile(url, null, file);
+		}
+
+		progressListener.multiProgressUpdated(0, new ProgressEvent(metadata, numDataSets, numDataSets, ""));
 	}
 }
