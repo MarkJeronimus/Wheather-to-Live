@@ -58,6 +58,7 @@ public final class WorldClimDatasetFactory {
 	public static FilteredDataSet createFor(String filename,
 	                                        String dataSetName,
 	                                        boolean absoluteZero,
+	                                        int gamma,
 	                                        ColorGradient gradient)
 			throws IOException {
 		String prefix = filename.substring(0, 14); // e.g. "wc2.1_10m_prec"
@@ -86,7 +87,7 @@ public final class WorldClimDatasetFactory {
 				rawData[month] = convertGeoTiffToRawData(geoData);
 			}
 
-			DataSet dataSet = new DataSet(dataSetName, rawData, width, height, absoluteZero, gradient);
+			DataSet dataSet = new DataSet(dataSetName, rawData, width, height, absoluteZero, gamma, gradient);
 			return new FilteredDataSet(dataSet);
 		}
 	}

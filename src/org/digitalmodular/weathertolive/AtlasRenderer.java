@@ -274,6 +274,7 @@ public class AtlasRenderer {
 	private void renderParameterBackground(DataSet dataSet, int month, int[] pixels) {
 		float[][]     rawData  = dataSet.getRawData();
 		RangeF        minMax   = dataSet.getMinMax();
+		int           gamma    = dataSet.getGamma();
 		ColorGradient gradient = dataSet.getGradient();
 		int           length   = rawData[0].length;
 
@@ -285,10 +286,16 @@ public class AtlasRenderer {
 			int color;
 			if (Float.isNaN(value)) {
 				color = DataSet.SEA_BLUE;
-			} else if (gradient != null) {
-				color = gradient.getColor(value);
 			} else {
-				color = (int)(value * 255) * 0x010101;
+				if (gamma > 1) {
+					value = applyGamma(value, gamma);
+				}
+
+				if (gradient != null) {
+					color = gradient.getColor(value);
+				} else {
+					color = (int)(value * 255) * 0x010101;
+				}
 			}
 
 			pixels[i] = color;
@@ -353,6 +360,28 @@ public class AtlasRenderer {
 			return false;
 		} finally {
 			lock.unlock();
+		}
+	}
+
+	public static float applyGamma(float value, int gamma) {
+		value = 1 - value;
+
+		int power = gamma;
+		assert power > 0 : power;
+
+		float result = 1;
+
+		while (true) {
+			if ((power & 1) != 0) {
+				result *= value;
+			}
+
+			value *= value;
+			power >>>= 1;
+
+			if (power == 0) {
+				return 1 - result;
+			}
 		}
 	}
 }

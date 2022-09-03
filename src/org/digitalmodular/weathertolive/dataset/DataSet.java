@@ -63,7 +63,9 @@ public class DataSet {
 	private final int           width;
 	private final int           height;
 	private final float[][]     rawData;
+	private final boolean       absoluteZero;
 	private final RangeF        minMax;
+	private final int           gamma;
 	private final ColorGradient gradient;
 
 	// Confusing syntax for: Non-null array (pointer / object) of non-null arrays of @Nullable elements.
@@ -79,6 +81,7 @@ public class DataSet {
 	                  int width,
 	                  int height,
 	                  boolean absoluteZero,
+	                  int gamma,
 	                  ColorGradient gradient) {
 		this.name = requireStringLengthAtLeast(1, name, "name");
 		this.rawData = requireNonNull(rawData, "rawData");
@@ -93,9 +96,10 @@ public class DataSet {
 			            "'rawData[" + month + "].length' should equal 'width' * 'height': " +
 			            rawData[month].length + ", " + width + " * " + height + " (" + width * height + ')');
 		}
-		this.gradient = requireNonNull(gradient, "gradient");
-
+		this.absoluteZero = absoluteZero;
 		minMax = findMinMax(rawData, absoluteZero);
+		this.gamma = requireAtLeast(1, gamma, "gamma");
+		this.gradient = requireNonNull(gradient, "gradient");
 
 		prepareThumbnails();
 	}
@@ -184,6 +188,10 @@ public class DataSet {
 		return minMax;
 	}
 
+	public int getGamma() {
+		return gamma;
+	}
+
 	public ColorGradient getGradient() {
 		return gradient;
 	}
@@ -195,6 +203,7 @@ public class DataSet {
 	 * <p>
 	 * This data is generated once in the constructor.
 	 */
+	@SuppressWarnings("AssignmentOrReturnOfFieldWithMutableType")
 	public @Nullable RangeF[][] getThumbnails() {
 		return thumbnails;
 	}
