@@ -32,7 +32,7 @@ import java.util.List;
 import static org.digitalmodular.weathertolive.util.ValidatorUtilities.requireSizeAtLeast;
 
 /**
- * Encalsulates a set of {@link DataSet}s for each parameter in the climate data set.
+ * Encapsulates {@link DataSet}s for each parameter in the climate data set.
  *
  * @author Mark Jeronimus
  */

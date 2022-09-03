@@ -1,0 +1,12 @@
+https://biogeo.ucdavis.edu/data/worldclim/v2.1/base/
+https://www.worldclim.org/data/worldclim21.html
+Historical climate data
+This is WorldClim version 2.1 climate data for 1970-2000. This version was released in January 2020.
+Copyright 2020-2022, worldclim.org
+No license
+filename          	dataSetName                	absoluteZero   	gamma	gradientFilename
+wc2.1_10m_tmin.zip	<html>Minimum temp (&deg;C)	false       	1    	gradient-temperature.png
+wc2.1_10m_tavg.zip	<html>Average temp (&deg;C)	false       	1    	gradient-temperature.png
+wc2.1_10m_tmax.zip	<html>Maximum temp (&deg;C)	false       	1    	gradient-temperature.png
+wc2.1_10m_prec.zip	<html>Precipitation (mm)   	true        	6    	gradient-precipitation.png
+wc2.1_10m_wind.zip	<html>Wind speed (m/s)     	true        	4    	gradient-wind.png

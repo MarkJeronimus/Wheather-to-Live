@@ -1,0 +1,14 @@
+https://crudata.uea.ac.uk/cru/data/hrg/tmc/
+A high-resolution data set of surface climate over global land areas
+No copyright
+No license
+filename             	dataSetName                         	absoluteZero   	gamma	gradientFilename
+grid_10min_tmp.dat.gz 	<html>Mean temperature (&deg;C)        	false       	1    	gradient-temperature.png
+grid_10min_dtr.dat.gz 	<html>Temperature swing (&deg;C)       	false       	1    	gradient-temperature.png
+grid_10min_pre.dat.gz 	<html>Precipitation (mm/month)         	false       	1    	gradient-precipitation.png
+grid_10min_rd0.dat.gz 	<html>Wet-days                         	false       	1    	gradient-precipitation.png
+grid_10min_wnd.dat.gz 	<html>10m windspeed (m/s)              	false       	1    	gradient-wind.png
+grid_10min_reh.dat.gz 	<html>Relative humidity (%RH)          	false       	1    	gradient-wind.png
+grid_10min_frs.dat.gz 	<html>Ground-frost (days/mo)           	false       	1    	gradient-precipitation.png
+grid_10min_sunp.dat.gz 	<html>Sunshine (% of daylength)        	false       	1    	gradient-temperature.png
+grid_10min_elv.dat.gz 	<html>Elevation (km)                   	false       	1    	<grayscale>

@@ -72,7 +72,7 @@ public final class CRUCL20DataSetFactory {
 				}
 
 				String[] fields = SPACES_PATTERN.split(line.trim());
-				if (fields.length != 14 && fields.length != 26) {
+				if (fields.length != 3 && fields.length != 14 && fields.length != 26) {
 					continue;
 				}
 
@@ -93,7 +93,8 @@ public final class CRUCL20DataSetFactory {
 		int p = x + WIDTH * y;
 
 		for (int month = 0; month < 12; month++) {
-			rawData[month][p] = Float.parseFloat(fields[month + 2]);
+			String field = fields.length == 3 ? fields[2] : fields[month + 2];
+			rawData[month][p] = Float.parseFloat(field);
 		}
 	}
 }

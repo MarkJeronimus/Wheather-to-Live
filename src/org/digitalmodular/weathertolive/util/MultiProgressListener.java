@@ -1,5 +1,5 @@
 /*
- * This file is part of Weather to Live.
+ * This file is part of AllUtilities.
  *
  * Copyleft 2022 Mark Jeronimus. All Rights Reversed.
  *
@@ -24,31 +24,16 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.digitalmodular.weathertolive;
-
-import java.io.IOException;
-import java.nio.file.Paths;
-
-import org.digitalmodular.weathertolive.dataset.ClimateDataSetMetadata;
-import org.digitalmodular.weathertolive.util.MultiProgressListener;
-import org.digitalmodular.weathertolive.util.ProgressEvent;
-import org.digitalmodular.weathertolive.util.ProgressListener;
-import org.digitalmodular.weathertolive.util.TextProgressListener;
+package org.digitalmodular.weathertolive.util;
 
 /**
  * @author Mark Jeronimus
  */
-// Created 2022-08-26
-public final class DownloadStuffMain {
-	public static void main(String... args) throws IOException {
-		ClimateDataSetMetadata metadata = new ClimateDataSetMetadata(Paths.get("config-cru-cl-2.0-10min.tsv"));
-		metadata.download(new MultiProgressListener() {
-			private final ProgressListener listener = new TextProgressListener(System.out, 4000);
+// Created 2019-08-08 Copied from ProgressListener
+public interface MultiProgressListener {
+	void multiProgressUpdated(int progressBarIndex, ProgressEvent evt);
 
-			@Override
-			public void multiProgressUpdated(int progressBarIndex, ProgressEvent evt) {
-				listener.progressUpdated(evt);
-			}
-		});
+	default ProgressListener wrapAsSingleProgressListener(int progressBarIndex) {
+		return evt -> multiProgressUpdated(progressBarIndex, evt);
 	}
 }

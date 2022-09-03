@@ -35,4 +35,4 @@
 
 #Project-specific
 *.zip
-*.dat
+*.gz
