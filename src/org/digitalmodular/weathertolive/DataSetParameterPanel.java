@@ -35,6 +35,9 @@ import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
+import java.util.function.DoubleUnaryOperator;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JSlider;
@@ -68,11 +71,14 @@ public class DataSetParameterPanel extends JPanel {
 	private static final int              MIN_SLIDER_STEPS = 60;
 	private static final PreferredNumbers STEP_QUANTIZER   = new PreferredNumbers(10, 100, 125, 150, 200, 500);
 
+	private static final Pattern EXTRACT_UNIT_PATTERN = Pattern.compile("^(.+) \\((.+)\\)$");
+
 	private final FilterDataSet filterDataSet;
 	private final int           dataSetIndex;
 
 	private final DecimalFormat numberFormat;
 
+	private final JLabel     nameLabel      = new JLabel();
 	private final ImagePanel thumbnailPanel = new ImagePanel(null, true);
 	private final JLabel     beginLabel     = new JLabel();
 	private final JSlider    slider         = new RangeSlider();
@@ -81,6 +87,9 @@ public class DataSetParameterPanel extends JPanel {
 	private final Animator animator = new Animator(thumbnailPanel::setImage);
 
 	private final float sliderStepSize;
+
+	private boolean             imperialUnits  = false;
+	private DoubleUnaryOperator unitConversion = d -> d;
 
 	@SuppressWarnings("FieldHasSetterButNoGetter")
 	private @Nullable Consumer<Integer> parameterChangedCallback = null;
@@ -99,7 +108,6 @@ public class DataSetParameterPanel extends JPanel {
 		prepareSliderRange(minMax);
 
 		{
-			JLabel nameLabel = new JLabel(filterDataSet.getDataSet().getName() + ' ');
 			nameLabel.setHorizontalAlignment(SwingConstants.CENTER);
 			add(nameLabel, BorderLayout.NORTH);
 		}
@@ -133,6 +141,8 @@ public class DataSetParameterPanel extends JPanel {
 
 			add(p, BorderLayout.SOUTH);
 		}
+
+		setImperialUnits(false);
 
 		sliderChanged(null); // Initialize real label values
 	}
@@ -169,6 +179,54 @@ public class DataSetParameterPanel extends JPanel {
 		slider.getModel().setRangeProperties(min, max - min, min, max, false);
 	}
 
+	public boolean isImperialUnits() {
+		return imperialUnits;
+	}
+
+	public void setImperialUnits(boolean imperialUnits) {
+		this.imperialUnits = imperialUnits;
+		String              name        = filterDataSet.getDataSet().getName();
+		String @Nullable [] nameAndUnit = extractNameAndUnit(name);
+
+		if (imperialUnits && nameAndUnit != null) {
+			switch (nameAndUnit[1]) {
+				case "&deg;C":
+					name = nameAndUnit[0] + " (&deg;F)";
+					unitConversion = d -> d * 1.8 + 32.0;
+					break;
+				case "mm":
+					name = nameAndUnit[0] + " (in)";
+					unitConversion = d -> d / 25.4;
+					break;
+				case "m/s":
+					name = nameAndUnit[0] + " (mph)";
+					unitConversion = d -> d * 3.6 / 1.609344;
+					break;
+				case "km":
+					name = nameAndUnit[0] + " (mi)";
+					unitConversion = d -> d / 1.60934;
+					break;
+				default: // Not a unit
+					name = nameAndUnit[0] + " (" + nameAndUnit[1] + ')';
+			}
+		} else {
+			unitConversion = d -> d;
+		}
+
+		nameLabel.setText(name + ' ');
+
+		prepareLabelWidths(getMinMax());
+	}
+
+	private static String @Nullable [] extractNameAndUnit(String name) {
+		Matcher matcher = EXTRACT_UNIT_PATTERN.matcher(name);
+		if (!matcher.matches()) {
+			return null;
+		}
+
+		return new String[]{matcher.group(1), matcher.group(2)};
+	}
+
 	// Slider listener
 	private void sliderChanged(@Nullable ChangeEvent e) {
 		RangeF minMax = getMinMax();
@@ -182,7 +240,7 @@ public class DataSetParameterPanel extends JPanel {
 		}
 	}
 
-	public RangeF getMinMax() {
+	private RangeF getMinMax() {
 		float begin = slider.getValue();
 		float end   = begin + slider.getExtent();
 
@@ -207,8 +265,11 @@ public class DataSetParameterPanel extends JPanel {
 	}
 
 	private void updateLabels(RangeF minMax) {
-		beginLabel.setText(numberFormat.format(minMax.getBegin()));
-		endLabel.setText(numberFormat.format(minMax.getEnd()));
+		double begin = unitConversion.applyAsDouble(minMax.getBegin());
+		double end   = unitConversion.applyAsDouble(minMax.getEnd());
+
+		beginLabel.setText(numberFormat.format(begin));
+		endLabel.setText(numberFormat.format(end));
 	}
 
 	public void setMonth(int month) {

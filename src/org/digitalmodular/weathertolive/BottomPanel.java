@@ -62,6 +62,7 @@ public class BottomPanel extends JPanel {
 	private final JButton   newButton             = new JButton("New");
 	private final JButton   loadButton            = new JButton("Load");
 	private final JButton   saveButton            = new JButton("Save");
+	private final JCheckBox imperialCheckbox      = new JCheckBox("Imperial units");
 	private final JCheckBox fastPreviewCheckbox   = new JCheckBox("Fast previewing");
 	private final JCheckBox animateCheckbox       = new JCheckBox("Animate");
 	private final JSlider   monthSlider           = new LabelSlider(Arrays.asList(
@@ -73,7 +74,7 @@ public class BottomPanel extends JPanel {
 	@SuppressWarnings("FieldHasSetterButNoGetter")
 	private @Nullable Consumer<Integer> parameterChangedCallback = null;
 
-	private boolean machineEvent = false;
+	private int machineEvent = 0;
 
 	@SuppressWarnings("OverridableMethodCallDuringObjectConstruction")
 	public BottomPanel(WeatherToLivePanel parent) {
@@ -111,6 +112,7 @@ public class BottomPanel extends JPanel {
 		}
 		{
 			JPanel p = new ListPanel(BoxLayout.Y_AXIS, SPACING);
+			p.add(imperialCheckbox);
 			p.add(fastPreviewCheckbox);
 			p.add(animateCheckbox);
 			p.add(monthSlider);
@@ -135,6 +137,7 @@ public class BottomPanel extends JPanel {
 	private void attachListeners() {
 		ActionListener actionPerformed = this::actionPerformed;
 
+		imperialCheckbox.addActionListener(actionPerformed);
 		fastPreviewCheckbox.addActionListener(actionPerformed);
 		animateCheckbox.addActionListener(actionPerformed);
 		monthSlider.addChangeListener(this::monthChanged);
@@ -143,13 +146,15 @@ public class BottomPanel extends JPanel {
 
 	@SuppressWarnings("ObjectEquality") // Comparing identity, not equality
 	private void actionPerformed(ActionEvent e) {
-		if (machineEvent) {
+		if (machineEvent > 0) {
 			return;
 		}
 
-		machineEvent = true;
+		machineEvent++;
 		try {
-			if (e.getSource() == fastPreviewCheckbox) {
+			if (e.getSource() == imperialCheckbox) {
+				setImperialUnits(imperialCheckbox.isSelected());
+			} else if (e.getSource() == fastPreviewCheckbox) {
 				parent.setFastPreview(animateCheckbox.isSelected());
 			} else if (e.getSource() == animateCheckbox) {
 				parent.setAnimated(animateCheckbox.isSelected());
@@ -157,38 +162,49 @@ public class BottomPanel extends JPanel {
 				parent.setAggregateYear(aggregateYearCheckbox.isSelected());
 			}
 		} finally {
-			machineEvent = false;
+			machineEvent--;
 		}
 	}
 
 	// Slider listener
 	private void monthChanged(ChangeEvent e) {
-		if (machineEvent) {
+		if (machineEvent > 0) {
 			return;
 		}
 
-		machineEvent = true;
+		machineEvent++;
 		try {
 			parent.setMonth(monthSlider.getValue());
 			parent.setAnimated(false);
 		} finally {
-			machineEvent = false;
+			machineEvent--;
+		}
+	}
+
+	public void setImperialUnits(boolean imperialUnits) {
+		machineEvent++;
+		try {
+			for (int i = 0; i < filterPanel.getNumChildren(); i++) {
+				filterPanel.getChild(i).setImperialUnits(imperialUnits);
+			}
+		} finally {
+			machineEvent--;
 		}
 	}
 
 	// Called from the outside, so don't call this from listeners
 	public void setAnimated(boolean animated) {
-		machineEvent = true;
+		machineEvent++;
 		try {
 			animateCheckbox.setSelected(animated);
 		} finally {
-			machineEvent = false;
+			machineEvent--;
 		}
 	}
 
 	// Called from the outside, so don't call this from listeners
 	public void setMonth(int month) {
-		machineEvent = true;
+		machineEvent++;
 		try {
 			for (int i = 0; i < filterPanel.getNumChildren(); i++) {
 				filterPanel.getChild(i).setMonth(month);
@@ -196,7 +212,7 @@ public class BottomPanel extends JPanel {
 
 			monthSlider.setValue(month);
 		} finally {
-			machineEvent = false;
+			machineEvent--;
 		}
 	}
 
