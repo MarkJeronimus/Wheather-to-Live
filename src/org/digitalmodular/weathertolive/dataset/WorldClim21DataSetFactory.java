@@ -53,7 +53,7 @@ public final class WorldClim21DataSetFactory {
 
 	public static FilterDataSet createFor(ClimateDataSetData setMetadata) throws IOException {
 		String filename = setMetadata.filename;
-		String prefix   = filename.substring(0, 14); // e.g. "wc2.1_10m_prec"
+		String prefix   = filename.substring(0, filename.length() - 4); // e.g. "wc2.1_10m_prec"
 
 		try (ZipFile zip = new ZipFile(new File(filename))) {
 			float[][] rawData = new float[12][];
