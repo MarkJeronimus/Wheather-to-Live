@@ -103,7 +103,7 @@ public class DataSet {
 		prepareThumbnails();
 	}
 
-	private static RangeF findMinMax(float[][] rawData, boolean absoluteZero) {
+	private RangeF findMinMax(float[][] rawData, boolean absoluteZero) {
 		float min = Float.POSITIVE_INFINITY;
 		float max = Float.NEGATIVE_INFINITY;
 
@@ -119,7 +119,7 @@ public class DataSet {
 		if (absoluteZero) {
 			if (min < 0.0f) {
 				throw new AssertionError("Dataset that should be 'absoluteZero' has negative minimum: [" +
-				                         min + ", " + max + ']');
+				                         min + ", " + max + "], " + name);
 			}
 
 			min = 0.0f;

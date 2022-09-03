@@ -50,7 +50,7 @@ import org.digitalmodular.weathertolive.util.TextProgressListener;
 // Created 2022-08-30
 public final class WeatherToLiveMain {
 	public static void main(String... args) throws IOException, ExecutionException, InterruptedException {
-		ClimateDataSetMetadata metadata = new ClimateDataSetMetadata(Paths.get("config-cru-cl-2.0-10min.tsv"));
+		ClimateDataSetMetadata metadata = new ClimateDataSetMetadata(Paths.get("config-worldclim-2.1-10min.tsv"));
 
 		ClimateDataSet climateDataSet = ClimateDataSetLoader.load(metadata, new MultiProgressListener() {
 			private final ProgressListener listener = new TextProgressListener(System.out, 4000);
