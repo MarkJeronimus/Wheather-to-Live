@@ -28,10 +28,14 @@ package org.digitalmodular.weathertolive.dataset;
 
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.regex.Pattern;
+import java.util.zip.GZIPInputStream;
 
 import static org.digitalmodular.weathertolive.dataset.ClimateDataSetMetadata.ClimateDataSetData;
 
@@ -58,7 +62,10 @@ public final class CRUCL20DataSetFactory {
 			Arrays.fill(rawData[month], Float.NaN);
 		}
 
-		try (BufferedReader in = Files.newBufferedReader(Paths.get(filename))) {
+		try (InputStream stream = Files.newInputStream(Paths.get(filename));
+		     GZIPInputStream gzIn = new GZIPInputStream(stream)) {
+			BufferedReader in = new BufferedReader(new InputStreamReader(gzIn, StandardCharsets.ISO_8859_1));
+
 			while (true) {
 				String line = in.readLine();
 				if (line == null) {
