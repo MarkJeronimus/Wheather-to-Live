@@ -48,6 +48,7 @@ import org.digitalmodular.weathertolive.dataset.FilteredDataSet;
 import org.digitalmodular.weathertolive.util.AnimationFrame;
 import org.digitalmodular.weathertolive.util.Animator;
 import org.digitalmodular.weathertolive.util.ImagePanel;
+import org.digitalmodular.weathertolive.util.NumberUtilities;
 import org.digitalmodular.weathertolive.util.PreferredNumbers;
 import org.digitalmodular.weathertolive.util.RangeF;
 import static org.digitalmodular.weathertolive.WeatherToLivePanel.SCALE_FACTOR;
@@ -119,7 +120,7 @@ public class DataSetParameterPanel extends JPanel {
 				slider.setMajorTickSpacing(10000);
 				slider.setMinorTickSpacing(10);
 				slider.setPaintTicks(true);
-				slider.addChangeListener(this::valueChanged);
+				slider.addChangeListener(this::sliderChanged);
 
 				p.setPreferredSize(new Dimension(thumbnailPanel.getPreferredSize().width,
 				                                 slider.getPreferredSize().height));
@@ -133,7 +134,7 @@ public class DataSetParameterPanel extends JPanel {
 			add(p, BorderLayout.SOUTH);
 		}
 
-		valueChanged(null); // Initialize real label values
+		sliderChanged(null); // Initialize real label values
 	}
 
 	private static int calculateQuantizerStep(RangeF minMax) {
@@ -169,7 +170,7 @@ public class DataSetParameterPanel extends JPanel {
 	}
 
 	// Slider listener
-	private void valueChanged(@Nullable ChangeEvent e) {
+	private void sliderChanged(@Nullable ChangeEvent e) {
 		RangeF minMax = getMinMax();
 
 		updateLabels(minMax);
@@ -182,9 +183,28 @@ public class DataSetParameterPanel extends JPanel {
 	}
 
 	public RangeF getMinMax() {
-		int begin = slider.getValue();
-		int end   = begin + slider.getExtent();
-		return RangeF.of(begin * sliderStepSize, end * sliderStepSize);
+		float begin = slider.getValue();
+		float end   = begin + slider.getExtent();
+
+		int gamma = filteredDataSet.getDataSet().getGamma();
+
+		if (gamma == 1) {
+			begin *= sliderStepSize;
+			end *= sliderStepSize;
+		} else {
+			RangeF minMax = filteredDataSet.getDataSet().getMinMax();
+
+			begin = minMax.unLerp(begin);
+			end = minMax.unLerp(end);
+			begin = NumberUtilities.clamp(begin, 0.0f, 1.0f);
+			end = NumberUtilities.clamp(end, 0.0f, 1.0f);
+			begin = 1 - (float)Math.pow(1 - begin, gamma);
+			end = 1 - (float)Math.pow(1 - end, gamma);
+			begin = minMax.lerp(begin);
+			end = minMax.lerp(end);
+		}
+
+		return RangeF.of(begin, end);
 	}
 
 	private void updateLabels(RangeF minMax) {
