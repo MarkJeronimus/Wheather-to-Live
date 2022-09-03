@@ -36,8 +36,8 @@ import javax.swing.WindowConstants;
 import com.formdev.flatlaf.FlatDarkLaf;
 import com.formdev.flatlaf.FlatLaf;
 import com.jidesoft.plaf.LookAndFeelFactory;
+import org.digitalmodular.weathertolive.dataset.CRUCL20DataSetFactory;
 import org.digitalmodular.weathertolive.dataset.ClimateDataSet;
-import org.digitalmodular.weathertolive.dataset.WorldClimDatasetFactory;
 
 /**
  * @author Mark Jeronimus
@@ -51,31 +51,11 @@ public final class WeatherToLiveMain {
 
 		long t = System.nanoTime();
 		ClimateDataSet climateDataSet = new ClimateDataSet(List.of(
-				WorldClimDatasetFactory.createFor("wc2.1_10m_tmin.zip",
-				                                  "<html>Minimum temp (&deg;C)",
-				                                  false,
-				                                  1,
-				                                  tempGradient),
-				WorldClimDatasetFactory.createFor("wc2.1_10m_tavg.zip",
-				                                  "<html>Average temp (&deg;C)",
-				                                  false,
-				                                  1,
-				                                  tempGradient),
-				WorldClimDatasetFactory.createFor("wc2.1_10m_tmax.zip",
-				                                  "<html>Maximum temp (&deg;C)",
-				                                  false,
-				                                  1,
-				                                  tempGradient),
-				WorldClimDatasetFactory.createFor("wc2.1_10m_prec.zip",
-				                                  "<html>Precipitation (mm)",
-				                                  true,
-				                                  6,
-				                                  precGradient),
-				WorldClimDatasetFactory.createFor("wc2.1_10m_wind.zip",
-				                                  "<html>Wind speed (m/s)",
-				                                  true,
-				                                  4,
-				                                  windGradient)
+				CRUCL20DataSetFactory.createFor("grid_10min_tmp.dat",
+				                                "grid_10min_tmp.dat",
+				                                false,
+				                                1,
+				                                tempGradient)
 		));
 		System.out.println("Loading took " + (System.nanoTime() - t) / 1.0e9f + " s");
 
