@@ -28,6 +28,7 @@ package org.digitalmodular.weathertolive.dataset;
 
 import java.io.IOException;
 import java.net.URL;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
@@ -47,6 +48,8 @@ public final class DataSetDownloader {
 
 	public static void download(ClimateDataSetMetadata metadata, MultiProgressListener progressListener)
 			throws IOException {
+		long t = System.nanoTime();
+
 		int              numDataSets              = metadata.getNumMetadata();
 		ProgressListener downloadProgressListener = progressListener.wrapAsSingleProgressListener(1);
 
@@ -58,11 +61,17 @@ public final class DataSetDownloader {
 
 			progressListener.multiProgressUpdated(0, new ProgressEvent(metadata, i, numDataSets, filename));
 
-			HTTPDownloader httpDownloader = new HTTPDownloader();
-			httpDownloader.addProgressListener(downloadProgressListener);
-			httpDownloader.downloadToFile(url, null, file);
+			if (Files.exists(file)) {
+				progressListener.multiProgressUpdated(1, new ProgressEvent(metadata, 0, -1, filename));
+			} else {
+				HTTPDownloader httpDownloader = new HTTPDownloader();
+				httpDownloader.addProgressListener(downloadProgressListener);
+				httpDownloader.downloadToFile(url, null, file);
+			}
 		}
 
 		progressListener.multiProgressUpdated(0, new ProgressEvent(metadata, numDataSets, numDataSets, ""));
+
+		System.out.println("Downloading took " + (System.nanoTime() - t) / 1.0e9f + " s");
 	}
 }
