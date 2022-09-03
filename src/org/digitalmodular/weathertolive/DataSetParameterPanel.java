@@ -186,20 +186,19 @@ public class DataSetParameterPanel extends JPanel {
 		float begin = slider.getValue();
 		float end   = begin + slider.getExtent();
 
-		int gamma = filterDataSet.getDataSet().getGamma();
+		begin *= sliderStepSize;
+		end *= sliderStepSize;
 
-		if (gamma == 1) {
-			begin *= sliderStepSize;
-			end *= sliderStepSize;
-		} else {
+		int gamma = filterDataSet.getDataSet().getGamma();
+		if (gamma > 1) {
 			RangeF minMax = filterDataSet.getDataSet().getMinMax();
 
 			begin = minMax.unLerp(begin);
 			end = minMax.unLerp(end);
 			begin = NumberUtilities.clamp(begin, 0.0f, 1.0f);
 			end = NumberUtilities.clamp(end, 0.0f, 1.0f);
-			begin = 1 - (float)Math.pow(1 - begin, gamma);
-			end = 1 - (float)Math.pow(1 - end, gamma);
+			begin = 1 - (float)Math.pow(1 - begin, 1.0 / gamma);
+			end = 1 - (float)Math.pow(1 - end, 1.0 / gamma);
 			begin = minMax.lerp(begin);
 			end = minMax.lerp(end);
 		}
