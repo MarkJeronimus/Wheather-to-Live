@@ -40,7 +40,7 @@ public class TextProgressListener implements ProgressListener {
 	private final int         updateGranularity;
 
 	private String lastPrinted  = "";
-	private int    nextUpdateAt = 0;
+	private long   nextUpdateAt = 0;
 
 	public TextProgressListener(PrintStream writer, int updateGranularity) {
 		this.writer = requireNonNull(writer, "writer");
@@ -62,10 +62,11 @@ public class TextProgressListener implements ProgressListener {
 
 		eraseLine();
 
-		lastPrinted = indeterminate
-		              ? Long.toString(progress) + ' ' + evt.getText()
-		              : Long.toString(progress) + '/' + Long.toString(evt.getTotal()) + ' ' +
-		                evt.getText();
+		if (indeterminate) {
+			lastPrinted = Long.toString(progress) + ' ' + evt.getText();
+		} else {
+			lastPrinted = Long.toString(progress) + '/' + evt.getTotal() + ' ' + evt.getText();
+		}
 
 		writer.print(lastPrinted);
 

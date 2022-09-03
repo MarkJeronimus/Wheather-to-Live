@@ -47,13 +47,13 @@ public class HTTPResponseStream extends InputStreamWithLength {
 	private final int                       responseCode;
 	private final Map<String, List<String>> responseHeaders;
 
-	private int position = 0;
+	private long position = 0;
 
 	public HTTPResponseStream(URL url,
 	                          InputStream in,
 	                          int responseCode,
 	                          Map<String, List<String>> responseHeaders,
-	                          int length) {
+	                          long length) {
 		super(in, length);
 		this.responseCode = requireRange(100, 599, responseCode, "responseCode");
 		this.responseHeaders = requireNonNull(responseHeaders, "responseHeaders");
@@ -123,7 +123,7 @@ public class HTTPResponseStream extends InputStreamWithLength {
 	public synchronized void close() throws IOException {
 		super.close();
 
-		int length = getLength();
+		long length = getLength();
 		if (length == -1) {
 			fireCompleted();
 		}
@@ -135,20 +135,25 @@ public class HTTPResponseStream extends InputStreamWithLength {
 	}
 
 	private void fireUpdated() {
-		int length = getLength();
+		long length = getLength();
 		if (length >= 0 && position == length) {
 			fireCompleted();
 			return;
 		}
 
-		String message = "Downloading... " + (int)(100.0f * position / length) + '%';
+		String message;
+		if (length <= 0) {
+			message = "Downloading... (unknown size)";
+		} else {
+			message = "Downloading... " + (int)(100.0f * position / length) + '%';
+		}
 
 		ProgressEvent event = new ProgressEvent(this, position, length, message);
 		fireProgressUpdated(event);
 	}
 
 	private void fireCompleted() {
-		int length = getLength();
+		long length = getLength();
 		length = length >= 0 ? length : position;
 		String message = position == length ? "Download Complete" : "Download Aborted";
 

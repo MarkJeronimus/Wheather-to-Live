@@ -172,7 +172,7 @@ public class HTTPDownloader {
 
 			in = getDecompressedStream(connection, in);
 
-			int                       contentLength   = attemptGetStreamLength(connection);
+			long                      contentLength   = attemptGetStreamLength(connection);
 			Map<String, List<String>> responseHeaders = connection.getHeaderFields();
 
 			HTTPResponseStream stream = new HTTPResponseStream(url, in, responseCode, responseHeaders, contentLength);
@@ -284,19 +284,19 @@ public class HTTPDownloader {
 		}
 	}
 
-	@SuppressWarnings("IOResourceOpenedButNotSafelyClosed")
 	private static InputStream getDecompressedStream(URLConnection connection, InputStream in) throws IOException {
 		if ("gzip".equals(connection.getHeaderField("Content-Encoding"))) {
-			in = new GZIPInputStream(in);
+			return new GZIPInputStream(in);
 		} else if ("deflate".equals(connection.getHeaderField("Content-Encoding"))) {
-			in = new DeflaterInputStream(in);
+			return new DeflaterInputStream(in);
+		} else {
+			return in;
 		}
-		return in;
 	}
 
-	private static int attemptGetStreamLength(URLConnection connection) {
+	private static long attemptGetStreamLength(URLConnection connection) {
 		try {
-			return Integer.parseInt(connection.getHeaderField("Content-Length"));
+			return Long.parseLong(connection.getHeaderField("Content-Length"));
 		} catch (NumberFormatException ignored) {
 			return -1;
 		}

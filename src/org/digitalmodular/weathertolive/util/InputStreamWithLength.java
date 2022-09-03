@@ -34,14 +34,14 @@ import java.io.InputStream;
  */
 // Created 2015-10-17
 public class InputStreamWithLength extends FilterInputStream {
-	private final int length;
+	private final long length;
 
-	public InputStreamWithLength(InputStream in, int length) {
+	public InputStreamWithLength(InputStream in, long length) {
 		super(in);
 		this.length = length;
 	}
 
-	public int getLength() {
+	public long getLength() {
 		return length;
 	}
 }

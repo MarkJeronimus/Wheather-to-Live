@@ -36,11 +36,11 @@ import static org.digitalmodular.weathertolive.util.ValidatorUtilities.requireNo
  */
 // Created 2015-08-15
 public class ProgressEvent extends EventObject {
-	private final int    progress;
-	private final int    total;
+	private final long   progress;
+	private final long   total;
 	private final String text;
 
-	public ProgressEvent(Object source, int progress, int total, String text) {
+	public ProgressEvent(Object source, long progress, long total, String text) {
 		super(source);
 		this.text = requireNonNull(text, "text");
 
@@ -55,11 +55,11 @@ public class ProgressEvent extends EventObject {
 
 	}
 
-	public int getProgress() {
+	public long getProgress() {
 		return progress;
 	}
 
-	public int getTotal() {
+	public long getTotal() {
 		return total;
 	}
 
@@ -82,9 +82,9 @@ public class ProgressEvent extends EventObject {
 	@Override
 	public int hashCode() {
 		int hash = 0x811C9DC5;
-		hash ^= Integer.hashCode(progress);
+		hash ^= Long.hashCode(progress);
 		hash *= 0x01000193;
-		hash ^= Integer.hashCode(total);
+		hash ^= Long.hashCode(total);
 		hash *= 0x01000193;
 		hash ^= text.hashCode();
 		hash *= 0x01000193;
