@@ -47,25 +47,32 @@ import org.digitalmodular.weathertolive.util.ColorGradient;
 // Created 2022-08-30
 public final class WeatherToLiveMain {
 	public static void main(String... args) throws IOException, ExecutionException, InterruptedException {
-		ColorGradient gradient = new ColorGradient(new File("Inferno-mod.png"));
+		ColorGradient tempGradient = new ColorGradient(new File("gradient-temperature.png"));
+		ColorGradient precGradient = new ColorGradient(new File("gradient-precipitation.png"));
+		ColorGradient windGradient = new ColorGradient(new File("gradient-wind.png"));
 
 		long t = System.nanoTime();
 		ClimateDataSet climateDataSet = new ClimateDataSet(List.of(
 				WorldClimDatasetFactory.createFor("wc2.1_10m_tmin.zip",
 				                                  "<html>Minimum temp (&deg;C)",
-				                                  false),
+				                                  false,
+				                                  tempGradient),
 				WorldClimDatasetFactory.createFor("wc2.1_10m_tavg.zip",
 				                                  "<html>Average temp (&deg;C)",
-				                                  false),
+				                                  false,
+				                                  tempGradient),
 				WorldClimDatasetFactory.createFor("wc2.1_10m_tmax.zip",
 				                                  "<html>Maximum temp (&deg;C)",
-				                                  false),
+				                                  false,
+				                                  tempGradient),
 				WorldClimDatasetFactory.createFor("wc2.1_10m_prec.zip",
 				                                  "<html>Precipitation (mm)",
-				                                  true),
+				                                  true,
+				                                  precGradient),
 				WorldClimDatasetFactory.createFor("wc2.1_10m_wind.zip",
 				                                  "<html>Wind speed (m/s)",
-				                                  true)
+				                                  true,
+				                                  windGradient)
 		));
 		System.out.println("Loading took " + (System.nanoTime() - t) / 1.0e9f + " s");
 
@@ -84,7 +91,6 @@ public final class WeatherToLiveMain {
 			f.setVisible(true);
 
 			weatherToLivePanel.setClimateDataSet(climateDataSet);
-			weatherToLivePanel.setGradient(gradient);
 			weatherToLivePanel.dataChanged(-1);
 		});
 	}

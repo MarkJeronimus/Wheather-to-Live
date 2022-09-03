@@ -32,11 +32,8 @@ import java.awt.DisplayMode;
 import java.awt.GraphicsDevice;
 import javax.swing.JPanel;
 
-import org.jetbrains.annotations.Nullable;
-
 import org.digitalmodular.weathertolive.dataset.ClimateDataSet;
 import org.digitalmodular.weathertolive.util.Animator;
-import org.digitalmodular.weathertolive.util.ColorGradient;
 import org.digitalmodular.weathertolive.util.GraphicsUtilities;
 import org.digitalmodular.weathertolive.util.ZoomPanel;
 
@@ -90,13 +87,6 @@ public class WeatherToLivePanel extends JPanel {
 		bottomPanel.prepareFilters(climateDataSet);
 
 		setMonth(0);
-	}
-
-	/**
-	 * A call of this must eventually be followed by a call to {@link #dataChanged(int)}!
-	 */
-	public void setGradient(@Nullable ColorGradient gradient) {
-		atlasRenderer.setGradient(gradient);
 	}
 
 	public void dataChanged(int dataSetIndex) {

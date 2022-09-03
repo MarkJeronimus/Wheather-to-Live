@@ -28,6 +28,7 @@ package org.digitalmodular.weathertolive.dataset;
 
 import org.jetbrains.annotations.Nullable;
 
+import org.digitalmodular.weathertolive.util.ColorGradient;
 import org.digitalmodular.weathertolive.util.RangeF;
 import org.digitalmodular.weathertolive.util.RangeFBuilder;
 import static org.digitalmodular.weathertolive.WeatherToLivePanel.SCALE_FACTOR;
@@ -58,11 +59,12 @@ public class DataSet {
 
 	static final int THUMBNAIL_PIXELS = THUMBNAIL_WIDTH * THUMBNAIL_HEIGHT;
 
-	private final String    name;
-	private final int       width;
-	private final int       height;
-	private final float[][] rawData;
-	private final RangeF    minMax;
+	private final String        name;
+	private final int           width;
+	private final int           height;
+	private final float[][]     rawData;
+	private final RangeF        minMax;
+	private final ColorGradient gradient;
 
 	// Confusing syntax for: Non-null array (pointer / object) of non-null arrays of @Nullable elements.
 	// https://checkerframework.org/jsr308/specification/java-annotation-design.html#array-syntax
@@ -72,7 +74,12 @@ public class DataSet {
 	 * @param rawData      The data to store. The object is stored as-is without copying.
 	 * @param absoluteZero Whether the values start at 0 or can go negative (should find minimum)
 	 */
-	protected DataSet(String name, float[][] rawData, int width, int height, boolean absoluteZero) {
+	protected DataSet(String name,
+	                  float[][] rawData,
+	                  int width,
+	                  int height,
+	                  boolean absoluteZero,
+	                  ColorGradient gradient) {
 		this.name = requireStringLengthAtLeast(1, name, "name");
 		this.rawData = requireNonNull(rawData, "rawData");
 		requireArrayLengthExactly(12, rawData, "rawData");
@@ -86,6 +93,7 @@ public class DataSet {
 			            "'rawData[" + month + "].length' should equal 'width' * 'height': " +
 			            rawData[month].length + ", " + width + " * " + height + " (" + width * height + ')');
 		}
+		this.gradient = requireNonNull(gradient, "gradient");
 
 		minMax = findMinMax(rawData, absoluteZero);
 
@@ -174,6 +182,10 @@ public class DataSet {
 
 	public RangeF getMinMax() {
 		return minMax;
+	}
+
+	public ColorGradient getGradient() {
+		return gradient;
 	}
 
 	/**

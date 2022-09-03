@@ -66,7 +66,6 @@ public class AtlasRenderer {
 	private final Consumer<List<AnimationFrame>> renderUpdateCallback;
 
 	private @Nullable List<FilteredDataSet> filteredDataSets       = null;
-	private @Nullable ColorGradient         gradient               = null;
 	private           int                   currentMonth           = 0;
 	private           int                   backgroundDatasetIndex = -1;
 	private           boolean               aggregateYear          = false;
@@ -101,14 +100,6 @@ public class AtlasRenderer {
 	@SuppressWarnings("AssignmentOrReturnOfFieldWithMutableType")
 	public void setFilteredDataSets(@Nullable List<FilteredDataSet> filteredDataSets) {
 		this.filteredDataSets = filteredDataSets;
-	}
-
-	public @Nullable ColorGradient getGradient() {
-		return gradient;
-	}
-
-	public void setGradient(@Nullable ColorGradient gradient) {
-		this.gradient = gradient;
 	}
 
 	public int getCurrentMonth() {
@@ -281,9 +272,10 @@ public class AtlasRenderer {
 	}
 
 	private void renderParameterBackground(DataSet dataSet, int month, int[] pixels) {
-		float[][] rawData = dataSet.getRawData();
-		RangeF    minMax  = dataSet.getMinMax();
-		int       length  = rawData[0].length;
+		float[][]     rawData  = dataSet.getRawData();
+		RangeF        minMax   = dataSet.getMinMax();
+		ColorGradient gradient = dataSet.getGradient();
+		int           length   = rawData[0].length;
 
 		float[] rawMonthData = rawData[month];
 
