@@ -9,8 +9,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.ForkJoinPool;
 import javax.swing.AbstractAction;
-import javax.swing.AbstractButton;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.ButtonGroup;
@@ -61,8 +61,9 @@ public final class NewAction extends AbstractAction {
 
 	private final WeatherToLivePanel parent;
 
-	private final JButton selectButton = new JButton("Select");
-	private final JButton cancelButton = new JButton("Cancel");
+	private final JButton            selectButton = new JButton("Select");
+	private final JButton            cancelButton = new JButton("Cancel");
+	private final List<JRadioButton> radioButtons = new ArrayList<>(10);
 
 	private @Nullable List<ClimateDataSetMetadata> allMetadata             = null;
 	private           int                          selectedClimateSetIndex = -1;
@@ -111,7 +112,7 @@ public final class NewAction extends AbstractAction {
 		}
 
 		if (result == 0) { // index of selectButton
-			loadSelectedClimateSet();
+			loadClimateSet(selectedClimateSetIndex);
 		}
 	}
 
@@ -146,7 +147,7 @@ public final class NewAction extends AbstractAction {
 				labelText.append("<br>");
 				labelText.append("<b>Download size:</b> ").append(DOWNLOAD_SIZES[climateSetIndex]).append("<br>");
 
-				AbstractButton radioButton = new JRadioButton(labelText.toString());
+				JRadioButton radioButton = new JRadioButton(labelText.toString());
 				radioButton.setHorizontalAlignment(SwingConstants.CENTER);
 				radioButton.setHorizontalTextPosition(SwingConstants.CENTER);
 				radioButton.setVerticalTextPosition(SwingConstants.BOTTOM);
@@ -154,6 +155,7 @@ public final class NewAction extends AbstractAction {
 				tablePanel.add(radioButton);
 
 				buttonGroup.add(radioButton);
+				radioButtons.add(radioButton);
 			}
 
 			p.add(tablePanel);
@@ -196,6 +198,14 @@ public final class NewAction extends AbstractAction {
 	}
 
 	private void radioButtonPressed(ActionEvent e) {
+		selectedClimateSetIndex = -1;
+		for (int i = 0; i < radioButtons.size(); i++) {
+			if (radioButtons.get(i).isSelected()) {
+				selectedClimateSetIndex = i;
+				break;
+			}
+		}
+
 		selectButton.setEnabled(true);
 	}
 
@@ -211,8 +221,8 @@ public final class NewAction extends AbstractAction {
 		return null;
 	}
 
-	private void loadSelectedClimateSet() {
-		if (selectedClimateSetIndex == -1) {
+	public void loadClimateSet(int selectedClimateSetIndex) {
+		if (allMetadata == null || selectedClimateSetIndex < 0 || selectedClimateSetIndex >= allMetadata.size()) {
 			return;
 		}
 
@@ -226,6 +236,12 @@ public final class NewAction extends AbstractAction {
 		progressListener.setAutoShow(true);
 		progressListener.setAutoClose(true);
 
+		ForkJoinPool.commonPool().submit(() -> downloadProcess(parent, metadata, progressListener));
+	}
+
+	public static void downloadProcess(WeatherToLivePanel parent,
+	                                   ClimateDataSetMetadata metadata,
+	                                   MultiProgressDialog progressListener) {
 		try {
 			progressListener.setTaskName("Downloading " + metadata.getName());
 			ClimateDataSetDownloader.download(metadata, progressListener);
@@ -240,6 +256,7 @@ public final class NewAction extends AbstractAction {
 			ClimateDataSet climateDataSet = climateDataSetLoader.load(metadata, progressListener);
 
 			parent.setClimateDataSet(climateDataSet);
+			parent.dataChanged(0);
 		} catch (IOException e) {
 			//noinspection ProhibitedExceptionThrown
 			throw new RuntimeException(e);

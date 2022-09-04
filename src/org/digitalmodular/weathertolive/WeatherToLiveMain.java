@@ -26,12 +26,6 @@
  */
 package org.digitalmodular.weathertolive;
 
-import java.awt.Frame;
-import java.io.IOException;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.concurrent.ExecutionException;
-import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.SwingUtilities;
 import javax.swing.WindowConstants;
@@ -39,68 +33,25 @@ import javax.swing.WindowConstants;
 import com.formdev.flatlaf.FlatDarkLaf;
 import com.formdev.flatlaf.FlatLaf;
 import com.jidesoft.plaf.LookAndFeelFactory;
-import org.digitalmodular.weathertolive.dataset.ClimateDataSet;
-import org.digitalmodular.weathertolive.dataset.ClimateDataSetDownloader;
-import org.digitalmodular.weathertolive.dataset.ClimateDataSetLoader;
-import org.digitalmodular.weathertolive.dataset.ClimateDataSetMetadata;
-import org.digitalmodular.weathertolive.util.GraphicsUtilities;
-import org.digitalmodular.weathertolive.util.MultiProgressDialog;
 
 /**
  * @author Mark Jeronimus
  */
 // Created 2022-08-30
 public final class WeatherToLiveMain {
-	public static void main(String... args) throws IOException, ExecutionException, InterruptedException {
-		WeatherToLivePanel weatherToLivePanel = GraphicsUtilities.getFromEDT(() -> {
+	public static void main(String... args) {
+		SwingUtilities.invokeLater(() -> {
 			FlatLaf.setup(new FlatDarkLaf());
 			LookAndFeelFactory.installJideExtension();
 
 			JFrame f = new JFrame("Weather to Live");
 			f.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
 
-			WeatherToLivePanel panel = new WeatherToLivePanel();
-			f.setContentPane(panel);
+			f.setContentPane(new WeatherToLivePanel());
 
 			f.pack();
 			f.setLocationRelativeTo(null);
 			f.setVisible(true);
-
-			return panel;
 		});
-
-		assert weatherToLivePanel != null;
-
-		Path           file           = Paths.get("config-worldclim-2.1-10min.tsv");
-		ClimateDataSet climateDataSet = loadClimateDataSet(weatherToLivePanel, file);
-
-		SwingUtilities.invokeLater(() -> {
-			weatherToLivePanel.setClimateDataSet(climateDataSet);
-			weatherToLivePanel.dataChanged(0);
-		});
-	}
-
-	private static ClimateDataSet loadClimateDataSet(JComponent parent, Path file)
-			throws IOException, InterruptedException {
-		ClimateDataSetMetadata metadata = new ClimateDataSetMetadata(file);
-
-		Frame frame = (Frame)parent.getTopLevelAncestor();
-
-		MultiProgressDialog progressListener = new MultiProgressDialog(frame, frame.getTitle(), 2);
-		progressListener.setAutoShow(true);
-		progressListener.setAutoClose(true);
-
-		progressListener.setTaskName("Downloading " + metadata.getName());
-		ClimateDataSetDownloader.download(metadata, progressListener);
-
-		progressListener.setTaskName("Loading " + metadata.getName());
-		ClimateDataSetLoader climateDataSetLoader = new ClimateDataSetLoader();
-		progressListener.addCancelListener(ignored -> {
-			climateDataSetLoader.cancel();
-			progressListener.setVisible(false);
-		});
-		ClimateDataSet climateDataSet = climateDataSetLoader.load(metadata, progressListener);
-
-		return climateDataSet;
 	}
 }
