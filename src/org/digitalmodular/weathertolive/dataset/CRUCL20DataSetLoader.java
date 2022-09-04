@@ -50,6 +50,7 @@ public final class CRUCL20DataSetLoader {
 	public static final int PIXELS_PER_DEGREE = 6;
 	public static final int WIDTH             = 360 * PIXELS_PER_DEGREE;
 	public static final int HEIGHT            = 180 * PIXELS_PER_DEGREE;
+	public static final int CRU_CL_TOTAL      = 566669;
 
 	private static final Pattern SPACES_PATTERN = Pattern.compile(" +");
 
@@ -72,6 +73,7 @@ public final class CRUCL20DataSetLoader {
 		     GZIPInputStream gzIn = new GZIPInputStream(stream)) {
 			BufferedReader in = new BufferedReader(new InputStreamReader(gzIn, StandardCharsets.ISO_8859_1));
 
+			int i = 0;
 			while (true) {
 				String line = in.readLine();
 				if (line == null) {
@@ -82,13 +84,20 @@ public final class CRUCL20DataSetLoader {
 					throw new InterruptedException("Canceled");
 				}
 
+				if ((i & 0xFFF) == 0xFFF) {
+					progressListener.progressUpdated(new ProgressEvent(setMetadata, i, CRU_CL_TOTAL, ""));
+				}
+
 				String[] fields = SPACES_PATTERN.split(line.trim());
 				if (fields.length != 3 && fields.length != 14 && fields.length != 26) {
 					continue;
 				}
 
 				parseLine(fields, rawData);
+				i++;
 			}
+
+			progressListener.progressUpdated(new ProgressEvent(setMetadata, CRU_CL_TOTAL, CRU_CL_TOTAL, ""));
 		}
 
 		DataSet dataSet = new DataSet(setMetadata.dataSetName,
