@@ -232,6 +232,14 @@ public final class NewAction extends AbstractAction {
 
 		ClimateDataSetMetadata metadata = allMetadata.get(selectedClimateSetIndex);
 
+		{
+			@Nullable ClimateDataSet climateDataSet = parent.getClimateDataSet();
+			if (climateDataSet != null &&
+			    climateDataSet.getMetadata().getName().equals(metadata.getName())) {
+				return;
+			}
+		}
+
 		Frame frame = (Frame)parent.getTopLevelAncestor();
 
 		climateDataSetLoader.cancel();

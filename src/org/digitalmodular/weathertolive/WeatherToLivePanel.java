@@ -33,10 +33,13 @@ import java.awt.GraphicsDevice;
 import javax.swing.JPanel;
 import javax.swing.RootPaneContainer;
 
+import org.jetbrains.annotations.Nullable;
+
 import org.digitalmodular.weathertolive.dataset.ClimateDataSet;
 import org.digitalmodular.weathertolive.util.Animator;
 import org.digitalmodular.weathertolive.util.GraphicsUtilities;
 import org.digitalmodular.weathertolive.util.ZoomPanel;
+import static org.digitalmodular.weathertolive.util.ValidatorUtilities.requireNonNull;
 
 /**
  * @author Mark Jeronimus
@@ -59,6 +62,8 @@ public class WeatherToLivePanel extends JPanel {
 
 	private final AtlasRenderer atlasRenderer = new AtlasRenderer(animator::setAnimation);
 
+	private @Nullable ClimateDataSet climateDataSet = null;
+
 	@SuppressWarnings({"OverridableMethodCallDuringObjectConstruction", "ThisEscapedInObjectConstruction"})
 	public WeatherToLivePanel(RootPaneContainer frame) {
 		super(new BorderLayout());
@@ -75,13 +80,22 @@ public class WeatherToLivePanel extends JPanel {
 		animator.addAnimationListener(bottomPanel::setMonth);
 	}
 
+	public @Nullable ClimateDataSet getClimateDataSet() {
+		return climateDataSet;
+	}
+
 	/**
 	 * A call of this must eventually be followed by a call to {@link #dataChanged(int)}!
 	 */
 	public void setClimateDataSet(ClimateDataSet climateDataSet) {
-		if (climateDataSet == null) {
-			throw new IllegalStateException("setClimateDataSet() has not been called");
+		requireNonNull(climateDataSet, "climateDataSet");
+
+		//noinspection ObjectEquality // Comparing identity, not equality
+		if (this.climateDataSet == climateDataSet) {
+			return;
 		}
+
+		this.climateDataSet = climateDataSet;
 
 		atlasRenderer.setFilterDataSets(climateDataSet.getFilterDataSets());
 		atlasRenderer.setBackgroundDatasetIndex(0);

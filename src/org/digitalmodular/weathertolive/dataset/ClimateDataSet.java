@@ -29,6 +29,7 @@ package org.digitalmodular.weathertolive.dataset;
 import java.util.Collections;
 import java.util.List;
 
+import static org.digitalmodular.weathertolive.util.ValidatorUtilities.requireNonNull;
 import static org.digitalmodular.weathertolive.util.ValidatorUtilities.requireSizeAtLeast;
 
 /**
@@ -38,12 +39,18 @@ import static org.digitalmodular.weathertolive.util.ValidatorUtilities.requireSi
  */
 // Created 2022-08-31
 public class ClimateDataSet {
-	private final List<FilterDataSet> filterDataSets;
+	private final ClimateDataSetMetadata metadata;
+	private final List<FilterDataSet>    filterDataSets;
 
-	public ClimateDataSet(List<FilterDataSet> filterDataSets) {
+	public ClimateDataSet(ClimateDataSetMetadata metadata, List<FilterDataSet> filterDataSets) {
+		this.metadata = requireNonNull(metadata, "metadata");
 		requireSizeAtLeast(1, filterDataSets, "filterDataSets");
 
 		this.filterDataSets = Collections.unmodifiableList(filterDataSets);
+	}
+
+	public ClimateDataSetMetadata getMetadata() {
+		return metadata;
 	}
 
 	public List<FilterDataSet> getFilterDataSets() {

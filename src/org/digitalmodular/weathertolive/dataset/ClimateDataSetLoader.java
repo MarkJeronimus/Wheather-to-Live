@@ -64,7 +64,7 @@ public final class ClimateDataSetLoader {
 			progressListener.multiProgressUpdated(0, new ProgressEvent(
 					metadata, numDataSets, numDataSets, ""));
 
-			return new ClimateDataSet(dataSets);
+			return new ClimateDataSet(metadata, dataSets);
 		} finally {
 			System.out.println("Loading took " + (System.nanoTime() - t) / 1.0e9f + " s");
 
