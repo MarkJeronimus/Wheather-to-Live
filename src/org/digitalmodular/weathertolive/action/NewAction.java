@@ -66,8 +66,9 @@ public final class NewAction extends AbstractAction {
 	private final JButton            cancelButton = new JButton("Cancel");
 	private final List<JRadioButton> radioButtons = new ArrayList<>(10);
 
-	private @Nullable List<ClimateDataSetMetadata> allMetadata             = null;
-	private           int                          selectedClimateSetIndex = -1;
+	private final List<ClimateDataSetMetadata> allMetadata = new ArrayList<>(EXPECTED_METADATA_FILES.length);
+
+	private int selectedClimateSetIndex = -1;
 
 	private final ClimateDataSetLoader climateDataSetLoader = new ClimateDataSetLoader();
 
@@ -80,16 +81,14 @@ public final class NewAction extends AbstractAction {
 		selectButton.addActionListener(this::buttonPressed);
 		cancelButton.addActionListener(this::buttonPressed);
 
+		loadAllMetadata();
+
 		frame.getRootPane().getActionMap().put(NEW_ACTION_KEY, this);
 	}
 
 	@Override
 	public void actionPerformed(@Nullable ActionEvent e) {
 		Frame frame = (Frame)parent.getTopLevelAncestor();
-
-		if (allMetadata == null) {
-			allMetadata = loadAllMetadata();
-		}
 
 		JPanel layout = makeLayout(allMetadata);
 
@@ -133,7 +132,7 @@ public final class NewAction extends AbstractAction {
 		{
 			JPanel tablePanel = new ListPanel(BoxLayout.X_AXIS, SPACING);
 
-			for (int climateSetIndex = 0; climateSetIndex < allMetadata.size(); climateSetIndex++) {
+			for (int climateSetIndex = 0; climateSetIndex < EXPECTED_METADATA_FILES.length; climateSetIndex++) {
 				if (climateSetIndex > 0) {
 					tablePanel.add(new JSeparator(SwingConstants.VERTICAL));
 				}
@@ -176,17 +175,14 @@ public final class NewAction extends AbstractAction {
 		return titleLabel;
 	}
 
-	private static List<ClimateDataSetMetadata> loadAllMetadata() {
-		List<ClimateDataSetMetadata> allMetadata = new ArrayList<>(EXPECTED_METADATA_FILES.length);
-
+	private void loadAllMetadata() {
 		for (Path file : EXPECTED_METADATA_FILES) {
 			try {
 				allMetadata.add(new ClimateDataSetMetadata(file));
-			} catch (IOException ignored) {
+			} catch (IOException ex) {
+				throw new RuntimeException(ex);
 			}
 		}
-
-		return allMetadata;
 	}
 
 	@SuppressWarnings("ObjectEquality") // Comparing identity, not equality
@@ -228,11 +224,11 @@ public final class NewAction extends AbstractAction {
 	}
 
 	public void loadClimateSet(int selectedClimateSetIndex) {
-		if (allMetadata == null || selectedClimateSetIndex < 0 || selectedClimateSetIndex >= allMetadata.size()) {
+		if (selectedClimateSetIndex < 0 || selectedClimateSetIndex >= EXPECTED_METADATA_FILES.length) {
 			return;
 		}
 
-		assert allMetadata != null;
+		loadAllMetadata();
 
 		ClimateDataSetMetadata metadata = allMetadata.get(selectedClimateSetIndex);
 

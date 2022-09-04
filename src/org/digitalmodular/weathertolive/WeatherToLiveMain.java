@@ -48,11 +48,15 @@ public final class WeatherToLiveMain {
 			JFrame frame = new JFrame("Weather to Live");
 			frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
 
-			frame.setContentPane(new WeatherToLivePanel(frame));
+			WeatherToLivePanel panel = new WeatherToLivePanel(frame);
+			frame.setContentPane(panel);
 
 			frame.pack();
 			frame.setLocationRelativeTo(null);
 			frame.setVisible(true);
+
+			NewAction newAction = (NewAction)frame.getRootPane().getActionMap().get(NewAction.NEW_ACTION_KEY);
+			newAction.loadClimateSet(1);
 		});
 	}
 }
