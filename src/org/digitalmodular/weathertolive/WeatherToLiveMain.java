@@ -81,7 +81,7 @@ public final class WeatherToLiveMain {
 	}
 
 	private static ClimateDataSet loadClimateDataSet(JComponent parent, Path file)
-			throws IOException {
+			throws IOException, InterruptedException {
 		ClimateDataSetMetadata metadata = new ClimateDataSetMetadata(file);
 
 		Frame frame = (Frame)parent.getTopLevelAncestor();
@@ -94,7 +94,12 @@ public final class WeatherToLiveMain {
 		ClimateDataSetDownloader.download(metadata, progressListener);
 
 		progressListener.setTaskName("Loading " + metadata.getName());
-		ClimateDataSet climateDataSet = ClimateDataSetLoader.load(metadata, progressListener);
+		ClimateDataSetLoader climateDataSetLoader = new ClimateDataSetLoader();
+		progressListener.addCancelListener(ignored -> {
+			climateDataSetLoader.cancel();
+			progressListener.setVisible(false);
+		});
+		ClimateDataSet climateDataSet = climateDataSetLoader.load(metadata, progressListener);
 
 		return climateDataSet;
 	}

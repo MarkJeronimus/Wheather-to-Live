@@ -36,6 +36,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipException;
 import java.util.zip.ZipFile;
@@ -51,13 +52,13 @@ import static org.digitalmodular.weathertolive.dataset.ClimateDataSetMetadata.Cl
  * @author Mark Jeronimus
  */
 // Created 2022-08-28
-public final class WorldClim21DataSetFactory {
-	private WorldClim21DataSetFactory() {
-		throw new AssertionError();
-	}
+public class WorldClim21DataSetLoader {
+	private final AtomicBoolean cancelRequested = new AtomicBoolean();
 
-	public static FilterDataSet createFor(ClimateDataSetData setMetadata, ProgressListener progressListener)
-			throws IOException {
+	public FilterDataSet load(ClimateDataSetData setMetadata, ProgressListener progressListener)
+			throws IOException, InterruptedException {
+		cancelRequested.set(false);
+
 		String filename = setMetadata.filename;
 		String prefix   = filename.substring(0, filename.length() - 4); // e.g. "wc2.1_10m_prec"
 
@@ -75,6 +76,10 @@ public final class WorldClim21DataSetFactory {
 				@Nullable ZipEntry zipEntry    = zip.getEntry(tifFilename);
 				if (zipEntry == null) {
 					throw new IOException(tifFilename + " not found in " + filename);
+				}
+
+				if (cancelRequested.get()) {
+					throw new InterruptedException("Canceled");
 				}
 
 				progressListener.progressUpdated(new ProgressEvent(setMetadata, month, 13, "Month " + (month + 1)));
@@ -104,6 +109,10 @@ public final class WorldClim21DataSetFactory {
 			Files.delete(Paths.get(filename));
 			throw new IOException(ex.getMessage() + ": " + filename, ex);
 		}
+	}
+
+	public void cancel() {
+		cancelRequested.set(true);
 	}
 
 	private static float[] convertGeoTiffToRawData(BufferedImage geoData) {

@@ -34,6 +34,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Arrays;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.regex.Pattern;
 import java.util.zip.GZIPInputStream;
 
@@ -45,19 +46,19 @@ import static org.digitalmodular.weathertolive.dataset.ClimateDataSetMetadata.Cl
  * @author Mark Jeronimus
  */
 // Created 2022-09-03
-public final class CRUCL20DataSetFactory {
-	private CRUCL20DataSetFactory() {
-		throw new AssertionError();
-	}
-
+public final class CRUCL20DataSetLoader {
 	public static final int PIXELS_PER_DEGREE = 6;
 	public static final int WIDTH             = 360 * PIXELS_PER_DEGREE;
 	public static final int HEIGHT            = 180 * PIXELS_PER_DEGREE;
 
 	private static final Pattern SPACES_PATTERN = Pattern.compile(" +");
 
-	public static FilterDataSet createFor(ClimateDataSetData setMetadata, ProgressListener progressListener)
-			throws IOException {
+	private final AtomicBoolean cancelRequested = new AtomicBoolean();
+
+	public FilterDataSet load(ClimateDataSetData setMetadata, ProgressListener progressListener)
+			throws IOException, InterruptedException {
+		cancelRequested.set(false);
+
 		String filename = setMetadata.filename;
 
 		progressListener.progressUpdated(new ProgressEvent(setMetadata, 1, -1, ""));
@@ -77,6 +78,10 @@ public final class CRUCL20DataSetFactory {
 					break;
 				}
 
+				if (cancelRequested.get()) {
+					throw new InterruptedException("Canceled");
+				}
+
 				String[] fields = SPACES_PATTERN.split(line.trim());
 				if (fields.length != 3 && fields.length != 14 && fields.length != 26) {
 					continue;
@@ -94,6 +99,10 @@ public final class CRUCL20DataSetFactory {
 		                              setMetadata.gamma,
 		                              setMetadata.gradientFilename);
 		return new FilterDataSet(dataSet);
+	}
+
+	public void cancel() {
+		cancelRequested.set(true);
 	}
 
 	private static void parseLine(String[] fields, float[][] rawData) {

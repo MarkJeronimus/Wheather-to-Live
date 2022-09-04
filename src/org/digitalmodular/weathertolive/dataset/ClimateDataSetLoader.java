@@ -3,6 +3,7 @@ package org.digitalmodular.weathertolive.dataset;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.digitalmodular.weathertolive.util.MultiProgressListener;
 import org.digitalmodular.weathertolive.util.ProgressEvent;
@@ -10,16 +11,19 @@ import org.digitalmodular.weathertolive.util.ProgressListener;
 import static org.digitalmodular.weathertolive.dataset.ClimateDataSetMetadata.ClimateDataSetData;
 
 /**
- * @author author
+ * @author Mark Jeronimus
  */
 // Created 2022-09-03
 public final class ClimateDataSetLoader {
-	private ClimateDataSetLoader() {
-		throw new AssertionError();
-	}
+	private final WorldClim21DataSetLoader worldClim21DataSetLoader = new WorldClim21DataSetLoader();
+	private final CRUCL20DataSetLoader     crucl20DataSetLoader     = new CRUCL20DataSetLoader();
 
-	public static ClimateDataSet load(ClimateDataSetMetadata metadata, MultiProgressListener progressListener)
-			throws IOException {
+	private final AtomicBoolean cancelRequested = new AtomicBoolean();
+
+	public ClimateDataSet load(ClimateDataSetMetadata metadata, MultiProgressListener progressListener)
+			throws IOException, InterruptedException {
+		cancelRequested.set(false);
+
 		int                 numDataSets = metadata.getNumMetadata();
 		List<FilterDataSet> dataSets    = new ArrayList<>(numDataSets);
 		long                t           = System.nanoTime();
@@ -34,10 +38,14 @@ public final class ClimateDataSetLoader {
 			progressListener.multiProgressUpdated(0, new ProgressEvent(
 					metadata, i, numDataSets, filename));
 
+			if (cancelRequested.get()) {
+				throw new InterruptedException("Canceled");
+			}
+
 			if (filename.endsWith(".zip")) {
-				dataSets.add(WorldClim21DataSetFactory.createFor(setMetadata, loadProgressListener));
+				dataSets.add(worldClim21DataSetLoader.load(setMetadata, loadProgressListener));
 			} else if (filename.endsWith(".gz")) {
-				dataSets.add(CRUCL20DataSetFactory.createFor(setMetadata, loadProgressListener));
+				dataSets.add(crucl20DataSetLoader.load(setMetadata, loadProgressListener));
 			} else {
 				throw new IllegalStateException("Unknown dataset data file: " + filename);
 			}
@@ -48,5 +56,11 @@ public final class ClimateDataSetLoader {
 
 		System.out.println("Loading took " + (System.nanoTime() - t) / 1.0e9f + " s");
 		return new ClimateDataSet(dataSets);
+	}
+
+	public void cancel() {
+		cancelRequested.set(true);
+		worldClim21DataSetLoader.cancel();
+		crucl20DataSetLoader.cancel();
 	}
 }
