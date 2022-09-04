@@ -96,6 +96,7 @@ public class WeatherToLivePanel extends JPanel {
 	}
 
 	public void setFastPreview(boolean fastPreview) {
+		// TODO setFastPreview
 	}
 
 	public void setAnimated(boolean animated) {

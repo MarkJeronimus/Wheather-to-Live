@@ -26,11 +26,11 @@
  */
 package org.digitalmodular.weathertolive;
 
+import java.awt.Frame;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.concurrent.ExecutionException;
-import java.util.concurrent.TimeUnit;
 import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.SwingUtilities;
@@ -56,7 +56,7 @@ public final class WeatherToLiveMain {
 			FlatLaf.setup(new FlatDarkLaf());
 			LookAndFeelFactory.installJideExtension();
 
-			JFrame f = new JFrame();
+			JFrame f = new JFrame("Weather to Live");
 			f.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
 
 			WeatherToLivePanel panel = new WeatherToLivePanel();
@@ -84,7 +84,7 @@ public final class WeatherToLiveMain {
 			throws IOException {
 		ClimateDataSetMetadata metadata = new ClimateDataSetMetadata(file);
 
-		JFrame frame = (JFrame)parent.getTopLevelAncestor();
+		Frame frame = (Frame)parent.getTopLevelAncestor();
 
 		MultiProgressDialog progressListener = new MultiProgressDialog(frame, frame.getTitle(), 2);
 		progressListener.setAutoShow(true);

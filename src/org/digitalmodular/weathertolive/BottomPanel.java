@@ -62,6 +62,8 @@ public class BottomPanel extends JPanel {
 	private final JButton   newButton             = new JButton("New");
 	private final JButton   loadButton            = new JButton("Load");
 	private final JButton   saveButton            = new JButton("Save");
+	private final JButton   saveAsButton          = new JButton("Save As");
+	private final JButton   helpButton            = new JButton("Help");
 	private final JCheckBox imperialCheckbox      = new JCheckBox("Imperial units");
 	private final JCheckBox fastPreviewCheckbox   = new JCheckBox("Fast previewing");
 	private final JCheckBox animateCheckbox       = new JCheckBox("Animate");
@@ -93,6 +95,8 @@ public class BottomPanel extends JPanel {
 			p.add(newButton);
 			p.add(loadButton);
 			p.add(saveButton);
+			p.add(saveAsButton);
+			p.add(helpButton);
 			add(p, BorderLayout.LINE_START);
 		}
 		{
@@ -119,6 +123,8 @@ public class BottomPanel extends JPanel {
 			p.add(aggregateYearCheckbox);
 			add(p, BorderLayout.LINE_END);
 		}
+
+		aggregateYearCheckbox.setToolTipText("Combine the monthly filter results into a single result");
 	}
 
 	public void prepareFilters(ClimateDataSet climateDataSet) {
@@ -139,6 +145,11 @@ public class BottomPanel extends JPanel {
 	private void attachListeners() {
 		ActionListener actionPerformed = this::actionPerformed;
 
+		newButton.addActionListener(actionPerformed);
+		loadButton.addActionListener(actionPerformed);
+		saveButton.addActionListener(actionPerformed);
+		saveAsButton.addActionListener(actionPerformed);
+		helpButton.addActionListener(actionPerformed);
 		imperialCheckbox.addActionListener(actionPerformed);
 		fastPreviewCheckbox.addActionListener(actionPerformed);
 		animateCheckbox.addActionListener(actionPerformed);
@@ -154,7 +165,17 @@ public class BottomPanel extends JPanel {
 
 		machineEvent++;
 		try {
-			if (e.getSource() == imperialCheckbox) {
+			if (e.getSource() == newButton) {
+				// TODO newButton
+			} else if (e.getSource() == loadButton) {
+				// TODO loadButton
+			} else if (e.getSource() == saveButton) {
+				// TODO saveButton
+			} else if (e.getSource() == saveAsButton) {
+				// TODO saveAsButton
+			} else if (e.getSource() == helpButton) {
+				AboutAndHelpDialog.showAboutAndHelpDialog(this);
+			} else if (e.getSource() == imperialCheckbox) {
 				setImperialUnits(imperialCheckbox.isSelected());
 			} else if (e.getSource() == fastPreviewCheckbox) {
 				parent.setFastPreview(animateCheckbox.isSelected());

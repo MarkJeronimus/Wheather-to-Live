@@ -1,4 +1,4 @@
-WorldClim 2.1 (2.5 min per pixel)
+WorldClim 2.1 (2.5 min per pixel resolution)
 https://biogeo.ucdavis.edu/data/worldclim/v2.1/base/
 NOTE: This requires 19GB of memory. Start this program with: java -Xms19G -jar weather-to-live.jar
 Historical climate data
