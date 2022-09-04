@@ -62,6 +62,7 @@ public class ClimateDataSetMetadata {
 		}
 	}
 
+	private final String                   name;
 	private final String                   downloadRoot;
 	private final List<ClimateDataSetData> climateDataSetData = new ArrayList<>(10);
 
@@ -71,13 +72,18 @@ public class ClimateDataSetMetadata {
 		}
 
 		List<String> lines = Files.readAllLines(file);
-		if (lines.isEmpty()) {
-			throw new IOException("File is empty: " + file.getFileName());
+		if (lines.size() < 4) {
+			throw new IOException("File is corrupt: " + file.getFileName());
 		}
 
-		downloadRoot = parseDownloadRoot(file, lines);
+		name = parseName(file, lines.get(0));
+		downloadRoot = parseDownloadRoot(file, lines.get(1));
 
-		parseTable(file, lines);
+		parseTable(file, lines.subList(2, lines.size()));
+	}
+
+	public String getName() {
+		return name;
 	}
 
 	public String getDownloadRoot() {
@@ -92,23 +98,30 @@ public class ClimateDataSetMetadata {
 		return climateDataSetData.get(i);
 	}
 
-	private static String parseDownloadRoot(Path file, List<String> lines) throws IOException {
-		String downloadRoot = lines.get(0);
-		if (downloadRoot.isEmpty()) {
-			throw new IOException("First line should contain the download root URL: " + file.getFileName());
+	private static String parseName(Path file, String line) throws IOException {
+		if (line.isEmpty()) {
+			throw new IOException("First line should contain the name: " + file.getFileName());
 		}
 
-		if (!downloadRoot.endsWith("/")) {
-			downloadRoot += '/';
+		return line;
+	}
+
+	private static String parseDownloadRoot(Path file, String line) throws IOException {
+		if (line.isEmpty()) {
+			throw new IOException("Second line should contain the download root URL: " + file.getFileName());
 		}
 
-		return downloadRoot;
+		if (!line.endsWith("/")) {
+			line += '/';
+		}
+
+		return line;
 	}
 
 	private void parseTable(Path file, List<String> lines) throws IOException {
 		boolean tableStarted = false;
 
-		for (int i = 1; i < lines.size(); i++) {
+		for (int i = 0; i < lines.size(); i++) {
 			String line = lines.get(i);
 			if (line.startsWith("filename")) {
 				tableStarted = true;
