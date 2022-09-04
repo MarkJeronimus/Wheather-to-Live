@@ -45,6 +45,7 @@ import javax.swing.event.ChangeEvent;
 import org.jetbrains.annotations.Nullable;
 
 import org.digitalmodular.weathertolive.action.HelpAction;
+import org.digitalmodular.weathertolive.action.NewAction;
 import org.digitalmodular.weathertolive.dataset.ClimateDataSet;
 import org.digitalmodular.weathertolive.dataset.FilterDataSet;
 import org.digitalmodular.weathertolive.util.LabelSlider;
@@ -146,7 +147,7 @@ public class BottomPanel extends JPanel {
 	private void attachListeners() {
 		ActionListener actionPerformed = this::actionPerformed;
 
-//		newButton.setAction(); // TODO newButton
+		newButton.setAction(new NewAction(parent));
 //		loadButton.setAction(); // TODO loadButton
 //		saveButton.setAction(); // TODO saveButton
 //		saveAsButton.setAction(); // TODO saveAsButton
