@@ -51,23 +51,25 @@ import org.digitalmodular.weathertolive.util.TextProgressListener;
 // Created 2022-08-30
 public final class WeatherToLiveMain {
 	public static void main(String... args) throws IOException, ExecutionException, InterruptedException {
-		ClimateDataSetMetadata metadata = new ClimateDataSetMetadata(Paths.get("config-worldclim-2.1-30s.tsv"));
+		ClimateDataSetMetadata metadata = new ClimateDataSetMetadata(Paths.get("config-cru-cl-2.0-10min.tsv"));
 
 		ClimateDataSetDownloader.download(metadata, new MultiProgressListener() {
-			private final ProgressListener listener = new TextProgressListener(System.out, 4000);
+			private final ProgressListener[] listeners = {new TextProgressListener(System.out, 1),
+			                                              new TextProgressListener(System.out, 1)};
 
 			@Override
 			public void multiProgressUpdated(int progressBarIndex, ProgressEvent evt) {
-				listener.progressUpdated(evt);
+				listeners[progressBarIndex].progressUpdated(evt);
 			}
 		});
 
 		ClimateDataSet climateDataSet = ClimateDataSetLoader.load(metadata, new MultiProgressListener() {
-			private final ProgressListener listener = new TextProgressListener(System.out, 4000);
+			private final ProgressListener[] listeners = {new TextProgressListener(System.out, 1),
+			                                              new TextProgressListener(System.out, 1)};
 
 			@Override
 			public void multiProgressUpdated(int progressBarIndex, ProgressEvent evt) {
-				listener.progressUpdated(evt);
+				listeners[progressBarIndex].progressUpdated(evt);
 			}
 		});
 

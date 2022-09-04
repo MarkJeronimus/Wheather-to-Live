@@ -62,7 +62,7 @@ public final class ClimateDataSetDownloader {
 			progressListener.multiProgressUpdated(0, new ProgressEvent(metadata, i, numDataSets, filename));
 
 			if (Files.exists(file)) {
-				progressListener.multiProgressUpdated(1, new ProgressEvent(metadata, 0, -1, filename));
+				progressListener.multiProgressUpdated(1, new ProgressEvent(metadata, 1, -1, filename));
 			} else {
 				HTTPDownloader httpDownloader = new HTTPDownloader();
 				httpDownloader.addProgressListener(downloadProgressListener);

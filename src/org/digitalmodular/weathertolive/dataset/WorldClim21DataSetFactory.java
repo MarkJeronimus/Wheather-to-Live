@@ -34,6 +34,8 @@ import java.awt.image.DataBufferUShort;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipException;
 import java.util.zip.ZipFile;
@@ -41,6 +43,8 @@ import javax.imageio.ImageIO;
 
 import org.jetbrains.annotations.Nullable;
 
+import org.digitalmodular.weathertolive.util.ProgressEvent;
+import org.digitalmodular.weathertolive.util.ProgressListener;
 import static org.digitalmodular.weathertolive.dataset.ClimateDataSetMetadata.ClimateDataSetData;
 
 /**
@@ -52,7 +56,8 @@ public final class WorldClim21DataSetFactory {
 		throw new AssertionError();
 	}
 
-	public static FilterDataSet createFor(ClimateDataSetData setMetadata) throws IOException {
+	public static FilterDataSet createFor(ClimateDataSetData setMetadata, ProgressListener progressListener)
+			throws IOException {
 		String filename = setMetadata.filename;
 		String prefix   = filename.substring(0, filename.length() - 4); // e.g. "wc2.1_10m_prec"
 
@@ -72,6 +77,8 @@ public final class WorldClim21DataSetFactory {
 					throw new IOException(tifFilename + " not found in " + filename);
 				}
 
+				progressListener.progressUpdated(new ProgressEvent(setMetadata, month, 13, "Month " + (month + 1)));
+
 				InputStream   inputStream = zip.getInputStream(zipEntry);
 				BufferedImage geoData     = ImageIO.read(inputStream);
 				width = geoData.getWidth();
@@ -80,6 +87,8 @@ public final class WorldClim21DataSetFactory {
 				rawData[month] = convertGeoTiffToRawData(geoData);
 			}
 
+			progressListener.progressUpdated(new ProgressEvent(setMetadata, 12, 13, "Finishing up"));
+
 			DataSet dataSet = new DataSet(setMetadata.dataSetName,
 			                              rawData,
 			                              width,
@@ -87,8 +96,12 @@ public final class WorldClim21DataSetFactory {
 			                              setMetadata.absoluteZero,
 			                              setMetadata.gamma,
 			                              setMetadata.gradientFilename);
+
+			progressListener.progressUpdated(new ProgressEvent(setMetadata, 13, 13, ""));
+
 			return new FilterDataSet(dataSet);
 		} catch (ZipException ex) {
+			Files.delete(Paths.get(filename));
 			throw new IOException(ex.getMessage() + ": " + filename, ex);
 		}
 	}

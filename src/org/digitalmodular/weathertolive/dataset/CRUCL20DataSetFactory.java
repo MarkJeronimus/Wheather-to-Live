@@ -37,6 +37,8 @@ import java.util.Arrays;
 import java.util.regex.Pattern;
 import java.util.zip.GZIPInputStream;
 
+import org.digitalmodular.weathertolive.util.ProgressEvent;
+import org.digitalmodular.weathertolive.util.ProgressListener;
 import static org.digitalmodular.weathertolive.dataset.ClimateDataSetMetadata.ClimateDataSetData;
 
 /**
@@ -54,8 +56,11 @@ public final class CRUCL20DataSetFactory {
 
 	private static final Pattern SPACES_PATTERN = Pattern.compile(" +");
 
-	public static FilterDataSet createFor(ClimateDataSetData setMetadata) throws IOException {
+	public static FilterDataSet createFor(ClimateDataSetData setMetadata, ProgressListener progressListener)
+			throws IOException {
 		String filename = setMetadata.filename;
+
+		progressListener.progressUpdated(new ProgressEvent(setMetadata, 1, -1, ""));
 
 		float[][] rawData = new float[12][WIDTH * HEIGHT];
 		for (int month = 0; month < 12; month++) {
