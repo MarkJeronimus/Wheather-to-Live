@@ -26,6 +26,7 @@
  */
 package org.digitalmodular.weathertolive;
 
+import javax.swing.Action;
 import javax.swing.JFrame;
 import javax.swing.SwingUtilities;
 import javax.swing.WindowConstants;
@@ -33,7 +34,7 @@ import javax.swing.WindowConstants;
 import com.formdev.flatlaf.FlatDarkLaf;
 import com.formdev.flatlaf.FlatLaf;
 import com.jidesoft.plaf.LookAndFeelFactory;
-import org.digitalmodular.weathertolive.action.NewAction;
+import org.digitalmodular.weathertolive.action.SelectAction;
 
 /**
  * @author Mark Jeronimus
@@ -48,15 +49,14 @@ public final class WeatherToLiveMain {
 			JFrame frame = new JFrame("Weather to Live");
 			frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
 
-			WeatherToLivePanel panel = new WeatherToLivePanel(frame);
-			frame.setContentPane(panel);
+			frame.setContentPane(new WeatherToLivePanel(frame));
 
 			frame.pack();
 			frame.setLocationRelativeTo(null);
 			frame.setVisible(true);
 
-			NewAction newAction = (NewAction)frame.getRootPane().getActionMap().get(NewAction.NEW_ACTION_KEY);
-			newAction.loadClimateSet(1);
+			Action selectAction = frame.getRootPane().getActionMap().get(SelectAction.SELECT_ACTION_KEY);
+			((SelectAction)selectAction).loadClimateSet(1);
 		});
 	}
 }

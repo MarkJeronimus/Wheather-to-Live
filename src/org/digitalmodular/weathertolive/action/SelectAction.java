@@ -41,8 +41,8 @@ import static org.digitalmodular.weathertolive.util.ValidatorUtilities.requireNo
  * @author Mark Jeronimus
  */
 // Created 2022-09-04
-public final class NewAction extends AbstractAction {
-	public static final String NEW_ACTION_KEY = "New";
+public final class SelectAction extends AbstractAction {
+	public static final String SELECT_ACTION_KEY = "Select";
 
 	private static final Path[] EXPECTED_METADATA_FILES = {
 			Paths.get("config-cru-cl-2.0-10min.tsv"),
@@ -75,8 +75,8 @@ public final class NewAction extends AbstractAction {
 	private final ClimateDataSetLoader climateDataSetLoader = new ClimateDataSetLoader();
 
 	@SuppressWarnings("ThisEscapedInObjectConstruction")
-	public NewAction(RootPaneContainer frame, WeatherToLivePanel parent) {
-		super(NEW_ACTION_KEY);
+	public SelectAction(RootPaneContainer frame, WeatherToLivePanel parent) {
+		super(SELECT_ACTION_KEY);
 		requireNonNull(frame, "frame");
 		this.parent = requireNonNull(parent, "parent");
 
@@ -87,7 +87,7 @@ public final class NewAction extends AbstractAction {
 
 		layout = makeLayout(allMetadata);
 
-		frame.getRootPane().getActionMap().put(NEW_ACTION_KEY, this);
+		frame.getRootPane().getActionMap().put(SELECT_ACTION_KEY, this);
 	}
 
 	private JPanel makeLayout(List<ClimateDataSetMetadata> allMetadata) {
