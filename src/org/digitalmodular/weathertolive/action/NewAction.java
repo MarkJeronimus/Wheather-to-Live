@@ -62,11 +62,12 @@ public final class NewAction extends AbstractAction {
 
 	private final WeatherToLivePanel parent;
 
+	private final List<ClimateDataSetMetadata> allMetadata = new ArrayList<>(EXPECTED_METADATA_FILES.length);
+
 	private final JButton            selectButton = new JButton("Select");
 	private final JButton            cancelButton = new JButton("Cancel");
 	private final List<JRadioButton> radioButtons = new ArrayList<>(10);
-
-	private final List<ClimateDataSetMetadata> allMetadata = new ArrayList<>(EXPECTED_METADATA_FILES.length);
+	private final JPanel             layout;
 
 	private int selectedClimateSetIndex = -1;
 
@@ -83,14 +84,14 @@ public final class NewAction extends AbstractAction {
 
 		loadAllMetadata();
 
+		layout = makeLayout(allMetadata);
+
 		frame.getRootPane().getActionMap().put(NEW_ACTION_KEY, this);
 	}
 
 	@Override
 	public void actionPerformed(@Nullable ActionEvent e) {
 		Frame frame = (Frame)parent.getTopLevelAncestor();
-
-		JPanel layout = makeLayout(allMetadata);
 
 		selectButton.setEnabled(false);
 		selectedClimateSetIndex = -1;
