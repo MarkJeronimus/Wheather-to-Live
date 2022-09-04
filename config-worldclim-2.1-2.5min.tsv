@@ -1,4 +1,5 @@
 https://biogeo.ucdavis.edu/data/worldclim/v2.1/base/
+NOTE: This requires 19GB of memory. Start this program with: java -Xms19G -jar weather-to-live.jar
 Historical climate data
 This is WorldClim version 2.1 climate data for 1970-2000. This version was released in January 2020.
 URL for more information: https://www.worldclim.org/data/worldclim21.html
