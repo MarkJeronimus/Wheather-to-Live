@@ -31,6 +31,7 @@ import java.awt.Dimension;
 import java.awt.DisplayMode;
 import java.awt.GraphicsDevice;
 import javax.swing.JPanel;
+import javax.swing.RootPaneContainer;
 
 import org.digitalmodular.weathertolive.dataset.ClimateDataSet;
 import org.digitalmodular.weathertolive.util.Animator;
@@ -51,16 +52,15 @@ public class WeatherToLivePanel extends JPanel {
 		SCALE_FACTOR = Math.round(realWidth / effectiveWidth);
 	}
 
-	private final ZoomPanel   worldPanel  = new ZoomPanel();
-	@SuppressWarnings("ThisEscapedInObjectConstruction")
-	private final BottomPanel bottomPanel = new BottomPanel(this);
+	private final ZoomPanel   worldPanel = new ZoomPanel();
+	private final BottomPanel bottomPanel;
 
 	private final Animator animator = new Animator(worldPanel::setImage);
 
 	private final AtlasRenderer atlasRenderer = new AtlasRenderer(animator::setAnimation);
 
-	@SuppressWarnings("OverridableMethodCallDuringObjectConstruction")
-	public WeatherToLivePanel() {
+	@SuppressWarnings({"OverridableMethodCallDuringObjectConstruction", "ThisEscapedInObjectConstruction"})
+	public WeatherToLivePanel(RootPaneContainer frame) {
 		super(new BorderLayout());
 
 		DisplayMode displayMode = GraphicsUtilities.getDisplayMode();
@@ -68,6 +68,7 @@ public class WeatherToLivePanel extends JPanel {
 
 		add(worldPanel, BorderLayout.CENTER);
 
+		bottomPanel = new BottomPanel(frame, this);
 		bottomPanel.setParameterChangedCallback(this::dataChanged);
 		add(bottomPanel, BorderLayout.SOUTH);
 

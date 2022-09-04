@@ -33,6 +33,7 @@ import javax.swing.WindowConstants;
 import com.formdev.flatlaf.FlatDarkLaf;
 import com.formdev.flatlaf.FlatLaf;
 import com.jidesoft.plaf.LookAndFeelFactory;
+import org.digitalmodular.weathertolive.action.NewAction;
 
 /**
  * @author Mark Jeronimus
@@ -44,14 +45,14 @@ public final class WeatherToLiveMain {
 			FlatLaf.setup(new FlatDarkLaf());
 			LookAndFeelFactory.installJideExtension();
 
-			JFrame f = new JFrame("Weather to Live");
-			f.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
+			JFrame frame = new JFrame("Weather to Live");
+			frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
 
-			f.setContentPane(new WeatherToLivePanel());
+			frame.setContentPane(new WeatherToLivePanel(frame));
 
-			f.pack();
-			f.setLocationRelativeTo(null);
-			f.setVisible(true);
+			frame.pack();
+			frame.setLocationRelativeTo(null);
+			frame.setVisible(true);
 		});
 	}
 }

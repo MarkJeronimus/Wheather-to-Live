@@ -39,6 +39,7 @@ import javax.swing.JCheckBox;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JSlider;
+import javax.swing.RootPaneContainer;
 import javax.swing.ScrollPaneConstants;
 import javax.swing.event.ChangeEvent;
 
@@ -81,14 +82,14 @@ public class BottomPanel extends JPanel {
 	private int machineEvent = 0;
 
 	@SuppressWarnings("OverridableMethodCallDuringObjectConstruction")
-	public BottomPanel(WeatherToLivePanel parent) {
+	public BottomPanel(RootPaneContainer frame, WeatherToLivePanel parent) {
 		super(new BorderLayout());
 		this.parent = requireNonNull(parent, "parent");
 
 		setOpaque(true);
 
 		makeGUI();
-		attachListeners();
+		attachListeners(frame);
 	}
 
 	private void makeGUI() {
@@ -144,14 +145,14 @@ public class BottomPanel extends JPanel {
 		filterPanel.revalidate();
 	}
 
-	private void attachListeners() {
+	private void attachListeners(RootPaneContainer frame) {
 		ActionListener actionPerformed = this::actionPerformed;
 
-		newButton.setAction(new NewAction(parent));
+		newButton.setAction(new NewAction(frame, parent));
 //		loadButton.setAction(); // TODO loadButton
 //		saveButton.setAction(); // TODO saveButton
 //		saveAsButton.setAction(); // TODO saveAsButton
-		helpButton.setAction(new HelpAction(parent));
+		helpButton.setAction(new HelpAction(frame, parent));
 		imperialCheckbox.addActionListener(actionPerformed);
 		fastPreviewCheckbox.addActionListener(actionPerformed);
 		animateCheckbox.addActionListener(actionPerformed);

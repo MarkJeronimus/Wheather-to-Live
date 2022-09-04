@@ -21,6 +21,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 import javax.swing.JSeparator;
+import javax.swing.RootPaneContainer;
 import javax.swing.SwingConstants;
 import javax.swing.UIManager;
 
@@ -70,13 +71,16 @@ public final class NewAction extends AbstractAction {
 
 	private final ClimateDataSetLoader climateDataSetLoader = new ClimateDataSetLoader();
 
-	public NewAction(WeatherToLivePanel parent) {
+	@SuppressWarnings("ThisEscapedInObjectConstruction")
+	public NewAction(RootPaneContainer frame, WeatherToLivePanel parent) {
 		super(NEW_ACTION_KEY);
-
+		requireNonNull(frame, "frame");
 		this.parent = requireNonNull(parent, "parent");
 
 		selectButton.addActionListener(this::buttonPressed);
 		cancelButton.addActionListener(this::buttonPressed);
+
+		frame.getRootPane().getActionMap().put(NEW_ACTION_KEY, this);
 	}
 
 	@Override

@@ -5,6 +5,7 @@ import java.awt.event.ActionEvent;
 import javax.swing.AbstractAction;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
+import javax.swing.RootPaneContainer;
 import javax.swing.SwingConstants;
 
 import org.jetbrains.annotations.Nullable;
@@ -21,10 +22,13 @@ public final class HelpAction extends AbstractAction {
 
 	private final WeatherToLivePanel parent;
 
-	public HelpAction(WeatherToLivePanel parent) {
+	@SuppressWarnings("ThisEscapedInObjectConstruction")
+	public HelpAction(RootPaneContainer frame, WeatherToLivePanel parent) {
 		super(HELP_ACTION_KEY);
-
+		requireNonNull(frame, "frame");
 		this.parent = requireNonNull(parent, "parent");
+
+		frame.getRootPane().getActionMap().put(HELP_ACTION_KEY, this);
 	}
 
 	@Override
