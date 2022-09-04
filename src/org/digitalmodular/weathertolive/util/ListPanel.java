@@ -38,6 +38,8 @@ import static org.digitalmodular.weathertolive.util.ValidatorUtilities.requireAt
 import static org.digitalmodular.weathertolive.util.ValidatorUtilities.requireRange;
 
 /**
+ * I guess this *could* be done with a layout manager, but that'll take me more time.
+ *
  * @author Mark Jeronimus
  */
 // Created 2022-08-31

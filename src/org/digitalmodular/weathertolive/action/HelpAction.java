@@ -56,6 +56,6 @@ public final class HelpAction extends AbstractAction {
 		                             JOptionPane.PLAIN_MESSAGE,
 		                             null,
 		                             new Object[]{"Close"},
-		                             null);
+		                             "Close");
 	}
 }

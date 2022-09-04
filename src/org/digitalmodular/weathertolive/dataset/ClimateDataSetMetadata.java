@@ -32,6 +32,8 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 
+import static org.digitalmodular.weathertolive.util.ValidatorUtilities.requireNonNull;
+
 /**
  * @author Mark Jeronimus
  */
@@ -62,11 +64,14 @@ public class ClimateDataSetMetadata {
 		}
 	}
 
+	private final Path                     file;
 	private final String                   name;
 	private final String                   downloadRoot;
 	private final List<ClimateDataSetData> climateDataSetData = new ArrayList<>(10);
 
 	public ClimateDataSetMetadata(Path file) throws IOException {
+		this.file = requireNonNull(file, "file");
+
 		if (!Files.exists(file)) {
 			throw new IOException("File is missing: " + file.getFileName());
 		}
@@ -80,6 +85,10 @@ public class ClimateDataSetMetadata {
 		downloadRoot = parseDownloadRoot(file, lines.get(1));
 
 		parseTable(file, lines.subList(2, lines.size()));
+	}
+
+	public Path getFile() {
+		return file;
 	}
 
 	public String getName() {
