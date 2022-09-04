@@ -1,0 +1,22 @@
+<component name="ArtifactManager">
+  <artifact name="Zip with dependencies">
+    <output-path>$PROJECT_DIR$/out/artifacts</output-path>
+    <root id="root">
+      <element id="archive" name="weather-to-live.zip">
+        <element id="file-copy" path="$USER_HOME$/.m2/repository/org/jetbrains/annotations/20.1.0/annotations-20.1.0.jar" />
+        <element id="file-copy" path="$PROJECT_DIR$/config-cru-cl-2.0-10min.tsv" />
+        <element id="file-copy" path="$PROJECT_DIR$/config-worldclim-2.1-2.5min.tsv" />
+        <element id="file-copy" path="$PROJECT_DIR$/config-worldclim-2.1-5min.tsv" />
+        <element id="file-copy" path="$PROJECT_DIR$/config-worldclim-2.1-10min.tsv" />
+        <element id="file-copy" path="$PROJECT_DIR$/flatlaf-2.4.jar" />
+        <element id="file-copy" path="$PROJECT_DIR$/flatlaf-jide-oss-2.4.jar" />
+        <element id="file-copy" path="$PROJECT_DIR$/gradient-precipitation.png" />
+        <element id="file-copy" path="$PROJECT_DIR$/gradient-temperature.png" />
+        <element id="file-copy" path="$PROJECT_DIR$/gradient-wind.png" />
+        <element id="file-copy" path="$USER_HOME$/.m2/repository/net/jcip/jcip-annotations/1.0/jcip-annotations-1.0.jar" />
+        <element id="file-copy" path="$PROJECT_DIR$/jide-oss-3.7.12.jar" />
+        <element id="artifact" artifact-name="Just the jar" />
+      </element>
+    </root>
+  </artifact>
+</component>

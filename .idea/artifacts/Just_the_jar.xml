@@ -1,0 +1,13 @@
+<component name="ArtifactManager">
+  <artifact name="Just the jar">
+    <output-path>$PROJECT_DIR$/out/artifacts/weather-to-live</output-path>
+    <root id="root">
+      <element id="archive" name="weather-to-live.jar">
+        <element id="directory" name="META-INF">
+          <element id="file-copy" path="$PROJECT_DIR$/manifests/META-INF/MANIFEST.MF" />
+        </element>
+        <element id="module-output" name="Weather to Live" />
+      </element>
+    </root>
+  </artifact>
+</component>
