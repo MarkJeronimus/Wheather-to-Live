@@ -66,6 +66,7 @@ public final class NewAction extends AbstractAction {
 
 	private final JButton            selectButton = new JButton("Select");
 	private final JButton            cancelButton = new JButton("Cancel");
+	private final ButtonGroup        buttonGroup  = new ButtonGroup();
 	private final List<JRadioButton> radioButtons = new ArrayList<>(10);
 	private final JPanel             layout;
 
@@ -89,46 +90,11 @@ public final class NewAction extends AbstractAction {
 		frame.getRootPane().getActionMap().put(NEW_ACTION_KEY, this);
 	}
 
-	@Override
-	public void actionPerformed(@Nullable ActionEvent e) {
-		Frame frame = (Frame)parent.getTopLevelAncestor();
-
-		selectButton.setEnabled(false);
-		selectedClimateSetIndex = -1;
-
-		Object[] options = {selectButton, cancelButton};
-
-		// Windows swaps the buttons compared to Linux.
-		boolean isYesLast = UIManager.getDefaults().getBoolean("OptionPane.isYesLast");
-		if (isYesLast) {
-			Collections.reverse(Arrays.asList(options));
-		}
-
-		int result = JOptionPane.showOptionDialog(frame,
-		                                          layout,
-		                                          frame.getTitle(),
-		                                          JOptionPane.DEFAULT_OPTION,
-		                                          JOptionPane.PLAIN_MESSAGE,
-		                                          null,
-		                                          options,
-		                                          options[0]);
-
-		if (isYesLast) {
-			result = options.length - result - 1;
-		}
-
-		if (result == 0) { // index of selectButton
-			loadClimateSet(selectedClimateSetIndex);
-		}
-	}
-
 	private JPanel makeLayout(List<ClimateDataSetMetadata> allMetadata) {
 		JPanel p = new ListPanel(BoxLayout.Y_AXIS, SPACING);
 
 		p.add(newCenterLabel("<html><h1>Select a Climate Data Set"));
 		p.add(Box.createVerticalStrut(SPACING));
-
-		ButtonGroup buttonGroup = new ButtonGroup();
 
 		{
 			JPanel tablePanel = new ListPanel(BoxLayout.X_AXIS, SPACING);
@@ -168,6 +134,66 @@ public final class NewAction extends AbstractAction {
 		}
 
 		return p;
+	}
+
+	@Override
+	public void actionPerformed(@Nullable ActionEvent e) {
+		Frame frame = (Frame)parent.getTopLevelAncestor();
+
+		selectButton.setEnabled(false);
+
+		selectedClimateSetIndex = findDataSetIndex(parent.getClimateDataSet());
+		selectInitialRadioButton();
+
+		Object[] options = {selectButton, cancelButton};
+
+		// Windows swaps the buttons compared to Linux.
+		boolean isYesLast = UIManager.getDefaults().getBoolean("OptionPane.isYesLast");
+		if (isYesLast) {
+			Collections.reverse(Arrays.asList(options));
+		}
+
+		int result = JOptionPane.showOptionDialog(frame,
+		                                          layout,
+		                                          frame.getTitle(),
+		                                          JOptionPane.DEFAULT_OPTION,
+		                                          JOptionPane.PLAIN_MESSAGE,
+		                                          null,
+		                                          options,
+		                                          options[0]);
+
+		if (isYesLast) {
+			result = options.length - result - 1;
+		}
+
+		if (result == 0) { // index of selectButton
+			loadClimateSet(selectedClimateSetIndex);
+		}
+	}
+
+	private int findDataSetIndex(@Nullable ClimateDataSet climateDataSet) {
+		if (climateDataSet == null) {
+			return -1;
+		}
+
+		for (int i = 0; i < allMetadata.size(); i++) {
+			ClimateDataSetMetadata climateMetadata = allMetadata.get(i);
+			if (climateMetadata.getName().equals(climateDataSet.getMetadata().getName())) {
+				return i;
+			}
+		}
+
+		return -1;
+	}
+
+	private void selectInitialRadioButton() {
+		if (selectedClimateSetIndex == -1) {
+			buttonGroup.clearSelection();
+		} else {
+			for (int i = 0; i < EXPECTED_METADATA_FILES.length; i++) {
+				radioButtons.get(i).setSelected(i == selectedClimateSetIndex);
+			}
+		}
 	}
 
 	private static JLabel newCenterLabel(String text) {
