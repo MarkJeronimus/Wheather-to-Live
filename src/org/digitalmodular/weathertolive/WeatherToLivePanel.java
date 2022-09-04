@@ -30,16 +30,18 @@ import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.DisplayMode;
 import java.awt.GraphicsDevice;
+import java.util.Collections;
+import java.util.List;
 import javax.swing.JPanel;
 import javax.swing.RootPaneContainer;
 
 import org.jetbrains.annotations.Nullable;
 
 import org.digitalmodular.weathertolive.dataset.ClimateDataSet;
+import org.digitalmodular.weathertolive.dataset.FilterDataSet;
 import org.digitalmodular.weathertolive.util.Animator;
 import org.digitalmodular.weathertolive.util.GraphicsUtilities;
 import org.digitalmodular.weathertolive.util.ZoomPanel;
-import static org.digitalmodular.weathertolive.util.ValidatorUtilities.requireNonNull;
 
 /**
  * @author Mark Jeronimus
@@ -87,9 +89,7 @@ public class WeatherToLivePanel extends JPanel {
 	/**
 	 * A call of this must eventually be followed by a call to {@link #dataChanged(int)}!
 	 */
-	public void setClimateDataSet(ClimateDataSet climateDataSet) {
-		requireNonNull(climateDataSet, "climateDataSet");
-
+	public void setClimateDataSet(@Nullable ClimateDataSet climateDataSet) {
 		//noinspection ObjectEquality // Comparing identity, not equality
 		if (this.climateDataSet == climateDataSet) {
 			return;
@@ -97,7 +97,11 @@ public class WeatherToLivePanel extends JPanel {
 
 		this.climateDataSet = climateDataSet;
 
-		atlasRenderer.setFilterDataSets(climateDataSet.getFilterDataSets());
+		List<FilterDataSet> filterDataSets = climateDataSet == null ?
+		                                     Collections.emptyList() :
+		                                     climateDataSet.getFilterDataSets();
+
+		atlasRenderer.setFilterDataSets(filterDataSets);
 		atlasRenderer.setBackgroundDatasetIndex(0);
 		bottomPanel.prepareFilters(climateDataSet);
 

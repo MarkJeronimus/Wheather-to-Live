@@ -31,6 +31,7 @@ import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.function.Consumer;
 import javax.swing.BoxLayout;
@@ -130,10 +131,12 @@ public class BottomPanel extends JPanel {
 		aggregateYearCheckbox.setToolTipText("Combine the monthly filter results into a single result");
 	}
 
-	public void prepareFilters(ClimateDataSet climateDataSet) {
+	public void prepareFilters(@Nullable ClimateDataSet climateDataSet) {
 		filterPanel.removeAll();
 
-		List<FilterDataSet> filterDataSets = climateDataSet.getFilterDataSets();
+		List<FilterDataSet> filterDataSets = climateDataSet == null ?
+		                                     Collections.emptyList() :
+		                                     climateDataSet.getFilterDataSets();
 
 		for (int i = 0; i < filterDataSets.size(); i++) {
 			DataSetParameterPanel parameter = new DataSetParameterPanel(filterDataSets.get(i), i);

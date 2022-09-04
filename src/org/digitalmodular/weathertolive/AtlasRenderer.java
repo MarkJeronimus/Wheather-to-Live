@@ -120,7 +120,9 @@ public class AtlasRenderer {
 			throw new IllegalStateException("'filterDataSets' is null");
 		}
 
-		this.backgroundDatasetIndex = requireRange(-1,
+		this.backgroundDatasetIndex = filterDataSets.isEmpty() ?
+		                              0 :
+		                              requireRange(-1,
 		                                           filterDataSets.size() - 1,
 		                                           backgroundDatasetIndex,
 		                                           "backgroundDatasetIndex");

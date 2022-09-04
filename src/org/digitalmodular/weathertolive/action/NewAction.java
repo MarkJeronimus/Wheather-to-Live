@@ -243,6 +243,7 @@ public final class NewAction extends AbstractAction {
 
 		Frame frame = (Frame)parent.getTopLevelAncestor();
 
+		parent.setClimateDataSet(null);
 		climateDataSetLoader.cancel();
 		ForkJoinPool.commonPool().submit(() -> downloadProcess(frame, parent, metadata));
 	}
