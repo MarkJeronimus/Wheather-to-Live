@@ -27,8 +27,10 @@
 package org.digitalmodular.weathertolive;
 
 import java.io.IOException;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
 import javax.swing.JFrame;
 import javax.swing.SwingUtilities;
 import javax.swing.WindowConstants;
@@ -40,6 +42,7 @@ import org.digitalmodular.weathertolive.dataset.ClimateDataSet;
 import org.digitalmodular.weathertolive.dataset.ClimateDataSetDownloader;
 import org.digitalmodular.weathertolive.dataset.ClimateDataSetLoader;
 import org.digitalmodular.weathertolive.dataset.ClimateDataSetMetadata;
+import org.digitalmodular.weathertolive.util.GraphicsUtilities;
 import org.digitalmodular.weathertolive.util.MultiProgressListener;
 import org.digitalmodular.weathertolive.util.ProgressEvent;
 import org.digitalmodular.weathertolive.util.ProgressListener;
@@ -51,7 +54,38 @@ import org.digitalmodular.weathertolive.util.TextProgressListener;
 // Created 2022-08-30
 public final class WeatherToLiveMain {
 	public static void main(String... args) throws IOException, ExecutionException, InterruptedException {
-		ClimateDataSetMetadata metadata = new ClimateDataSetMetadata(Paths.get("config-cru-cl-2.0-10min.tsv"));
+		WeatherToLivePanel weatherToLivePanel = GraphicsUtilities.getFromEDT(() -> {
+			FlatLaf.setup(new FlatDarkLaf());
+			LookAndFeelFactory.installJideExtension();
+
+			JFrame f = new JFrame();
+			f.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
+
+			WeatherToLivePanel panel = new WeatherToLivePanel();
+			f.setContentPane(panel);
+
+			f.pack();
+			f.setLocationRelativeTo(null);
+			f.setVisible(true);
+
+			return panel;
+		});
+
+		assert weatherToLivePanel != null;
+
+		TimeUnit.SECONDS.sleep(5);
+
+		ClimateDataSet climateDataSet = loadClimateDataSet(Paths.get("config-worldclim-2.1-10min.tsv"));
+
+		SwingUtilities.invokeLater(() -> {
+			weatherToLivePanel.setClimateDataSet(climateDataSet);
+			weatherToLivePanel.dataChanged(0);
+		});
+	}
+
+	private static ClimateDataSet loadClimateDataSet(Path file)
+			throws IOException {
+		ClimateDataSetMetadata metadata = new ClimateDataSetMetadata(file);
 
 		ClimateDataSetDownloader.download(metadata, new MultiProgressListener() {
 			private final ProgressListener[] listeners = {new TextProgressListener(System.out, 1),
@@ -63,7 +97,7 @@ public final class WeatherToLiveMain {
 			}
 		});
 
-		ClimateDataSet climateDataSet = ClimateDataSetLoader.load(metadata, new MultiProgressListener() {
+		return ClimateDataSetLoader.load(metadata, new MultiProgressListener() {
 			private final ProgressListener[] listeners = {new TextProgressListener(System.out, 1),
 			                                              new TextProgressListener(System.out, 1)};
 
@@ -71,24 +105,6 @@ public final class WeatherToLiveMain {
 			public void multiProgressUpdated(int progressBarIndex, ProgressEvent evt) {
 				listeners[progressBarIndex].progressUpdated(evt);
 			}
-		});
-
-		SwingUtilities.invokeLater(() -> {
-			FlatLaf.setup(new FlatDarkLaf());
-			LookAndFeelFactory.installJideExtension();
-
-			JFrame f = new JFrame();
-			f.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
-
-			WeatherToLivePanel weatherToLivePanel = new WeatherToLivePanel();
-			f.setContentPane(weatherToLivePanel);
-
-			f.pack();
-			f.setLocationRelativeTo(null);
-			f.setVisible(true);
-
-			weatherToLivePanel.setClimateDataSet(climateDataSet);
-			weatherToLivePanel.dataChanged(-1);
 		});
 	}
 }

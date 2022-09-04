@@ -132,6 +132,8 @@ public class BottomPanel extends JPanel {
 
 			filterPanel.add(parameter);
 		}
+
+		filterPanel.revalidate();
 	}
 
 	private void attachListeners() {
