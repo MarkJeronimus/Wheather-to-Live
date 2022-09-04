@@ -31,6 +31,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
+import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.SwingUtilities;
 import javax.swing.WindowConstants;
@@ -43,10 +44,7 @@ import org.digitalmodular.weathertolive.dataset.ClimateDataSetDownloader;
 import org.digitalmodular.weathertolive.dataset.ClimateDataSetLoader;
 import org.digitalmodular.weathertolive.dataset.ClimateDataSetMetadata;
 import org.digitalmodular.weathertolive.util.GraphicsUtilities;
-import org.digitalmodular.weathertolive.util.MultiProgressListener;
-import org.digitalmodular.weathertolive.util.ProgressEvent;
-import org.digitalmodular.weathertolive.util.ProgressListener;
-import org.digitalmodular.weathertolive.util.TextProgressListener;
+import org.digitalmodular.weathertolive.util.MultiProgressDialog;
 
 /**
  * @author Mark Jeronimus
@@ -73,9 +71,8 @@ public final class WeatherToLiveMain {
 
 		assert weatherToLivePanel != null;
 
-		TimeUnit.SECONDS.sleep(5);
-
-		ClimateDataSet climateDataSet = loadClimateDataSet(Paths.get("config-worldclim-2.1-10min.tsv"));
+		Path           file           = Paths.get("config-worldclim-2.1-10min.tsv");
+		ClimateDataSet climateDataSet = loadClimateDataSet(weatherToLivePanel, file);
 
 		SwingUtilities.invokeLater(() -> {
 			weatherToLivePanel.setClimateDataSet(climateDataSet);
@@ -83,28 +80,22 @@ public final class WeatherToLiveMain {
 		});
 	}
 
-	private static ClimateDataSet loadClimateDataSet(Path file)
+	private static ClimateDataSet loadClimateDataSet(JComponent parent, Path file)
 			throws IOException {
 		ClimateDataSetMetadata metadata = new ClimateDataSetMetadata(file);
 
-		ClimateDataSetDownloader.download(metadata, new MultiProgressListener() {
-			private final ProgressListener[] listeners = {new TextProgressListener(System.out, 1),
-			                                              new TextProgressListener(System.out, 1)};
+		JFrame frame = (JFrame)parent.getTopLevelAncestor();
 
-			@Override
-			public void multiProgressUpdated(int progressBarIndex, ProgressEvent evt) {
-				listeners[progressBarIndex].progressUpdated(evt);
-			}
-		});
+		MultiProgressDialog progressListener = new MultiProgressDialog(frame, frame.getTitle(), 2);
+		progressListener.setAutoShow(true);
+		progressListener.setAutoClose(true);
 
-		return ClimateDataSetLoader.load(metadata, new MultiProgressListener() {
-			private final ProgressListener[] listeners = {new TextProgressListener(System.out, 1),
-			                                              new TextProgressListener(System.out, 1)};
+		progressListener.setTaskName("Downloading " + metadata.getName());
+		ClimateDataSetDownloader.download(metadata, progressListener);
 
-			@Override
-			public void multiProgressUpdated(int progressBarIndex, ProgressEvent evt) {
-				listeners[progressBarIndex].progressUpdated(evt);
-			}
-		});
+		progressListener.setTaskName("Loading " + metadata.getName());
+		ClimateDataSet climateDataSet = ClimateDataSetLoader.load(metadata, progressListener);
+
+		return climateDataSet;
 	}
 }
