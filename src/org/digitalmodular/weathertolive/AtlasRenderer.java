@@ -146,7 +146,6 @@ public class AtlasRenderer {
 					while (taskRunning.get()) {
 						condition.await(100, TimeUnit.MILLISECONDS);
 					}
-
 				} catch (InterruptedException ex) {
 					throw new RuntimeException(ex);
 				}

@@ -68,6 +68,8 @@ public final class NewAction extends AbstractAction {
 	private @Nullable List<ClimateDataSetMetadata> allMetadata             = null;
 	private           int                          selectedClimateSetIndex = -1;
 
+	private final ClimateDataSetLoader climateDataSetLoader = new ClimateDataSetLoader();
+
 	public NewAction(WeatherToLivePanel parent) {
 		super(NEW_ACTION_KEY);
 
@@ -232,22 +234,20 @@ public final class NewAction extends AbstractAction {
 
 		Frame frame = (Frame)parent.getTopLevelAncestor();
 
+		climateDataSetLoader.cancel();
+		ForkJoinPool.commonPool().submit(() -> downloadProcess(frame, parent, metadata));
+	}
+
+	public void downloadProcess(Frame frame, WeatherToLivePanel parent, ClimateDataSetMetadata metadata) {
 		MultiProgressDialog progressListener = new MultiProgressDialog(frame, frame.getTitle(), 2);
 		progressListener.setAutoShow(true);
 		progressListener.setAutoClose(true);
 
-		ForkJoinPool.commonPool().submit(() -> downloadProcess(parent, metadata, progressListener));
-	}
-
-	public static void downloadProcess(WeatherToLivePanel parent,
-	                                   ClimateDataSetMetadata metadata,
-	                                   MultiProgressDialog progressListener) {
 		try {
 			progressListener.setTaskName("Downloading " + metadata.getName());
 			ClimateDataSetDownloader.download(metadata, progressListener);
 
 			progressListener.setTaskName("Loading " + metadata.getName());
-			ClimateDataSetLoader climateDataSetLoader = new ClimateDataSetLoader();
 			progressListener.addCancelListener(ignored -> {
 				climateDataSetLoader.cancel();
 				progressListener.setVisible(false);
