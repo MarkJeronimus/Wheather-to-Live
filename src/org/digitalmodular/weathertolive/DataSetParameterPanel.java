@@ -142,8 +142,6 @@ public class DataSetParameterPanel extends JPanel {
 		}
 
 		setImperialUnits(false);
-
-		sliderChanged(null); // Initialize real label values
 	}
 
 	private static int calculateQuantizerStep(float span) {

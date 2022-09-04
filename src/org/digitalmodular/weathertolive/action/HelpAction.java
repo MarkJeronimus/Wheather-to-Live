@@ -1,23 +1,36 @@
-package org.digitalmodular.weathertolive;
+package org.digitalmodular.weathertolive.action;
 
 import java.awt.FlowLayout;
 import java.awt.Frame;
-import javax.swing.JComponent;
+import java.awt.event.ActionEvent;
+import javax.swing.AbstractAction;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.SwingConstants;
 
+import org.jetbrains.annotations.Nullable;
+
+import org.digitalmodular.weathertolive.WeatherToLivePanel;
+import static org.digitalmodular.weathertolive.util.ValidatorUtilities.requireNonNull;
+
 /**
- * @author author
+ * @author Mark Jeronimus
  */
 // Created 2022-09-04
-public final class AboutAndHelpDialog {
-	private AboutAndHelpDialog() {
-		throw new AssertionError();
+public final class HelpAction extends AbstractAction {
+	public static final String HELP_ACTION_KEY = "Help";
+
+	private final WeatherToLivePanel parent;
+
+	public HelpAction(WeatherToLivePanel parent) {
+		super(HELP_ACTION_KEY);
+
+		this.parent = requireNonNull(parent, "parent");
 	}
 
-	public static void showAboutAndHelpDialog(JComponent parent) {
+	@Override
+	public void actionPerformed(@Nullable ActionEvent e) {
 		JPanel p = new JPanel(new FlowLayout());
 
 		Frame frame = (Frame)parent.getTopLevelAncestor();

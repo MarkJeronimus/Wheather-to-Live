@@ -44,6 +44,7 @@ import javax.swing.event.ChangeEvent;
 
 import org.jetbrains.annotations.Nullable;
 
+import org.digitalmodular.weathertolive.action.HelpAction;
 import org.digitalmodular.weathertolive.dataset.ClimateDataSet;
 import org.digitalmodular.weathertolive.dataset.FilterDataSet;
 import org.digitalmodular.weathertolive.util.LabelSlider;
@@ -145,11 +146,11 @@ public class BottomPanel extends JPanel {
 	private void attachListeners() {
 		ActionListener actionPerformed = this::actionPerformed;
 
-		newButton.addActionListener(actionPerformed);
-		loadButton.addActionListener(actionPerformed);
-		saveButton.addActionListener(actionPerformed);
-		saveAsButton.addActionListener(actionPerformed);
-		helpButton.addActionListener(actionPerformed);
+//		newButton.setAction(); // TODO newButton
+//		loadButton.setAction(); // TODO loadButton
+//		saveButton.setAction(); // TODO saveButton
+//		saveAsButton.setAction(); // TODO saveAsButton
+		helpButton.setAction(new HelpAction(parent));
 		imperialCheckbox.addActionListener(actionPerformed);
 		fastPreviewCheckbox.addActionListener(actionPerformed);
 		animateCheckbox.addActionListener(actionPerformed);
@@ -165,17 +166,7 @@ public class BottomPanel extends JPanel {
 
 		machineEvent++;
 		try {
-			if (e.getSource() == newButton) {
-				// TODO newButton
-			} else if (e.getSource() == loadButton) {
-				// TODO loadButton
-			} else if (e.getSource() == saveButton) {
-				// TODO saveButton
-			} else if (e.getSource() == saveAsButton) {
-				// TODO saveAsButton
-			} else if (e.getSource() == helpButton) {
-				AboutAndHelpDialog.showAboutAndHelpDialog(this);
-			} else if (e.getSource() == imperialCheckbox) {
+			if (e.getSource() == imperialCheckbox) {
 				setImperialUnits(imperialCheckbox.isSelected());
 			} else if (e.getSource() == fastPreviewCheckbox) {
 				parent.setFastPreview(animateCheckbox.isSelected());
