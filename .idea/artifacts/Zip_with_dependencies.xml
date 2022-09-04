@@ -16,6 +16,8 @@
         <element id="file-copy" path="$USER_HOME$/.m2/repository/net/jcip/jcip-annotations/1.0/jcip-annotations-1.0.jar" />
         <element id="file-copy" path="$PROJECT_DIR$/jide-oss-3.7.12.jar" />
         <element id="artifact" artifact-name="Just the jar" />
+        <element id="file-copy" path="$PROJECT_DIR$/start.cmd" />
+        <element id="file-copy" path="$PROJECT_DIR$/start.sh" />
       </element>
     </root>
   </artifact>
